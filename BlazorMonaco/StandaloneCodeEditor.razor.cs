@@ -720,10 +720,20 @@ namespace BlazorMonaco.Editor
         public Task<int> GetOffsetForColumn(int lineNumber, int column)
             => JsRuntime.SafeInvokeAsync<int>("blazorMonaco.editor.getOffsetForColumn", Id, lineNumber, column);
         /**
+         * Get the width of a line in the editor.
+         */
+        public Task<int> GetWidthOfLine(int lineNumber)
+            => JsRuntime.SafeInvokeAsync<int>("blazorMonaco.editor.getWidthOfLine", Id, lineNumber);
+        /**
          * Force an editor render now.
          */
         public Task Render(bool? forceRedraw = null)
             => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.render", Id, forceRedraw);
+        /**
+         * Render the editor at the next animation frame.
+         */
+        public Task RenderAsync(bool? forceRedraw = null)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.renderAsync", Id, forceRedraw);
         /**
          * Get the hit test target at coordinates `clientX` and `clientY`.
          * The coordinates are relative to the top-left of the viewport.

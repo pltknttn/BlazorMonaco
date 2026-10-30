@@ -364,6 +364,13 @@ namespace BlazorMonaco.Editor
         public Task<ModelDecoration[]> GetCustomLineHeightsDecorations(int? ownerId)
             => JsRuntime.SafeInvokeAsync<ModelDecoration[]>("blazorMonaco.editor.model.getCustomLineHeightsDecorations", Uri, ownerId);
         /**
+         * Gets all the decorations that contain custom line heights.
+         * @param range The range to search in
+         * @param ownerId If set, it will ignore decorations belonging to other owners.
+         */
+        public Task<ModelDecoration[]> GetCustomLineHeightsDecorationsInRange(Range range, int? ownerId)
+            => JsRuntime.SafeInvokeAsync<ModelDecoration[]>("blazorMonaco.editor.model.getCustomLineHeightsDecorationsInRange", Uri, range, ownerId);
+        /**
          * Normalize a string containing whitespace according to indentation rules (converts to spaces or to tabs).
          */
         public Task<string> NormalizeIndentation(string str)

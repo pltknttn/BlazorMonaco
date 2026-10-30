@@ -1,5 +1,11 @@
 # BlazorMonaco Changelog
 
+## 3.6.0
+- Updated to Monaco Editor **v0.57.0**
+- Added new editor options (`wordWrapIndicator`, `fullwidthCharacterWidth`, `doubleClickSelectsBlock`, `closeOnResult`, `showLongLineWarning`) and API members (`RevealAllCursors`, `GetWidthOfLine`, `RenderAsync`, `GetCustomLineHeightsDecorationsInRange`).
+- Updated NuGet dependencies to the latest patch versions.
+- Breaking change: `EditorHoverOptions.Enabled` is now a string (`'on' | 'off' | 'onKeyboardModifier'`) instead of a boolean, to match the Monaco Editor API.
+
 ## 3.5.0
 - Updated to Monaco Editor **v0.55.1**
 - Added support for **net10.0**

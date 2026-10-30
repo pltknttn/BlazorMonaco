@@ -420,6 +420,11 @@ window.blazorMonaco.editor = {
         return editor.getOffsetForColumn(lineNumber, column);
     },
 
+    getWidthOfLine: function (id, lineNumber) {
+        let editor = this.getEditor(id);
+        return editor.getWidthOfLine(lineNumber);
+    },
+
     getOption: function (id, optionId) {
         let editor = this.getEditor(id);
         return JSON.stringify(editor.getOption(optionId));
@@ -564,6 +569,11 @@ window.blazorMonaco.editor = {
         editor.render(forceRedraw);
     },
 
+    renderAsync: function (id, forceRedraw) {
+        let editor = this.getEditor(id);
+        editor.renderAsync(forceRedraw);
+    },
+
     revealLine: function (id, lineNumber, scrollType) {
         let editor = this.getEditor(id);
         editor.revealLine(lineNumber, scrollType);
@@ -627,6 +637,11 @@ window.blazorMonaco.editor = {
     revealRangeInCenterIfOutsideViewport: function (id, range, scrollType) {
         let editor = this.getEditor(id);
         editor.revealRangeInCenterIfOutsideViewport(range, scrollType);
+    },
+
+    revealAllCursors: function (id, revealHorizontal, minimalReveal) {
+        let editor = this.getEditor(id);
+        editor.revealAllCursors(revealHorizontal, minimalReveal);
     },
 
     setEventListener: function (id, eventName) {
@@ -993,6 +1008,12 @@ window.blazorMonaco.editor = {
         getCustomLineHeightsDecorations: function (uriStr, ownerId) {
             let model = this.getModel(uriStr);
             let result = model.getCustomLineHeightsDecorations(ownerId);
+            return blazorMonaco.editor.removeCircularReferences(result);
+        },
+
+        getCustomLineHeightsDecorationsInRange: function (uriStr, range, ownerId) {
+            let model = this.getModel(uriStr);
+            let result = model.getCustomLineHeightsDecorationsInRange(range, ownerId);
             return blazorMonaco.editor.removeCircularReferences(result);
         },
 

@@ -294,6 +294,11 @@ namespace BlazorMonaco.Editor
         public Task RevealRangeInCenterIfOutsideViewport(Range range, ScrollType? scrollType = null)
             => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.revealRangeInCenterIfOutsideViewport", Id, range, scrollType);
         /**
+         * Scroll vertically or horizontally as necessary and reveal the current cursors.
+         */
+        public Task RevealAllCursors(bool revealHorizontal, bool? minimalReveal = null)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.revealAllCursors", Id, revealHorizontal, minimalReveal);
+        /**
          * Scroll vertically or horizontally as necessary and reveal a range close to the top of the viewport,
          * optimized for viewing a code definition.
          */
