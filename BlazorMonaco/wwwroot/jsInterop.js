@@ -1,6 +1,7 @@
 var require = { paths: { vs: document.baseURI + '_content/BlazorMonaco/lib/monaco-editor/min/vs' } };
 window.blazorMonaco = window.blazorMonaco || {};
 window.blazorMonaco.editors = [];
+window.blazorMonaco.workers = {};
 
 window.blazorMonaco.editor = {
 
@@ -129,7 +130,48 @@ window.blazorMonaco.editor = {
         window.blazorMonaco.isWasm = isWasm;
     },
 
-    //#endregion
+    toContentWidget: function (widget) {
+        return {
+            getId: () => widget.id,
+            getDomNode: () => document.getElementById(widget.domNodeId),
+            getPosition: () => widget.position,
+            allowEditorOverflow: widget.allowEditorOverflow,
+            useDisplayNone: widget.useDisplayNone,
+            suppressMouseDown: widget.suppressMouseDown
+        };
+    },
+
+    toOverlayWidget: function (widget) {
+        return {
+            getId: () => widget.id,
+            getDomNode: () => document.getElementById(widget.domNodeId),
+            getPosition: () => widget.position,
+            allowEditorOverflow: widget.allowEditorOverflow
+        };
+    },
+
+    toGlyphMarginWidget: function (widget) {
+        return {
+            getId: () => widget.id,
+            getDomNode: () => document.getElementById(widget.domNodeId),
+            getPosition: () => widget.position
+        };
+    },
+
+    toViewZone: function (viewZone) {
+        return {
+            afterLineNumber: viewZone.afterLineNumber,
+            afterColumn: viewZone.afterColumn,
+            showInHiddenAreas: viewZone.showInHiddenAreas,
+            ordinal: viewZone.ordinal,
+            suppressMouseDown: viewZone.suppressMouseDown,
+            heightInLines: viewZone.heightInLines,
+            heightInPx: viewZone.heightInPx,
+            minWidthInPx: viewZone.minWidthInPx,
+            domNode: document.getElementById(viewZone.domNodeId),
+            marginDomNode: viewZone.marginDomNodeId ? document.getElementById(viewZone.marginDomNodeId) : null
+        };
+    },
 
     //#region Static methods
 
@@ -286,6 +328,118 @@ window.blazorMonaco.editor = {
         monaco.editor.setTheme(theme);
     },
 
+    setZoomLevel: function (id, zoomLevel) {
+        if (id == null) {
+            // Global zoom level
+            monaco.editor.setZoomLevel(zoomLevel);
+            return;
+        }
+        let editor = this.getEditor(id);
+        if (editor) {
+            editor.updateOptions({ fontSize: editor.getOption(monaco.editor.EditorOptions.fontSize.id) * zoomLevel });
+        }
+    },
+
+    getZoomLevel: function () {
+        return monaco.editor.getZoomLevel();
+    },
+
+    getEditors: function () {
+        return monaco.editor.getEditors().map(function (editor) {
+            return editor.getId();
+        });
+    },
+
+    getDiffEditors: function () {
+        return monaco.editor.getDiffEditors().map(function (editor) {
+            return editor.getId();
+        });
+    },
+
+    tokenize: function (text, languageId) {
+        return monaco.editor.tokenize(text, languageId);
+    },
+
+    registerCommand: function (commandId, dotnetRef) {
+        monaco.editor.registerCommand(commandId, function (accessor) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return dotnetRef.invokeMethodAsync("Invoke", commandId, args);
+        });
+    },
+
+    registerLinkOpener: async function (linkOpenerRef) {
+        await monaco.editor.registerLinkOpener({
+            open: (resource, isTrusted) => {
+                return linkOpenerRef.invokeMethodAsync("OpenLink", resource.toString());
+            }
+        });
+    },
+
+    registerEditorOpener: async function (codeEditorOpenerRef) {
+        await monaco.editor.registerEditorOpener({
+            openCodeEditor: (source, resource, selectionOrPosition) => {
+                let holder = window.blazorMonaco.editors.find(h => h.editor === source);
+                return codeEditorOpenerRef.invokeMethodAsync("OpenCodeEditorLink", holder ? holder.id : null, resource.toString(), selectionOrPosition);
+            }
+        });
+    },
+
+    addKeybindingRule: function (rule) {
+        monaco.editor.addKeybindingRule(rule);
+    },
+
+    addKeybindingRules: function (rules) {
+        monaco.editor.addKeybindingRules(rules);
+    },
+
+    registerLifecycleListeners: function (lifecycleRef) {
+        if (window.blazorMonaco.lifecycleListenersRegistered) return;
+        window.blazorMonaco.lifecycleListenersRegistered = true;
+        window.blazorMonaco.lifecycleRef = lifecycleRef;
+        if (typeof monaco === 'undefined') {
+            console.warn("BlazorMonaco: monaco is undefined; lifecycle listeners will not be registered.");
+            return;
+        }
+        monaco.editor.onDidCreateEditor(editor => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnDidCreateEditor", JSON.stringify({ id: editor.getId() }));
+        });
+        monaco.editor.onDidCreateDiffEditor(editor => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnDidCreateDiffEditor", JSON.stringify({ id: editor.getId() }));
+        });
+        monaco.editor.onDidChangeModelLanguage(e => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnDidChangeModelLanguage", JSON.stringify({ uri: e.model.uri.toString(), oldLanguage: e.oldLanguage }));
+        });
+        monaco.editor.onDidChangeMarkers(resources => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnDidChangeMarkers", JSON.stringify({ resources: resources.map(u => u.toString()) }));
+        });
+        monaco.editor.onDidCreateModel(model => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnDidCreateModel", JSON.stringify({ uri: model.uri.toString() }));
+        });
+        monaco.editor.onWillDisposeModel(model => {
+            lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnWillDisposeModel", JSON.stringify({ uri: model.uri.toString() }));
+        });
+    },
+
+    createWebWorker: async function (options) {
+        let workerOpts = {
+            worker: new Worker(options.workerUrl),
+            host: options.host,
+            keepIdleModels: options.keepIdleModels
+        };
+        let worker = monaco.editor.createWebWorker(workerOpts);
+        let id = blazorMonaco.editor.uuidv4();
+        window.blazorMonaco.workers[id] = worker;
+        return id;
+    },
+
+    addCommandDescriptor: async function (descriptor) {
+        await monaco.editor.addCommand(descriptor);
+    },
+
+    addEditorAction: async function (descriptor) {
+        await monaco.editor.addEditorAction(descriptor);
+    },
+
     //#endregion
 
     //#region Instance methods
@@ -313,6 +467,223 @@ window.blazorMonaco.editor = {
         }, context);
     },
 
+    getSupportedActions: function (id) {
+        let editor = this.getEditor(id);
+        let actions = editor.getSupportedActions();
+        if (actions == null)
+            return [];
+        return actions.map(function (action) {
+            return {
+                id: action.id,
+                label: action.label,
+                alias: action.alias,
+                metadata: action.metadata
+            };
+        });
+    },
+
+    getAction: function (id, actionId) {
+        let editor = this.getEditor(id);
+        let action = editor.getAction(actionId);
+        if (action == null)
+            return null;
+        return {
+            id: action.id,
+            label: action.label,
+            alias: action.alias,
+            metadata: action.metadata
+        };
+    },
+
+    getContribution: function (id, contributionId) {
+        let editor = this.getEditor(id);
+        let contribution = editor.getContribution(contributionId);
+        if (contribution == null)
+            return null;
+        return blazorMonaco.editor.removeCircularReferences(contribution);
+    },
+
+    executeCommand: function (id, source, commandId, args) {
+        let editor = this.getEditor(id);
+        let command = { id: commandId, args: args };
+        editor.executeCommand(source, command);
+    },
+
+    createDecorationsCollection: function (id, owner) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        let ranges = collection.getRanges().map(function (r) {
+            return { startLineNumber: r.startLineNumber, startColumn: r.startColumn, endLineNumber: r.endLineNumber, endColumn: r.endColumn };
+        });
+        return {
+            id: editor.getId(),
+            owner: owner,
+            length: collection.length,
+            ranges: ranges
+        };
+    },
+
+    decorationsSet: function (id, owner, newDecorations) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        return collection.set(newDecorations);
+    },
+
+    decorationsAppend: function (id, owner, newDecorations) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        return collection.append(newDecorations);
+    },
+
+    decorationsClear: function (id, owner) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        collection.clear();
+    },
+
+    decorationsHas: function (id, owner, decoration) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        return collection.has(decoration);
+    },
+
+    decorationsGetRange: function (id, owner, index) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        let range = collection.getRange(index);
+        if (range == null) return null;
+        return { startLineNumber: range.startLineNumber, startColumn: range.startColumn, endLineNumber: range.endLineNumber, endColumn: range.endColumn };
+    },
+
+    decorationsGetRanges: function (id, owner) {
+        let editor = this.getEditor(id);
+        let collection = editor.createDecorationsCollection(owner);
+        return collection.getRanges();
+    },
+
+    addContentWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.addContentWidget(blazorMonaco.editor.toContentWidget(widget));
+    },
+
+    layoutContentWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.layoutContentWidget(blazorMonaco.editor.toContentWidget(widget));
+    },
+
+    removeContentWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.removeContentWidget(blazorMonaco.editor.toContentWidget(widget));
+    },
+
+    removeAllContentWidgets: function (id) {
+        let editor = this.getEditor(id);
+        editor.removeAllContentWidgets();
+    },
+
+    getContentWidgetPosition: function (id, widget) {
+        let editor = this.getEditor(id);
+        let pos = editor.getContentWidgetPosition(blazorMonaco.editor.toContentWidget(widget));
+        return blazorMonaco.editor.convertUriToString(pos);
+    },
+
+    addOverlayWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.addOverlayWidget(blazorMonaco.editor.toOverlayWidget(widget));
+    },
+
+    layoutOverlayWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.layoutOverlayWidget(blazorMonaco.editor.toOverlayWidget(widget));
+    },
+
+    removeOverlayWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.removeOverlayWidget(blazorMonaco.editor.toOverlayWidget(widget));
+    },
+
+    getOverlayWidgetPosition: function (id, widget) {
+        let editor = this.getEditor(id);
+        let pos = editor.getOverlayWidgetPosition(blazorMonaco.editor.toOverlayWidget(widget));
+        return blazorMonaco.editor.convertUriToString(pos);
+    },
+
+    addGlyphMarginWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.addGlyphMarginWidget(blazorMonaco.editor.toGlyphMarginWidget(widget));
+    },
+
+    layoutGlyphMarginWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.layoutGlyphMarginWidget(blazorMonaco.editor.toGlyphMarginWidget(widget));
+    },
+
+    removeGlyphMarginWidget: function (id, widget) {
+        let editor = this.getEditor(id);
+        editor.removeGlyphMarginWidget(blazorMonaco.editor.toGlyphMarginWidget(widget));
+    },
+
+    getGlyphMarginWidgetPosition: function (id, widget) {
+        let editor = this.getEditor(id);
+        let pos = editor.getGlyphMarginWidgetPosition(blazorMonaco.editor.toGlyphMarginWidget(widget));
+        return blazorMonaco.editor.convertUriToString(pos);
+    },
+
+    addViewZone: function (id, viewZone) {
+        let editor = this.getEditor(id);
+        let zoneId = null;
+        editor.changeViewZones(accessor => {
+            zoneId = accessor.addZone(blazorMonaco.editor.toViewZone(viewZone));
+        });
+        return zoneId;
+    },
+
+    removeViewZone: function (id, viewZoneId) {
+        let editor = this.getEditor(id);
+        editor.changeViewZones(accessor => {
+            accessor.removeZone(viewZoneId);
+        });
+    },
+
+    layoutViewZone: function (id, viewZoneId) {
+        let editor = this.getEditor(id);
+        editor.changeViewZones(accessor => {
+            accessor.layoutZone(viewZoneId);
+        });
+    },
+
+    goToDiff: function (id, target) {
+        let editor = this.getEditor(id);
+        editor.goToDiff(target);
+    },
+
+    revealFirstDiff: function (id) {
+        let editor = this.getEditor(id);
+        editor.revealFirstDiff();
+    },
+
+    getModifiedEditor: function (id) {
+        let editor = this.getEditor(id);
+        return editor.getModifiedEditor();
+    },
+    getOriginalEditor: function (id) {
+        let editor = this.getEditor(id);
+        return editor.getOriginalEditor();
+    },
+    getLineChanges: function (id) {
+        let editor = this.getEditor(id);
+        return editor.getLineChanges();
+    },
+    accessibleDiffViewerNext: function (id) {
+        let editor = this.getEditor(id);
+        editor.accessibleDiffViewerNext();
+    },
+
+    accessibleDiffViewerPrev: function (id) {
+        let editor = this.getEditor(id);
+        editor.accessibleDiffViewerPrev();
+    },
+
     deltaDecorations: function (id, oldDecorations, newDecorations) {
         let editor = this.getEditor(id);
         return editor.deltaDecorations(oldDecorations, newDecorations);
@@ -323,6 +694,18 @@ window.blazorMonaco.editor = {
         return editor.removeDecorations(decorationsIds);
     },
 
+    getDecorationsInRange: function (id, range, ownerId, filterOutValidation, filterFontDecorations, onlyMinimapDecorations, onlyMarginDecorations) {
+        let editor = this.getEditor(id);
+        return editor.getDecorationsInRange(range, ownerId, filterOutValidation, filterFontDecorations, onlyMinimapDecorations, onlyMarginDecorations);
+    },
+    getLineDecorations: function (id, lineNumber, ownerId, filterOutValidation, filterFontDecorations) {
+        let editor = this.getEditor(id);
+        return editor.getLineDecorations(lineNumber, ownerId, filterOutValidation, filterFontDecorations);
+    },
+    executeCommands: function (id, source, commands) {
+        let editor = this.getEditor(id);
+        editor.executeCommands(source, commands);
+    },
     dispose: function (id) {
         let editor = this.getEditor(id);
         editor.dispose();
@@ -1080,6 +1463,34 @@ window.blazorMonaco.editor = {
         dispose: function (uriStr) {
             let model = this.getModel(uriStr);
             return model.dispose();
+        },
+
+        createSnapshot: function (uriStr, preserveBOM) {
+            let model = this.getModel(uriStr);
+            if (model == null)
+                return "";
+            let snapshot = model.createSnapshot(preserveBOM);
+            let parts = [];
+            let chunk;
+            while ((chunk = snapshot.read()) !== null && chunk !== undefined) {
+                parts.push(chunk);
+            }
+            return parts.join('');
+        },
+
+        pushEditOperations: function (uriStr, beforeCursorState, editOperations) {
+            let model = this.getModel(uriStr);
+            if (model == null)
+                return null;
+            let result = model.pushEditOperations(beforeCursorState, editOperations);
+            return result;
+        },
+
+        isAttachedToEditor: function (uriStr) {
+            let model = this.getModel(uriStr);
+            if (model == null)
+                return false;
+            return model.isAttachedToEditor();
         }
     }
 
@@ -1141,7 +1552,527 @@ window.blazorMonaco.languages = {
                 return completionItemProviderRef.invokeMethodAsync("ResolveCompletionItem", completionItem);
             }
         });
+    },
+
+
+    registerDefinitionProvider: async function (language, definitionProviderRef) {
+        await monaco.languages.registerDefinitionProvider(language, {
+            provideDefinitions: (model, position, token) => {
+                return definitionProviderRef.invokeMethodAsync("ProvideDefinitions", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerReferenceProvider: async function (language, referenceProviderRef) {
+        await monaco.languages.registerReferenceProvider(language, {
+            provideReferences: (model, position, context, token) => {
+                return referenceProviderRef.invokeMethodAsync("ProvideReferences", decodeURI(model.uri.toString()), position, context);
+            }
+        });
+    },
+
+    registerImplementationProvider: async function (language, implementationProviderRef) {
+        await monaco.languages.registerImplementationProvider(language, {
+            provideImplementation: (model, position, token) => {
+                return implementationProviderRef.invokeMethodAsync("ProvideImplementations", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerTypeDefinitionProvider: async function (language, typeDefinitionProviderRef) {
+        await monaco.languages.registerTypeDefinitionProvider(language, {
+            provideTypeDefinition: (model, position, token) => {
+                return typeDefinitionProviderRef.invokeMethodAsync("ProvideTypeDefinitions", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerDeclarationProvider: async function (language, declarationProviderRef) {
+        await monaco.languages.registerDeclarationProvider(language, {
+            provideDeclaration: (model, position, token) => {
+                return declarationProviderRef.invokeMethodAsync("ProvideDeclarations", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerDocumentSymbolProvider: async function (language, documentSymbolProviderRef) {
+        await monaco.languages.registerDocumentSymbolProvider(language, {
+            provideDocumentSymbols: (model, token) => {
+                return documentSymbolProviderRef.invokeMethodAsync("ProvideDocumentSymbols", decodeURI(model.uri.toString()));
+            }
+        });
+    },
+
+    registerFoldingRangeProvider: async function (language, foldingRangeProviderRef) {
+        await monaco.languages.registerFoldingRangeProvider(language, {
+            provideFoldingRanges: (model, context, token) => {
+                return foldingRangeProviderRef.invokeMethodAsync("ProvideFoldingRanges", decodeURI(model.uri.toString()));
+            }
+        });
+    },
+
+    registerDocumentHighlightProvider: async function (language, documentHighlightProviderRef) {
+        await monaco.languages.registerDocumentHighlightProvider(language, {
+            provideDocumentHighlights: (model, position, token) => {
+                return documentHighlightProviderRef.invokeMethodAsync("ProvideDocumentHighlights", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerColorProvider: async function (language, documentColorProviderRef) {
+        await monaco.languages.registerColorProvider(language, {
+            provideColors: (model, token) => {
+                return documentColorProviderRef.invokeMethodAsync("ProvideColors", decodeURI(model.uri.toString()));
+            },
+            provideColorPresentations: (model, colorInfo, token) => {
+                return documentColorProviderRef.invokeMethodAsync("ProvideColorPresentations", decodeURI(model.uri.toString()), colorInfo);
+            }
+        });
+    },
+
+    registerSelectionRangeProvider: async function (language, selectionRangeProviderRef) {
+        await monaco.languages.registerSelectionRangeProvider(language, {
+            provideSelectionRanges: (model, positions, token) => {
+                return selectionRangeProviderRef.invokeMethodAsync("ProvideSelectionRanges", decodeURI(model.uri.toString()), positions);
+            }
+        });
+    },
+
+    registerSignatureHelpProvider: async function (language, signatureHelpProviderRef) {
+        await monaco.languages.registerSignatureHelpProvider(language, {
+            provideSignatureHelp: (model, position, token, context) => {
+                return signatureHelpProviderRef.invokeMethodAsync("ProvideSignatureHelp", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerCodeLensProvider: async function (language, codeLensProviderRef) {
+        await monaco.languages.registerCodeLensProvider(language, {
+            provideCodeLenses: (model, token) => {
+                return codeLensProviderRef.invokeMethodAsync("ProvideCodeLenses", decodeURI(model.uri.toString()));
+            },
+            resolveCodeLens: (model, codeLens, token) => {
+                return codeLensProviderRef.invokeMethodAsync("ResolveCodeLens", decodeURI(model.uri.toString()), codeLens);
+            }
+        });
+    },
+
+    registerRenameProvider: async function (language, renameProviderRef) {
+        await monaco.languages.registerRenameProvider(language, {
+            provideRenameEdits: (model, position, newName, token) => {
+                return renameProviderRef.invokeMethodAsync("ProvideRenameEdits", decodeURI(model.uri.toString()), position, newName);
+            }
+        });
+    },
+
+    registerDocumentSemanticTokensProvider: async function (language, documentSemanticTokensProviderRef, legend) {
+        await monaco.languages.registerDocumentSemanticTokensProvider(language, {
+            getLegend: () => legend,
+            provideDocumentSemanticTokens: (model, lastResultId, token) => {
+                return documentSemanticTokensProviderRef.invokeMethodAsync("ProvideDocumentSemanticTokens", decodeURI(model.uri.toString()), lastResultId);
+            }
+        });
+    },
+
+    registerDocumentRangeSemanticTokensProvider: async function (language, documentRangeSemanticTokensProviderRef, legend) {
+        await monaco.languages.registerDocumentRangeSemanticTokensProvider(language, {
+            getLegend: () => legend,
+            provideDocumentRangeSemanticTokens: (model, range, token) => {
+                return documentRangeSemanticTokensProviderRef.invokeMethodAsync("ProvideDocumentRangeSemanticTokens", decodeURI(model.uri.toString()), range);
+            }
+        });
+    },
+
+    registerInlayHintsProvider: async function (language, inlayHintsProviderRef) {
+        await monaco.languages.registerInlayHintsProvider(language, {
+            provideInlayHints: (model, range, token) => {
+                return inlayHintsProviderRef.invokeMethodAsync("ProvideInlayHints", decodeURI(model.uri.toString()), range);
+            }
+        });
+    },
+
+    registerInlineCompletionsProvider: async function (language, inlineCompletionsProviderRef) {
+        await monaco.languages.registerInlineCompletionsProvider(language, {
+            provideInlineCompletions: (model, position, context, token) => {
+                return inlineCompletionsProviderRef.invokeMethodAsync("ProvideInlineCompletions", decodeURI(model.uri.toString()), position);
+            },
+            resolveInlineCompletion: (model, inlineCompletion, token) => {
+                return inlineCompletionsProviderRef.invokeMethodAsync("ResolveInlineCompletion", decodeURI(model.uri.toString()), inlineCompletion);
+            }
+        });
+    },
+
+    registerDocumentRangeFormattingEditProvider: async function (language, documentRangeFormattingEditProviderRef) {
+        await monaco.languages.registerDocumentRangeFormattingEditProvider(language, {
+            provideDocumentRangeFormattingEdits: (model, range, options, token) => {
+                return documentRangeFormattingEditProviderRef.invokeMethodAsync("ProvideDocumentRangeFormattingEdits", decodeURI(model.uri.toString()), range, options);
+            }
+        });
+    },
+
+    registerOnTypeFormattingEditProvider: async function (language, onTypeFormattingEditProviderRef, triggerCharacters) {
+        await monaco.languages.registerOnTypeFormattingEditProvider(language, {
+            provideOnTypeFormattingEdits: (model, position, ch, options, token) => {
+                return onTypeFormattingEditProviderRef.invokeMethodAsync("ProvideOnTypeFormattingEdits", decodeURI(model.uri.toString()), position, ch, options);
+            }
+        }, triggerCharacters || []);
+    },
+
+    registerLinkedEditingRangeProvider: async function (language, linkedEditingRangeProviderRef) {
+        await monaco.languages.registerLinkedEditingRangeProvider(language, {
+            provideLinkedEditingRanges: (model, position, token) => {
+                return linkedEditingRangeProviderRef.invokeMethodAsync("ProvideLinkedEditingRanges", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerLinkProvider: async function (language, linkProviderRef) {
+        await monaco.languages.registerLinkProvider(language, {
+            provideLinks: (model, token) => {
+                return linkProviderRef.invokeMethodAsync("ProvideLinks", decodeURI(model.uri.toString()));
+            },
+            resolveLink: (link, token) => {
+                return linkProviderRef.invokeMethodAsync("ResolveLink", link);
+            }
+        });
+    },
+
+    registerNewSymbolNameProvider: async function (language, newSymbolNamesProviderRef) {
+        await monaco.languages.registerNewSymbolNameProvider(language, {
+            provideNewSymbolNames: (model, range, triggerKind, token) => {
+                return newSymbolNamesProviderRef.invokeMethodAsync("ProvideNewSymbolNames", decodeURI(model.uri.toString()), range, triggerKind);
+            },
+            resolveNewSymbolName: (symbol, token) => {
+                return newSymbolNamesProviderRef.invokeMethodAsync("ResolveNewSymbolName", symbol);
+            }
+        });
+    },
+
+    registerLanguage: async function (language) {
+        await monaco.languages.register(language);
+    },
+
+    setLanguageConfiguration: async function (languageId, configuration) {
+        await monaco.languages.setLanguageConfiguration(languageId, configuration);
+    },
+
+    setMonarchTokensProvider: async function (languageId, languageDef) {
+        await monaco.languages.setMonarchTokensProvider(languageId, languageDef);
+    },
+
+    setColorMap: async function (colorMap) {
+        await monaco.languages.setColorMap(colorMap);
+    },
+
+    onLanguage: function (languageId) {
+        return monaco.languages.onLanguage(languageId, () => {
+            return window.blazorMonaco.lifecycleRef ? window.blazorMonaco.lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnLanguage", JSON.stringify({ languageId: languageId })) : null;
+        });
+    },
+
+    onLanguageEncountered: function (languageId) {
+        return monaco.languages.onLanguageEncountered(languageId, () => {
+            return window.blazorMonaco.lifecycleRef ? window.blazorMonaco.lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnLanguageEncountered", JSON.stringify({ languageId: languageId })) : null;
+        });
+    },
+
+    getEncodedLanguageId: async function (languageId) {
+        return monaco.languages.getEncodedLanguageId(languageId);
+    },
+
+    getLanguages: async function () {
+        return monaco.languages.getLanguages();
+    },
+
+    score: async function (selector, candidateUri, candidateLanguage) {
+        return monaco.languages.score(selector, monaco.Uri.parse(candidateUri), candidateLanguage);
+    },
+
+    setTokensProvider: async function (languageId, tokensProviderRef) {
+        await monaco.languages.setTokensProvider(languageId, {
+            getInitialState: () => tokensProviderRef.invokeMethodAsync("GetInitialState"),
+            tokenize: (line, state) => tokensProviderRef.invokeMethodAsync("Tokenize", line, state)
+        });
+    },
+
+    setEncodedTokensProvider: async function (languageId, tokensProviderRef) {
+        await monaco.languages.setTokensProvider(languageId, {
+            getInitialState: () => tokensProviderRef.invokeMethodAsync("GetInitialState"),
+            tokenizeEncoded: (line, state) => tokensProviderRef.invokeMethodAsync("TokenizeEncoded", line, state)
+        });
+    },
+
+    registerDefinitionProvider: async function (language, definitionProviderRef) {
+        await monaco.languages.registerDefinitionProvider(language, {
+            provideDefinitions: (model, position, token) => {
+                return definitionProviderRef.invokeMethodAsync("ProvideDefinitions", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerReferenceProvider: async function (language, referenceProviderRef) {
+        await monaco.languages.registerReferenceProvider(language, {
+            provideReferences: (model, position, context, token) => {
+                return referenceProviderRef.invokeMethodAsync("ProvideReferences", decodeURI(model.uri.toString()), position, context);
+            }
+        });
+    },
+
+    registerImplementationProvider: async function (language, implementationProviderRef) {
+        await monaco.languages.registerImplementationProvider(language, {
+            provideImplementation: (model, position, token) => {
+                return implementationProviderRef.invokeMethodAsync("ProvideImplementations", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerTypeDefinitionProvider: async function (language, typeDefinitionProviderRef) {
+        await monaco.languages.registerTypeDefinitionProvider(language, {
+            provideTypeDefinition: (model, position, token) => {
+                return typeDefinitionProviderRef.invokeMethodAsync("ProvideTypeDefinitions", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerDeclarationProvider: async function (language, declarationProviderRef) {
+        await monaco.languages.registerDeclarationProvider(language, {
+            provideDeclaration: (model, position, token) => {
+                return declarationProviderRef.invokeMethodAsync("ProvideDeclarations", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerDocumentSymbolProvider: async function (language, documentSymbolProviderRef) {
+        await monaco.languages.registerDocumentSymbolProvider(language, {
+            provideDocumentSymbols: (model, token) => {
+                return documentSymbolProviderRef.invokeMethodAsync("ProvideDocumentSymbols", decodeURI(model.uri.toString()));
+            }
+        });
+    },
+
+    registerFoldingRangeProvider: async function (language, foldingRangeProviderRef) {
+        await monaco.languages.registerFoldingRangeProvider(language, {
+            provideFoldingRanges: (model, context, token) => {
+                return foldingRangeProviderRef.invokeMethodAsync("ProvideFoldingRanges", decodeURI(model.uri.toString()));
+            }
+        });
+    },
+
+    registerDocumentHighlightProvider: async function (language, documentHighlightProviderRef) {
+        await monaco.languages.registerDocumentHighlightProvider(language, {
+            provideDocumentHighlights: (model, position, token) => {
+                return documentHighlightProviderRef.invokeMethodAsync("ProvideDocumentHighlights", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerColorProvider: async function (language, documentColorProviderRef) {
+        await monaco.languages.registerColorProvider(language, {
+            provideColors: (model, token) => {
+                return documentColorProviderRef.invokeMethodAsync("ProvideColors", decodeURI(model.uri.toString()));
+            },
+            provideColorPresentations: (model, colorInfo, token) => {
+                return documentColorProviderRef.invokeMethodAsync("ProvideColorPresentations", decodeURI(model.uri.toString()), colorInfo);
+            }
+        });
+    },
+
+    registerSelectionRangeProvider: async function (language, selectionRangeProviderRef) {
+        await monaco.languages.registerSelectionRangeProvider(language, {
+            provideSelectionRanges: (model, positions, token) => {
+                return selectionRangeProviderRef.invokeMethodAsync("ProvideSelectionRanges", decodeURI(model.uri.toString()), positions);
+            }
+        });
+    },
+
+    registerSignatureHelpProvider: async function (language, signatureHelpProviderRef) {
+        await monaco.languages.registerSignatureHelpProvider(language, {
+            provideSignatureHelp: (model, position, token, context) => {
+                return signatureHelpProviderRef.invokeMethodAsync("ProvideSignatureHelp", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerCodeLensProvider: async function (language, codeLensProviderRef) {
+        await monaco.languages.registerCodeLensProvider(language, {
+            provideCodeLenses: (model, token) => {
+                return codeLensProviderRef.invokeMethodAsync("ProvideCodeLenses", decodeURI(model.uri.toString()));
+            },
+            resolveCodeLens: (model, codeLens, token) => {
+                return codeLensProviderRef.invokeMethodAsync("ResolveCodeLens", decodeURI(model.uri.toString()), codeLens);
+            }
+        });
+    },
+
+    registerRenameProvider: async function (language, renameProviderRef) {
+        await monaco.languages.registerRenameProvider(language, {
+            provideRenameEdits: (model, position, newName, token) => {
+                return renameProviderRef.invokeMethodAsync("ProvideRenameEdits", decodeURI(model.uri.toString()), position, newName);
+            }
+        });
+    },
+
+    registerDocumentSemanticTokensProvider: async function (language, documentSemanticTokensProviderRef, legend) {
+        await monaco.languages.registerDocumentSemanticTokensProvider(language, {
+            getLegend: () => legend,
+            provideDocumentSemanticTokens: (model, lastResultId, token) => {
+                return documentSemanticTokensProviderRef.invokeMethodAsync("ProvideDocumentSemanticTokens", decodeURI(model.uri.toString()), lastResultId);
+            }
+        });
+    },
+
+    registerDocumentRangeSemanticTokensProvider: async function (language, documentRangeSemanticTokensProviderRef, legend) {
+        await monaco.languages.registerDocumentRangeSemanticTokensProvider(language, {
+            getLegend: () => legend,
+            provideDocumentRangeSemanticTokens: (model, range, token) => {
+                return documentRangeSemanticTokensProviderRef.invokeMethodAsync("ProvideDocumentRangeSemanticTokens", decodeURI(model.uri.toString()), range);
+            }
+        });
+    },
+
+    registerInlayHintsProvider: async function (language, inlayHintsProviderRef) {
+        await monaco.languages.registerInlayHintsProvider(language, {
+            provideInlayHints: (model, range, token) => {
+                return inlayHintsProviderRef.invokeMethodAsync("ProvideInlayHints", decodeURI(model.uri.toString()), range);
+            }
+        });
+    },
+
+    registerInlineCompletionsProvider: async function (language, inlineCompletionsProviderRef) {
+        await monaco.languages.registerInlineCompletionsProvider(language, {
+            provideInlineCompletions: (model, position, context, token) => {
+                return inlineCompletionsProviderRef.invokeMethodAsync("ProvideInlineCompletions", decodeURI(model.uri.toString()), position);
+            },
+            resolveInlineCompletion: (model, inlineCompletion, token) => {
+                return inlineCompletionsProviderRef.invokeMethodAsync("ResolveInlineCompletion", decodeURI(model.uri.toString()), inlineCompletion);
+            }
+        });
+    },
+
+    registerDocumentRangeFormattingEditProvider: async function (language, documentRangeFormattingEditProviderRef) {
+        await monaco.languages.registerDocumentRangeFormattingEditProvider(language, {
+            provideDocumentRangeFormattingEdits: (model, range, options, token) => {
+                return documentRangeFormattingEditProviderRef.invokeMethodAsync("ProvideDocumentRangeFormattingEdits", decodeURI(model.uri.toString()), range, options);
+            }
+        });
+    },
+
+    registerOnTypeFormattingEditProvider: async function (language, onTypeFormattingEditProviderRef, triggerCharacters) {
+        await monaco.languages.registerOnTypeFormattingEditProvider(language, {
+            provideOnTypeFormattingEdits: (model, position, ch, options, token) => {
+                return onTypeFormattingEditProviderRef.invokeMethodAsync("ProvideOnTypeFormattingEdits", decodeURI(model.uri.toString()), position, ch, options);
+            }
+        }, triggerCharacters || []);
+    },
+
+    registerLinkedEditingRangeProvider: async function (language, linkedEditingRangeProviderRef) {
+        await monaco.languages.registerLinkedEditingRangeProvider(language, {
+            provideLinkedEditingRanges: (model, position, token) => {
+                return linkedEditingRangeProviderRef.invokeMethodAsync("ProvideLinkedEditingRanges", decodeURI(model.uri.toString()), position);
+            }
+        });
+    },
+
+    registerLinkProvider: async function (language, linkProviderRef) {
+        await monaco.languages.registerLinkProvider(language, {
+            provideLinks: (model, token) => {
+                return linkProviderRef.invokeMethodAsync("ProvideLinks", decodeURI(model.uri.toString()));
+            },
+            resolveLink: (link, token) => {
+                return linkProviderRef.invokeMethodAsync("ResolveLink", link);
+            }
+        });
+    },
+
+    registerNewSymbolNameProvider: async function (language, newSymbolNamesProviderRef) {
+        await monaco.languages.registerNewSymbolNameProvider(language, {
+            provideNewSymbolNames: (model, range, triggerKind, token) => {
+                return newSymbolNamesProviderRef.invokeMethodAsync("ProvideNewSymbolNames", decodeURI(model.uri.toString()), range, triggerKind);
+            },
+            resolveNewSymbolName: (symbol, token) => {
+                return newSymbolNamesProviderRef.invokeMethodAsync("ResolveNewSymbolName", symbol);
+            }
+        });
+    },
+
+    registerLanguage: async function (language) {
+        await monaco.languages.register(language);
+    },
+
+    setLanguageConfiguration: async function (languageId, configuration) {
+        await monaco.languages.setLanguageConfiguration(languageId, configuration);
+    },
+
+    setMonarchTokensProvider: async function (languageId, languageDef) {
+        await monaco.languages.setMonarchTokensProvider(languageId, languageDef);
+    },
+
+    setColorMap: async function (colorMap) {
+        await monaco.languages.setColorMap(colorMap);
+    },
+
+    onLanguage: function (languageId) {
+        return monaco.languages.onLanguage(languageId, () => {
+            return window.blazorMonaco.lifecycleRef ? window.blazorMonaco.lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnLanguage", JSON.stringify({ languageId: languageId })) : null;
+        });
+    },
+
+    onLanguageEncountered: function (languageId) {
+        return monaco.languages.onLanguageEncountered(languageId, () => {
+            return window.blazorMonaco.lifecycleRef ? window.blazorMonaco.lifecycleRef.invokeMethodAsync("OnLifecycleEvent", "OnLanguageEncountered", JSON.stringify({ languageId: languageId })) : null;
+        });
+    },
+
+    getEncodedLanguageId: async function (languageId) {
+        return monaco.languages.getEncodedLanguageId(languageId);
+    },
+
+    getLanguages: async function () {
+        return monaco.languages.getLanguages();
+    },
+
+    score: async function (selector, candidateUri, candidateLanguage) {
+        return monaco.languages.score(selector, monaco.Uri.parse(candidateUri), candidateLanguage);
     }
 
     //#endregion
 }
+
+window.blazorMonaco.worker = {
+    dispose: function (id) {
+        let worker = window.blazorMonaco.workers[id];
+        if (worker) worker.dispose();
+    },
+    getProxy: async function (id) {
+        let worker = window.blazorMonaco.workers[id];
+        if (!worker) return null;
+        let proxy = await worker.getProxy();
+        return blazorMonaco.editor.removeCircularReferences(proxy);
+    },
+    withSyncedResources: async function (id, resources) {
+        let worker = window.blazorMonaco.workers[id];
+        if (!worker) return null;
+        return await worker.withSyncedResources((resources || []).map(u => monaco.Uri.parse(u)));
+    }
+};
+
+window.blazorMonaco.localization = {
+    getReference: function () {
+        return window.blazorMonaco.localizationRef;
+    },
+    setReference: function (ref) {
+        window.blazorMonaco.localizationRef = ref;
+    },
+    getString: async function (key) {
+        if (window.blazorMonaco.localizationRef) {
+            return await window.blazorMonaco.localizationRef.invokeMethodAsync("GetLocalizedString", key);
+        }
+        return null;
+    },
+    getAllStrings: async function () {
+        if (window.blazorMonaco.localizationRef) {
+            return await window.blazorMonaco.localizationRef.invokeMethodAsync("GetAllStrings");
+        }
+        return {};
+    }
+};

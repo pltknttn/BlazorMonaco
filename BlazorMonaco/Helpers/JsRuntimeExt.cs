@@ -1,30 +1,31 @@
 ﻿using Microsoft.JSInterop;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace BlazorMonaco.Helpers
 {
     internal static class JsRuntimeExt
     {
-        private static IJSRuntime Shared { get; set; }
+        // Use AsyncLocal for thread-safe storage in async context
+        // This allows each async flow to have its own IJSRuntime (important for Blazor Server)
+        private static readonly AsyncLocal<IJSRuntime> s_runtime = new AsyncLocal<IJSRuntime>();
 
         public static IJSRuntime UpdateRuntime(IJSRuntime jsRuntime)
         {
-            if (Shared is IJSInProcessRuntime || jsRuntime is IJSInProcessRuntime)
+            // Only update if a non-null runtime is provided
+            if (jsRuntime != null)
             {
-                // Allow jsRuntime to be null in WASM apps. If it's null, use the static instance instead.
-                return Shared = jsRuntime ?? Shared;
+                // Store the runtime for this async flow (including WASM where it's IJSInProcessRuntime)
+                s_runtime.Value = jsRuntime;
             }
-            else
-            {
-                // The static instance is not used in server-side apps. jsRuntime has to be non-null there.
-                return jsRuntime;
-            }
+            
+            // Return the stored runtime if available
+            return s_runtime.Value;
         }
 
         public static async Task SafeInvokeAsync(this IJSRuntime jsRuntime, string identifier, params object[] args)
         {
-            if (jsRuntime == null)
-                return;
+            if (jsRuntime == null) return;
             await jsRuntime.InvokeVoidAsync(identifier, args);
         }
 

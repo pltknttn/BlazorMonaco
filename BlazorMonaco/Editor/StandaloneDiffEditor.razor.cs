@@ -107,7 +107,6 @@ namespace BlazorMonaco.Editor
             return JsRuntime.SafeInvokeAsync<string>("blazorMonaco.editor.addCommand", Id, keybinding, context);
         }
 
-        //createContextKey<T extends ContextKeyValue = ContextKeyValue>(key: string, defaultValue: T): IContextKey<T>;
 
         [Obsolete("This method is deprecated. Use AddAction(ActionDescriptor actionDescriptor) instead.")]
         public Task AddAction(string actionId, string label, int[] keybindings, string precondition, string keybindingContext, string contextMenuGroupId, double contextMenuOrder, Action<CodeEditor, int[]> action)
@@ -165,7 +164,6 @@ namespace BlazorMonaco.Editor
         [Parameter] public EventCallback OnDidBlurEditorWidgetOriginal { get; set; }
         [Parameter] public EventCallback OnDidCompositionStartOriginal { get; set; }
         [Parameter] public EventCallback OnDidCompositionEndOriginal { get; set; }
-        //readonly onDidAttemptReadOnlyEdit: IEvent$1<void>;
         [Parameter] public EventCallback<PasteEvent> OnDidPasteOriginal { get; set; }
         [Parameter] public EventCallback<EditorMouseEvent> OnMouseUpOriginal { get; set; }
         [Parameter] public EventCallback<EditorMouseEvent> OnMouseDownOriginal { get; set; }
@@ -177,7 +175,6 @@ namespace BlazorMonaco.Editor
         [Parameter] public EventCallback<EditorLayoutInfo> OnDidLayoutChangeOriginal { get; set; }
         [Parameter] public EventCallback<ContentSizeChangedEvent> OnDidContentSizeChangeOriginal { get; set; }
         [Parameter] public EventCallback<ScrollEvent> OnDidScrollChangeOriginal { get; set; }
-        //readonly onDidChangeHiddenAreas: IEvent$1<void>;
 
         #endregion
 
@@ -200,7 +197,6 @@ namespace BlazorMonaco.Editor
         [Parameter] public EventCallback OnDidBlurEditorWidgetModified { get; set; }
         [Parameter] public EventCallback OnDidCompositionStartModified { get; set; }
         [Parameter] public EventCallback OnDidCompositionEndModified { get; set; }
-        //readonly onDidAttemptReadOnlyEdit: IEvent$1<void>;
         [Parameter] public EventCallback<PasteEvent> OnDidPasteModified { get; set; }
         [Parameter] public EventCallback<EditorMouseEvent> OnMouseUpModified { get; set; }
         [Parameter] public EventCallback<EditorMouseEvent> OnMouseDownModified { get; set; }
@@ -212,7 +208,6 @@ namespace BlazorMonaco.Editor
         [Parameter] public EventCallback<EditorLayoutInfo> OnDidLayoutChangeModified { get; set; }
         [Parameter] public EventCallback<ContentSizeChangedEvent> OnDidContentSizeChangeModified { get; set; }
         [Parameter] public EventCallback<ScrollEvent> OnDidScrollChangeModified { get; set; }
-        //readonly onDidChangeHiddenAreas: IEvent$1<void>;
 
         #endregion
 
@@ -250,7 +245,6 @@ namespace BlazorMonaco.Editor
                 OriginalEditor.OnDidBlurEditorWidget = OnDidBlurEditorWidgetOriginal;
                 OriginalEditor.OnDidCompositionStart = OnDidCompositionStartOriginal;
                 OriginalEditor.OnDidCompositionEnd = OnDidCompositionEndOriginal;
-                //readonly onDidAttemptReadOnlyEdit: IEvent$1<void>;
                 OriginalEditor.OnDidPaste = OnDidPasteOriginal;
                 OriginalEditor.OnMouseUp = OnMouseUpOriginal;
                 OriginalEditor.OnMouseDown = OnMouseDownOriginal;
@@ -262,7 +256,6 @@ namespace BlazorMonaco.Editor
                 OriginalEditor.OnDidLayoutChange = OnDidLayoutChangeOriginal;
                 OriginalEditor.OnDidContentSizeChange = OnDidContentSizeChangeOriginal;
                 OriginalEditor.OnDidScrollChange = OnDidScrollChangeOriginal;
-                //readonly onDidChangeHiddenAreas: IEvent$1<void>;
                 await OriginalEditor.SetEventListeners();
                 await OriginalEditor.OnDidInit.InvokeAsync(OriginalEditor);
 
@@ -290,7 +283,6 @@ namespace BlazorMonaco.Editor
                 ModifiedEditor.OnDidBlurEditorWidget = OnDidBlurEditorWidgetModified;
                 ModifiedEditor.OnDidCompositionStart = OnDidCompositionStartModified;
                 ModifiedEditor.OnDidCompositionEnd = OnDidCompositionEndModified;
-                //readonly onDidAttemptReadOnlyEdit: IEvent$1<void>;
                 ModifiedEditor.OnDidPaste = OnDidPasteModified;
                 ModifiedEditor.OnMouseUp = OnMouseUpModified;
                 ModifiedEditor.OnMouseDown = OnMouseDownModified;
@@ -302,7 +294,6 @@ namespace BlazorMonaco.Editor
                 ModifiedEditor.OnDidLayoutChange = OnDidLayoutChangeModified;
                 ModifiedEditor.OnDidContentSizeChange = OnDidContentSizeChangeModified;
                 ModifiedEditor.OnDidScrollChange = OnDidScrollChangeModified;
-                //readonly onDidChangeHiddenAreas: IEvent$1<void>;
                 await ModifiedEditor.SetEventListeners();
                 await ModifiedEditor.OnDidInit.InvokeAsync(ModifiedEditor);
 
@@ -353,19 +344,10 @@ namespace BlazorMonaco.Editor
         [Parameter]
         public EventCallback<DiffEditor> OnDidChangeModel { get; set; }
         /**
-         * Saves current view state of the editor in a serializable object.
-         */
-        //saveViewState(): IDiffEditorViewState | null;
-        /**
-         * Restores the view state of the editor from a serializable object generated by `saveViewState`.
-         */
-        //restoreViewState(state: IDiffEditorViewState | null): void;
-        /**
          * Type the getModel() of IEditor.
          */
         public Task<DiffEditorModel> GetModel()
             => JsRuntime.SafeInvokeAsync<DiffEditorModel>("blazorMonaco.editor.getInstanceDiffModel", Id);
-        //createViewModel(model: IDiffEditorModel) : IDiffEditorViewModel;
         /**
          * Sets the current model attached to this editor.
          * If the previous model was created by the editor via the value key in the options
@@ -376,7 +358,6 @@ namespace BlazorMonaco.Editor
          */
         public Task SetModel(DiffEditorModel model)
             => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.setInstanceDiffModel", Id, model);
-        //setModel(model: IDiffEditorModel | IDiffEditorViewModel | null) : void;
         /**
          * Get the `original` editor.
          */
@@ -385,10 +366,6 @@ namespace BlazorMonaco.Editor
          * Get the `modified` editor.
          */
         public CodeEditor ModifiedEditor { get; protected set; }
-        /**
-         * Get the computed diff information.
-         */
-        //getLineChanges(): ILineChange[] | null;
         /**
          * Update the editor's options after the editor has been created.
          */
@@ -401,15 +378,43 @@ namespace BlazorMonaco.Editor
         }
         /**
          * Jumps to the next or previous diff.
+         * @param target 'next' or 'previous'.
          */
-        //goToDiff(target: 'next' | 'previous') : void;
+        public Task GoToDiff(string target)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.goToDiff", Id, target);
         /**
          * Scrolls to the first diff.
          * (Waits until the diff computation finished.)
          */
-        //revealFirstDiff() : unknown;
-        //accessibleDiffViewerNext() : void;
-        //accessibleDiffViewerPrev() : void;
-        //handleInitialized() : void;
+        public Task RevealFirstDiff()
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.revealFirstDiff", Id);
+        /**
+         * Navigate to the next diff in the accessible diff viewer.
+         */
+        public Task AccessibleDiffViewerNext()
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.accessibleDiffViewerNext", Id);
+        /**
+         * Navigate to the previous diff in the accessible diff viewer.
+         */
+        public Task AccessibleDiffViewerPrevious()
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.accessibleDiffViewerPrevious", Id);
+
+    /**
+     * Get the line changes of the diff editor.
+     */
+    public Task<object> GetLineChanges()
+        => JsRuntime.SafeInvokeAsync<object>("blazorMonaco.editor.getLineChanges", Id);
+
+    /**
+     * Get the modified editor of the diff editor.
+     */
+    public Task<object> GetModifiedEditor()
+        => JsRuntime.SafeInvokeAsync<object>("blazorMonaco.editor.getModifiedEditor", Id);
+
+    /**
+     * Get the original editor of the diff editor.
+     */
+    public Task<object> GetOriginalEditor()
+        => JsRuntime.SafeInvokeAsync<object>("blazorMonaco.editor.getOriginalEditor", Id);
     }
 }

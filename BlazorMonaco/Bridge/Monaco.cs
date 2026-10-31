@@ -10,26 +10,6 @@ using System.Threading.Tasks;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
-// ReSharper disable UnusedMember.Global
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable InvalidXmlDocComment
-// ReSharper disable IdentifierTypo
-// ReSharper disable CommentTypo
-// ReSharper disable GrammarMistakeInComment
-
-/*---------------------------------------------------------------------------------------------
-*  C# translation of the monaco.d.ts file here : https://www.npmjs.com/package/monaco-editor/v/0.57.0?activeTab=code
-*--------------------------------------------------------------------------------------------*/
-
-// eslint-disable-next-line no-var
-/*declare global {
-    var MonacoEnvironment: Environment | undefined;
-}
-
-type Thenable<T> = PromiseLike<T>;*/
 
 namespace BlazorMonaco
 {
@@ -44,57 +24,7 @@ namespace BlazorMonaco
          * The base url where the editor sources are found (which contains the vs folder)
          */
         public string BaseUrl { get; set; }
-        /**
-         * A web worker factory.
-         * NOTE: If `getWorker` is defined, `getWorkerUrl` is not invoked.
-         */
-        //getWorker?(workerId: string, label: string): Worker;
-        /**
-         * Return the location for web worker scripts.
-         * NOTE: If `getWorker` is defined, `getWorkerUrl` is not invoked.
-         */
-        //getWorkerUrl?(workerId: string, label: string): string;
-        /**
-         * Create a trusted types policy (same API as window.trustedTypes.createPolicy)
-         */
-        /*createTrustedTypesPolicy? (
-            policyName: string,
-            policyOptions?: ITrustedTypePolicyOptions,
-        ): undefined | ITrustedTypePolicy;*/
     }
-
-    /*interface ITrustedTypePolicyOptions {
-    {
-        createHTML?: (input: string, ...arguments: any[]) => string;
-        createScript?: (input: string, ...arguments: any[]) => string;
-        createScriptURL?: (input: string, ...arguments: any[]) => string;
-    }*/
-
-    /*interface ITrustedTypePolicy {
-    {
-        readonly name: string;
-        createHTML? (input: string): any;
-        createScript? (input: string): any;
-        createScriptURL? (input: string): any;
-    }*/
-
-    /*interface IDisposable$2 {
-        dispose(): void;
-    }*/
-
-    /*interface IEvent$1<T> {
-        (listener: (e: T) => any, thisArg?: any): IDisposable;
-    }*/
-
-    /**
-     * A helper that allows to emit and listen to typed events
-     */
-    /*declare class Emitter<T> {
-        constructor();
-        readonly event: IEvent$1<T>;
-        fire(event: T): void;
-        dispose(): void;
-    }*/
 
     public enum MarkerTag
     {
@@ -110,174 +40,12 @@ namespace BlazorMonaco
         Error = 8
     }
 
-    /*declare class CancellationTokenSource {
-        constructor(parent?: CancellationToken);
-        get token(): CancellationToken;
-        cancel(): void;
-        dispose(cancel?: boolean): void;
-    }*/
-
-    /*interface CancellationToken {
-        / **
-         * A flag signalling is cancellation has been requested.
-         * /
-        readonly isCancellationRequested: boolean;
-        / **
-         * An event which fires when cancellation is requested. This event
-         * only ever fires `once` as cancellation can only happen once. Listeners
-         * that are registered after cancellation will be called (next event loop run),
-         * but also only once.
-         *
-         * @event
-         * /
-        readonly onCancellationRequested: (listener: (e: void) => unknown, thisArgs?: unknown, disposables?: IDisposable$2[]) => IDisposable$2;
-    }*/
     /**
      * Uniform Resource Identifier (Uri) http://tools.ietf.org/html/rfc3986.
      * This class is a simple parser which creates the basic component parts
      * (http://tools.ietf.org/html/rfc3986#section-3) with minimal validation
      * and encoding.
-     *
-     * ```txt
-     *       foo://example.com:8042/over/there?name=ferret#nose
-     *       \_/   \______________/\_________/ \_________/ \__/
-     *        |           |            |            |        |
-     *     scheme     authority       path        query   fragment
-     *        |   _____________________|__
-     *       / \ /                        \
-     *       urn:example:animal:ferret:nose
-     * ```
      */
-    /*declare class Uri implements UriComponents {
-        static isUri(thing: unknown): thing is Uri;
-        / **
-         * scheme is the 'http' part of 'http://www.example.com/some/path?query#fragment'.
-         * The part before the first colon.
-         * /
-        readonly scheme: string;
-        / **
-         * authority is the 'www.example.com' part of 'http://www.example.com/some/path?query#fragment'.
-         * The part between the first double slashes and the next slash.
-         * /
-        readonly authority: string;
-        / **
-         * path is the '/some/path' part of 'http://www.example.com/some/path?query#fragment'.
-         * /
-        readonly path: string;
-        / **
-         * query is the 'query' part of 'http://www.example.com/some/path?query#fragment'.
-         * /
-        readonly query: string;
-        / **
-         * fragment is the 'fragment' part of 'http://www.example.com/some/path?query#fragment'.
-         * /
-        readonly fragment: string;
-        / **
-         * Returns a string representing the corresponding file system path of this Uri.
-         * Will handle UNC paths, normalizes windows drive letters to lower-case, and uses the
-         * platform specific path separator.
-         *
-         * * Will *not* validate the path for invalid characters and semantics.
-         * * Will *not* look at the scheme of this Uri.
-         * * The result shall *not* be used for display purposes but for accessing a file on disk.
-         *
-         *
-         * The *difference* to `Uri#path` is the use of the platform specific separator and the handling
-         * of UNC paths. See the below sample of a file-uri with an authority (UNC path).
-         *
-         * ```ts
-            const u = Uri.parse('file://server/c$/folder/file.txt')
-            u.authority === 'server'
-            u.path === '/shares/c$/file.txt'
-            u.fsPath === '\\server\c$\folder\file.txt'
-        ```
-         *
-         * Using `Uri#path` to read a file (using fs-apis) would not be enough because parts of the path,
-         * namely the server name, would be missing. Therefore `Uri#fsPath` exists - it's sugar to ease working
-         * with URIs that represent files on disk (`file` scheme).
-         * /
-        get fsPath(): string;
-        with(change: {
-            scheme?: string;
-            authority?: string | null;
-            path?: string | null;
-            query?: string | null;
-            fragment?: string | null;
-        }): Uri;
-        / **
-         * Creates a new Uri from a string, e.g. `http://www.example.com/some/path`,
-         * `file:///usr/home`, or `scheme:with/path`.
-         *
-         * @param value A string which represents an Uri (see `Uri#toString`).
-         * /
-        static parse(value: string, _strict?: boolean): Uri;
-        / **
-         * Creates a new Uri from a file system path, e.g. `c:\my\files`,
-         * `/usr/home`, or `\\server\share\some\path`.
-         *
-         * The *difference* between `Uri#parse` and `Uri#file` is that the latter treats the argument
-         * as path, not as stringified-uri. E.g. `Uri.file(path)` is **not the same as**
-         * `Uri.parse('file://' + path)` because the path might contain characters that are
-         * interpreted (# and ?). See the following sample:
-         * ```ts
-        const good = Uri.file('/coding/c#/project1');
-        good.scheme === 'file';
-        good.path === '/coding/c#/project1';
-        good.fragment === '';
-        const bad = Uri.parse('file://' + '/coding/c#/project1');
-        bad.scheme === 'file';
-        bad.path === '/coding/c'; // path is now broken
-        bad.fragment === '/project1';
-        ```
-         *
-         * @param path A file system path (see `Uri#fsPath`)
-         * /
-        static file(path: string): Uri;
-        / **
-         * Creates new Uri from uri components.
-         *
-         * Unless `strict` is `true` the scheme is defaults to be `file`. This function performs
-         * validation and should be used for untrusted uri components retrieved from storage,
-         * user input, command arguments etc
-         * /
-        static from(components: UriComponents, strict?: boolean) : Uri;
-        / **
-         * Join a Uri path with path fragments and normalizes the resulting path.
-         *
-         * @param uri The input Uri.
-         * @param pathFragment The path fragment to add to the Uri path.
-         * @returns The resulting Uri.
-         * /
-        static joinPath(uri: Uri, ...pathFragment: string[]): Uri;
-        / **
-         * Creates a string representation for this Uri. It's guaranteed that calling
-         * `Uri.parse` with the result of this function creates an Uri which is equal
-         * to this Uri.
-         *
-         * * The result shall *not* be used for display purposes but for externalization or transport.
-         * * The result will be encoded using the percentage encoding and encoding happens mostly
-         * ignore the scheme-specific encoding rules.
-         *
-         * @param skipEncoding Do not encode the result, default is `false`
-         * /
-        toString(skipEncoding?: boolean): string;
-        toJSON(): UriComponents;
-        / **
-         * A helper function to revive URIs.
-         *
-         * **Note** that this function should only be used when receiving Uri#toJSON generated data
-         * and that it doesn't do any validation. Use {@link Uri.from} when received "untrusted"
-         * uri components such as command arguments or data from storage.
-         *
-         * @param data The Uri components or Uri to revive.
-         * @returns The revived Uri or undefined or null.
-         * /
-        static revive(data: UriComponents | Uri): Uri;
-        static revive(data: UriComponents | Uri | undefined): Uri | undefined;
-        static revive(data: UriComponents | Uri | null): Uri | null;
-        static revive(data: UriComponents | Uri | undefined | null): Uri | undefined | null;
-    }*/
-
     public class UriComponents
     {
         public string Scheme { get; set; }
@@ -499,23 +267,22 @@ namespace BlazorMonaco
         Shift = 1024,
         Alt = 512,
         WinCtrl = 256,
-        //static chord(firstPart: number, secondPart: number) : number;
     }
 
     public class MarkdownString
     {
         public string Value { get; set; }
-        public bool? IsTrusted { get; set; } // TODO | MarkdownStringTrustedOptions;
+        public object IsTrusted { get; set; }
         public bool? SupportThemeIcons { get; set; }
         public bool? SupportHtml { get; set; }
         public UriComponents BaseUri { get; set; }
         public Dictionary<string, UriComponents> Uris { get; set; }
     }
 
-    /*interface MarkdownStringTrustedOptions {
+    public class MarkdownStringTrustedOptions
     {
-        readonly enabledCommands: readonly string[];
-    }*/
+        public string[] EnabledCommands { get; set; }
+    }
 
     public class KeyboardEvent
     {
@@ -529,9 +296,6 @@ namespace BlazorMonaco
         public bool AltGraphKey { get; set; }
         public KeyCode KeyCode { get; set; }
         public string Code { get; set; }
-        //equals(keybinding: number) : boolean;
-        //preventDefault() : void;
-        //stopPropagation() : void;
     }
 
     public class MouseEvent
@@ -551,8 +315,6 @@ namespace BlazorMonaco
         public bool MetaKey { get; set; }
         public long Timestamp { get; set; }
         public bool DefaultPrevented { get; set; }
-        //preventDefault() : void;
-        //stopPropagation() : void;
     }
 
     public class ScrollEvent
@@ -587,71 +349,6 @@ namespace BlazorMonaco
          * column (the first character in a line is between column 1 and column 2)
          */
         public int Column { get; set; }
-
-        //constructor(lineNumber: number, column: number);
-        /**
-         * Create a new position from this position.
-         *
-         * @param newLineNumber new line number
-         * @param newColumn new column
-         */
-        //with(newLineNumber?: number, newColumn?: number) : Position;
-        /**
-         * Derive a new position from this position.
-         *
-         * @param deltaLineNumber line number delta
-         * @param deltaColumn column delta
-         */
-        //delta(deltaLineNumber?: number, deltaColumn?: number) : Position;
-        /**
-         * Test if this position equals other position
-         */
-        //equals(other: IPosition) : boolean;
-        /**
-         * Test if position `a` equals position `b`
-         */
-        //static equals(a: IPosition | null, b: IPosition | null) : boolean;
-        /**
-         * Test if this position is before other position.
-         * If the two positions are equal, the result will be false.
-         */
-        //isBefore(other: IPosition) : boolean;
-        /**
-         * Test if position `a` is before position `b`.
-         * If the two positions are equal, the result will be false.
-         */
-        //static isBefore(a: IPosition, b: IPosition) : boolean;
-        /**
-         * Test if this position is before other position.
-         * If the two positions are equal, the result will be true.
-         */
-        //isBeforeOrEqual(other: IPosition) : boolean;
-        /**
-         * Test if position `a` is before position `b`.
-         * If the two positions are equal, the result will be true.
-         */
-        //static isBeforeOrEqual(a: IPosition, b: IPosition) : boolean;
-        /**
-         * A function that compares positions, useful for sorting
-         */
-        //static compare(a: IPosition, b: IPosition) : number;
-        /**
-         * Clone this position.
-         */
-        //clone() : Position;
-        /**
-         * Convert to a human-readable representation.
-         */
-        //toString() : string;
-        /**
-         * Create a `Position` from an `IPosition`.
-         */
-        //static lift(pos: IPosition) : Position;
-        /**
-         * Test if `obj` is an `IPosition`.
-         */
-        //static isIPosition(obj: unknown): obj is IPosition;
-        //toJSON() : IPosition;
     }
 
     /**
@@ -685,155 +382,6 @@ namespace BlazorMonaco
             EndLineNumber = endLineNumber;
             EndColumn = endColumn;
         }
-
-        /**
-         * Test if this range is empty.
-         */
-        //isEmpty() : boolean;
-        /**
-         * Test if `range` is empty.
-         */
-        //static isEmpty(range: IRange) : boolean;
-        /**
-         * Test if position is in this range. If the position is at the edges, will return true.
-         */
-        //containsPosition(position: IPosition) : boolean;
-        /**
-         * Test if `position` is in `range`. If the position is at the edges, will return true.
-         */
-        //static containsPosition(range: IRange, position: IPosition) : boolean;
-        /**
-         * Test if range is in this range. If the range is equal to this range, will return true.
-         */
-        //containsRange(range: IRange) : boolean;
-        /**
-         * Test if `otherRange` is in `range`. If the ranges are equal, will return true.
-         */
-        //static containsRange(range: IRange, otherRange: IRange) : boolean;
-        /**
-         * Test if `range` is strictly in this range. `range` must start after and end before this range for the result to be true.
-         */
-        //strictContainsRange(range: IRange) : boolean;
-        /**
-         * Test if `otherRange` is strictly in `range` (must start after, and end before). If the ranges are equal, will return false.
-         */
-        //static strictContainsRange(range: IRange, otherRange: IRange) : boolean;
-        /**
-         * A reunion of the two ranges.
-         * The smallest position will be used as the start point, and the largest one as the end point.
-         */
-        //plusRange(range: IRange) : Range;
-        /**
-         * A reunion of the two ranges.
-         * The smallest position will be used as the start point, and the largest one as the end point.
-         */
-        //static plusRange(a: IRange, b: IRange) : Range;
-        /**
-         * A intersection of the two ranges.
-         */
-        //intersectRanges(range: IRange) : Range | null;
-        /**
-         * A intersection of the two ranges.
-         */
-        //static intersectRanges(a: IRange, b: IRange) : Range | null;
-        /**
-         * Test if this range equals other.
-         */
-        //equalsRange(other: IRange | null | undefined): boolean;
-        /**
-         * Test if range `a` equals `b`.
-         */
-        //static equalsRange(a: IRange | null | undefined, b: IRange | null | undefined): boolean;
-        /**
-         * Return the end position (which will be after or equal to the start position)
-         */
-        //getEndPosition() : Position;
-        /**
-         * Return the end position (which will be after or equal to the start position)
-         */
-        //static getEndPosition(range: IRange) : Position;
-        /**
-         * Return the start position (which will be before or equal to the end position)
-         */
-        //getStartPosition() : Position;
-        /**
-         * Return the start position (which will be before or equal to the end position)
-         */
-        //static getStartPosition(range: IRange) : Position;
-        /**
-         * Transform to a user presentable string representation.
-         */
-        //toString() : string;
-        /**
-         * Create a new range using this range's start position, and using endLineNumber and endColumn as the end position.
-         */
-        //setEndPosition(endLineNumber: number, endColumn: number) : Range;
-        /**
-         * Create a new range using this range's end position, and using startLineNumber and startColumn as the start position.
-         */
-        //setStartPosition(startLineNumber: number, startColumn: number) : Range;
-        /**
-         * Create a new empty range using this range's start position.
-         */
-        //collapseToStart() : Range;
-        /**
-         * Create a new empty range using this range's start position.
-         */
-        //static collapseToStart(range: IRange) : Range;
-        /**
-         * Create a new empty range using this range's end position.
-         */
-        //collapseToEnd() : Range;
-        /**
-         * Create a new empty range using this range's end position.
-         */
-        //static collapseToEnd(range: IRange) : Range;
-        /**
-         * Moves the range by the given amount of lines.
-         */
-        //delta(lineCount: number) : Range;
-        /**
-         * Test if this range starts and ends on the same line.
-         */
-        //isSingleLine(): boolean;
-        //static fromPositions(start: IPosition, end?: IPosition) : Range;
-        /**
-         * Create a `Range` from an `IRange`.
-         */
-        //static lift(range: undefined | null) : null;
-        //static lift(range: IRange) : Range;
-        //static lift(range: IRange | undefined | null) : Range | null;
-        /**
-         * Test if `obj` is an `IRange`.
-         */
-        //static isIRange(obj: unknown): obj is IRange;
-        /**
-         * Test if the two ranges are touching in any way.
-         */
-        //static areIntersectingOrTouching(a: IRange, b: IRange) : boolean;
-        /**
-         * Test if the two ranges are intersecting. If the ranges are touching it returns true.
-         */
-        //static areIntersecting(a: IRange, b: IRange) : boolean;
-        /**
-         * Test if the two ranges are intersecting, but not touching at all.
-         */
-        //static areOnlyIntersecting(a: IRange, b: IRange): boolean;
-        /**
-         * A function that compares ranges, useful for sorting ranges
-         * It will first compare ranges on the startPosition and then on the endPosition
-         */
-        //static compareRangesUsingStarts(a: IRange | null | undefined, b: IRange | null | undefined) : number;
-        /**
-         * A function that compares ranges, useful for sorting ranges
-         * It will first compare ranges on the endPosition and then on the startPosition
-         */
-        //static compareRangesUsingEnds(a: IRange, b: IRange) : number;
-        /**
-         * Test if the range spans multiple lines.
-         */
-        //static spansMultipleLines(range: IRange) : boolean;
-        //toJSON() : IRange;
     }
 
     /**
@@ -858,63 +406,7 @@ namespace BlazorMonaco
          * The column on `positionLineNumber` where the selection has ended.
          */
         public int PositionColumn { get; set; }
-        //constructor(selectionStartLineNumber: number, selectionStartColumn: number, positionLineNumber: number, positionColumn: number);
-        /**
-         * Transform to a human-readable representation.
-         */
-        //toString() : string;
-        /**
-         * Test if equals other selection.
-         */
-        //equalsSelection(other: ISelection) : boolean;
-        /**
-         * Test if the two selections are equal.
-         */
-        //static selectionsEqual(a: ISelection, b: ISelection) : boolean;
-        /**
-         * Get directions (LTR or RTL).
-         */
-        //getDirection() : SelectionDirection;
-        /**
-         * Create a new selection with a different `positionLineNumber` and `positionColumn`.
-         */
-        //setEndPosition(endLineNumber: number, endColumn: number) : Selection;
-        /**
-         * Get the position at `positionLineNumber` and `positionColumn`.
-         */
-        //getPosition() : Position;
-        /**
-         * Get the position at the start of the selection.
-        */
-        //getSelectionStart() : Position;
-        /**
-         * Create a new selection with a different `selectionStartLineNumber` and `selectionStartColumn`.
-         */
-        //setStartPosition(startLineNumber: number, startColumn: number) : Selection;
-        /**
-         * Create a `Selection` from one or two positions
-         */
-        //static fromPositions(start: IPosition, end?: IPosition) : Selection;
-        /**
-         * Creates a `Selection` from a range, given a direction.
-         */
-        //static fromRange(range: Range, direction: SelectionDirection) : Selection;
-        /**
-         * Create a `Selection` from an `ISelection`.
-         */
-        //static liftSelection(sel: ISelection) : Selection;
-        /**
-         * `a` equals `b`.
-         */
-        //static selectionsArrEqual(a: ISelection[], b: ISelection[]) : boolean;
-        /**
-         * Test if `obj` is an `ISelection`.
-         */
-        //static isISelection(obj: unknown): obj is ISelection;
-        /**
-         * Create with a direction.
-         */
-        //static createWithDirection(startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number, direction: SelectionDirection) : Selection;
+
     }
 
     /**
@@ -938,13 +430,253 @@ namespace BlazorMonaco
         public string Type { get; set; }
         public string Language { get; set; }
         //_tokenBrand: void;
-        //constructor(offset: number, type: string, language: string);
-        //toString(): string;
     }
 }
 
 namespace BlazorMonaco.Editor
 {
+
+    /**
+     * A global keybinding rule.
+     */
+    public class KeybindingRule
+    {
+        public int Keybinding { get; set; }
+        public string Command { get; set; }
+        public object CommandArgs { get; set; }
+        public string When { get; set; }
+    }
+
+    /**
+     * A link opener that can be registered with `Global.RegisterLinkOpener`.
+     */
+    public interface ILinkOpener
+    {
+        Task<object> Open(string resource);
+    }
+
+    /**
+     * Wrapper around `ILinkOpener` so the handler can be invoked from JavaScript.
+     */
+    public class LinkOpener : ILinkOpener
+    {
+        public delegate Task<object> OpenDelegate(string resource);
+        public OpenDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(OpenLink))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> OpenLink(string resource)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(resource));
+
+        public Task<object> Open(string resource)
+            => ProvideMethod?.Invoke(resource) ?? Task.FromResult<object>(null);
+
+        public LinkOpener(OpenDelegate open) => ProvideMethod = open;
+    }
+
+    /**
+     * A code editor opener that can be registered with `Global.RegisterEditorOpener`.
+     */
+    public interface ICodeEditorOpener
+    {
+        Task<object> OpenCodeEditor(string sourceId, string resource, object selectionOrPosition);
+    }
+
+    /**
+     * Wrapper around `ICodeEditorOpener` so the handler can be invoked from JavaScript.
+     */
+    public class CodeEditorOpener : ICodeEditorOpener
+    {
+        public delegate Task<object> OpenCodeEditorDelegate(string sourceId, string resource, object selectionOrPosition);
+        public OpenCodeEditorDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(OpenCodeEditorLink))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> OpenCodeEditorLink(string sourceId, string resource, object selectionOrPosition)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(sourceId, resource, selectionOrPosition));
+
+        public Task<object> OpenCodeEditor(string sourceId, string resource, object selectionOrPosition)
+            => ProvideMethod?.Invoke(sourceId, resource, selectionOrPosition) ?? Task.FromResult<object>(null);
+
+        public CodeEditorOpener(OpenCodeEditorDelegate openCodeEditor) => ProvideMethod = openCodeEditor;
+    }
+
+    /**
+     * A collection of decorations tracked by an editor, as returned by `Editor.CreateDecorationsCollection`.
+     */
+    public class EditorDecorationsCollection
+    {
+        internal IJSRuntime JsRuntime { get; set; }
+        internal string EditorId { get; set; }
+
+        public string Owner { get; set; }
+
+        public int Length { get; set; }
+
+        public List<Range> Ranges { get; set; }
+
+        public Task<List<string>> Set(object newDecorations)
+            => JsRuntime.SafeInvokeAsync<List<string>>("blazorMonaco.editor.decorationsSet", EditorId, Owner, newDecorations);
+
+        public Task<List<string>> Append(object newDecorations)
+            => JsRuntime.SafeInvokeAsync<List<string>>("blazorMonaco.editor.decorationsAppend", EditorId, Owner, newDecorations);
+
+        public Task Clear()
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.decorationsClear", EditorId, Owner);
+
+        public Task<bool> Has(object decoration)
+            => JsRuntime.SafeInvokeAsync<bool>("blazorMonaco.editor.decorationsHas", EditorId, Owner, decoration);
+
+        public Task<Range> GetRange(int index)
+            => JsRuntime.SafeInvokeAsync<Range>("blazorMonaco.editor.decorationsGetRange", EditorId, Owner, index);
+
+        public Task<List<Range>> GetRanges()
+            => JsRuntime.SafeInvokeAsync<List<Range>>("blazorMonaco.editor.decorationsGetRanges", EditorId, Owner);
+    }
+
+    /**
+     * Static hub for editor/model lifecycle events that have no per-instance .NET callback.
+     * JavaScript registers persistent global listeners (see `Global.RegisterLifecycleListeners`)
+     * that call back into `OnLifecycleEvent`.
+     */
+    public class MonacoLifecycle
+    {
+        private static MonacoLifecycle _instance;
+        private static DotNetObjectReference<MonacoLifecycle> _ref;
+
+        public static event Action<string, string> LifecycleEvent;
+
+        [JSInvokable]
+        public void OnLifecycleEvent(string eventName, string payloadJson)
+            => LifecycleEvent?.Invoke(eventName, payloadJson);
+
+        public static MonacoLifecycle GetInstance()
+        {
+            if (_instance == null)
+                _instance = new MonacoLifecycle();
+            return _instance;
+        }
+
+        internal static DotNetObjectReference<MonacoLifecycle> GetRef()
+        {
+            if (_ref == null)
+                _ref = DotNetObjectReference.Create(GetInstance());
+            return _ref;
+        }
+    }
+
+
+    /**
+     * A content widget added to an editor.
+     */
+    public class ContentWidget
+    {
+        public string Id { get; set; }
+        public string DomNodeId { get; set; }
+        public bool? AllowEditorOverflow { get; set; }
+        public bool? UseDisplayNone { get; set; }
+        public bool? SuppressMouseDown { get; set; }
+        public ContentWidgetPosition Position { get; set; }
+    }
+
+    /**
+     * The placement of a content widget.
+     */
+    public class ContentWidgetPosition
+    {
+        public Position Position { get; set; }
+        public Position SecondaryPosition { get; set; }
+        public ContentWidgetPositionPreference[] Preference { get; set; }
+    }
+
+    /**
+     * An overlay widget added to an editor.
+     */
+    public class OverlayWidget
+    {
+        public string Id { get; set; }
+        public string DomNodeId { get; set; }
+        public bool? AllowEditorOverflow { get; set; }
+        public object Position { get; set; }
+    }
+
+    /**
+     * A glyph margin widget added to an editor.
+     */
+    public class GlyphMarginWidget
+    {
+        public string Id { get; set; }
+        public string DomNodeId { get; set; }
+        public GlyphMarginWidgetPosition Position { get; set; }
+    }
+
+    /**
+     * The placement of a glyph margin widget.
+     */
+    public class GlyphMarginWidgetPosition
+    {
+        public int LineNumber { get; set; }
+        public int Column { get; set; }
+    }
+
+    /**
+     * A view zone added to an editor via `Editor.AddViewZone`.
+     */
+    public class ViewZone
+    {
+        public int AfterLineNumber { get; set; }
+        public int? AfterColumn { get; set; }
+        public bool? ShowInHiddenAreas { get; set; }
+        public int? Ordinal { get; set; }
+        public bool? SuppressMouseDown { get; set; }
+        public int? HeightInLines { get; set; }
+        public int? HeightInPx { get; set; }
+        public int? MinWidthInPx { get; set; }
+        public string DomNodeId { get; set; }
+        public string MarginDomNodeId { get; set; }
+    }
+
+    /**
+     * An accessor used to add/remove/layout view zones. Mirrors
+     * `monaco.editor.IViewZoneChangeAccessor`.
+     */
+    public interface IViewZoneChangeAccessor
+    {
+        Task<string> AddZone(ViewZone zone);
+        Task RemoveZone(string id);
+        Task LayoutZone(string id);
+    }
+
+    /**
+     * Bridge implementation of `IViewZoneChangeAccessor` bound to a specific editor.
+     */
+    public class ViewZoneChangeAccessor : IViewZoneChangeAccessor
+    {
+        internal IJSRuntime JsRuntime { get; set; }
+        internal string EditorId { get; set; }
+
+        public Task<string> AddZone(ViewZone zone)
+            => JsRuntime.SafeInvokeAsync<string>("blazorMonaco.editor.addViewZone", EditorId, zone);
+
+        public Task RemoveZone(string id)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.removeViewZone", EditorId, id);
+
+        public Task LayoutZone(string id)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.editor.layoutViewZone", EditorId, id);
+
+        public ViewZoneChangeAccessor() { }
+
+        internal ViewZoneChangeAccessor(IJSRuntime jsRuntime, string editorId)
+        {
+            JsRuntime = jsRuntime;
+            EditorId = editorId;
+        }
+    }
+
     public partial class Global
     {
         /**
@@ -974,28 +706,6 @@ namespace BlazorMonaco.Editor
             await JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.create", domElementId, optionsJson, overrideServices, dotnetObjectRef);
         }
 
-        /**
-         * Emitted when an editor is created.
-         * Creating a diff editor might cause this listener to be invoked with the two editors.
-         * @event
-         */
-        //export function onDidCreateEditor(listener: (codeEditor: ICodeEditor) => void): IDisposable$2;
-
-        /**
-         * Emitted when an diff editor is created.
-         * @event
-         */
-        //export function onDidCreateDiffEditor(listener: (diffEditor: IDiffEditor) => void): IDisposable$2;
-
-        /**
-         * Get all the created editors.
-         */
-        //export function getEditors() : readonly ICodeEditor[];
-
-        /**
-         * Get all the created diff editors.
-         */
-        //export function getDiffEditors() : readonly IDiffEditor[];
 
         /**
          * Create a new diff editor under `domElement`.
@@ -1026,53 +736,6 @@ namespace BlazorMonaco.Editor
             await JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.createDiffEditor", domElementId, optionsJson, overrideServices, dotnetObjectRef, dotnetObjectRefOriginal, dotnetObjectRefModified);
         }
 
-        //export function createMultiFileDiffEditor(domElement: HTMLElement, override?: IEditorOverrideServices): any;
-
-        /**
-         * Description of a command contribution
-         */
-        /*export interface ICommandDescriptor
-        {
-            /**
-             * An unique identifier of the contributed command.
-             /
-            id: string;
-            /**
-             * Callback that will be executed when the command is triggered.
-             /
-            run: ICommandHandler;
-        }*/
-
-        /**
-         * Add a command.
-         */
-        //export function addCommand(descriptor: ICommandDescriptor): IDisposable$2;
-
-        /**
-         * Add an action to all editors.
-         */
-        //export function addEditorAction(descriptor: IActionDescriptor): IDisposable$2;
-
-        /**
-         * A keybinding rule.
-         */
-        /*export interface IKeybindingRule
-        {
-            keybinding: number;
-            command?: string | null;
-            commandArgs?: any;
-            when?: string | null;
-        }*/
-
-        /**
-         * Add a keybinding rule.
-         */
-        //export function addKeybindingRule(rule: IKeybindingRule): IDisposable$2;
-
-        /**
-         * Add keybinding rules.
-         */
-        //export function addKeybindingRules(rules: IKeybindingRule[]): IDisposable$2;
 
         /**
          * Create a new editor model.
@@ -1127,11 +790,6 @@ namespace BlazorMonaco.Editor
             public int? Take { get; set; }
         }
 
-        /**
-         * Emitted when markers change for a model.
-         * @event
-         */
-        //export function onDidChangeMarkers(listener: (e: readonly Uri[]) => void): IDisposable$2;
 
         /**
          * Get the model that has `uri` if it exists.
@@ -1166,32 +824,6 @@ namespace BlazorMonaco.Editor
             return result;
         }
 
-        /**
-         * Emitted when a model is created.
-         * @event
-         */
-        //export function onDidCreateModel(listener: (model: ITextModel) => void): IDisposable$2;
-
-        /**
-         * Emitted right before a model is disposed.
-         * @event
-         */
-        //export function onWillDisposeModel(listener: (model: ITextModel) => void): IDisposable$2;
-
-        /**
-         * Emitted when a different language is set to a model.
-         * @event
-         */
-        /*export function onDidChangeModelLanguage(listener: (e: {
-            readonly model: ITextModel;
-            readonly oldLanguage: string;
-        }) => void): IDisposable$2;*/
-
-        /**
-         * Create a new web worker that has model syncing capabilities built in.
-         * Specify an AMD module to load that will `create` an object that will be proxied.
-         */
-        //export function createWebWorker<T extends object>(opts: IInternalWebWorkerOptions): MonacoWebWorker<T>;
 
         /**
          * Colorize the contents of `domNode` using attribute `data-lang`.
@@ -1222,10 +854,6 @@ namespace BlazorMonaco.Editor
         public static Task<string> ColorizeModelLine(IJSRuntime jsRuntime, TextModel model, int lineNumber, int? tabSize = null)
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<string>("blazorMonaco.editor.colorizeModelLine", model.Uri, lineNumber, tabSize);
 
-        /**
-         * Tokenize `text` using language `languageId`
-         */
-        //export function tokenize(text: string, languageId: string): Token[][];
 
         /**
          * Define a new theme or update an existing theme.
@@ -1258,48 +886,150 @@ namespace BlazorMonaco.Editor
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.remeasureFonts");
 
         /**
-         * Register a command.
+         * Returns the ids of all created code editors.
          */
-        //export function registerCommand(id: string, handler: (accessor: any, ...args: any[]) => void): IDisposable$2;
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task<List<string>> GetEditors()
+            => GetEditors(null);
 
-        /*export interface ILinkOpener
+        public static Task<List<string>> GetEditors(IJSRuntime jsRuntime)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<List<string>>("blazorMonaco.editor.getEditors");
+
+        /**
+         * Returns the ids of all created diff editors.
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task<List<string>> GetDiffEditors()
+            => GetDiffEditors(null);
+
+        public static Task<List<string>> GetDiffEditors(IJSRuntime jsRuntime)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<List<string>>("blazorMonaco.editor.getDiffEditors");
+
+        /**
+         * Tokenize a string. Returns the tokens grouped by line.
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task<List<List<Token>>> Tokenize(string text, string languageId)
+            => Tokenize(null, text, languageId);
+
+        public static Task<List<List<Token>>> Tokenize(IJSRuntime jsRuntime, string text, string languageId)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<List<List<Token>>>("blazorMonaco.editor.tokenize", text, languageId);
+
+        /**
+         * Register a command. The command handler is invoked (via JavaScript) when the
+         * command is executed, e.g. through `editor.executeCommand(...)` or a keybinding.
+         */
+        private static readonly Dictionary<string, Action<object[]>> _commands = new Dictionary<string, Action<object[]>>();
+        private static DotNetObjectReference<CommandHandler> _commandHandlerRef;
+
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterCommand(string commandId, Action<object[]> handler)
+            => RegisterCommand(null, commandId, handler);
+
+        public static Task RegisterCommand(IJSRuntime jsRuntime, string commandId, Action<object[]> handler)
         {
-            open(resource: Uri) : boolean | Promise<boolean>;
-        }*/
+            _commands[commandId] = handler;
+            if (_commandHandlerRef == null)
+                _commandHandlerRef = DotNetObjectReference.Create(new CommandHandler());
+            return JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerCommand", commandId, _commandHandlerRef);
+        }
 
-        /**
-         * Registers a handler that is called when a link is opened in any editor. The handler callback should return `true` if the link was handled and `false` otherwise.
-         * The handler that was registered last will be called first when a link is opened.
-         *
-         * Returns a disposable that can unregister the opener again.
-         */
-        //export function registerLinkOpener(opener: ILinkOpener): IDisposable$2;
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task AddCommand(object descriptor)
+            => AddCommand(null, descriptor);
 
-        /**
-         * Represents an object that can handle editor open operations (e.g. when "go to definition" is called
-         * with a resource other than the current model).
-         */
-        /*export interface ICodeEditorOpener
+        public static Task AddCommand(IJSRuntime jsRuntime, object descriptor)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.addCommandDescriptor", descriptor);
+
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task AddEditorAction(object descriptor)
+            => AddEditorAction(null, descriptor);
+
+        public static Task AddEditorAction(IJSRuntime jsRuntime, object descriptor)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.addEditorAction", descriptor);
+
+        /// <summary>
+        /// .NET callback target invoked by JavaScript when a registered command runs.
+        /// </summary>
+        internal class CommandHandler
         {
-            / **
-             * Callback that is invoked when a resource other than the current model should be opened (e.g. when "go to definition" is called).
-             * The callback should return `true` if the request was handled and `false` otherwise.
-             * @param source The code editor instance that initiated the request.
-             * @param resource The Uri of the resource that should be opened.
-             * @param selectionOrPosition An optional position or selection inside the model corresponding to `resource` that can be used to set the cursor.
-             * /
-            //openCodeEditor(source: ICodeEditor, resource: Uri, selectionOrPosition?: IRange | IPosition) : boolean | Promise<boolean>;
-        }*/
+            [JSInvokable]
+            public void Invoke(string commandId, object[] args)
+            {
+                if (_commands.TryGetValue(commandId, out var handler))
+                    handler?.Invoke(args);
+            }
+        }
+
 
         /**
-         * Registers a handler that is called when a resource other than the current model should be opened in the editor (e.g. "go to definition").
-         * The handler callback should return `true` if the request was handled and `false` otherwise.
-         *
-         * Returns a disposable that can unregister the opener again.
-         *
-         * If no handler is registered the default behavior is to do nothing for models other than the currently attached one.
+         * Register a handler that is called whenever a link is opened in an editor.
          */
-        //export function registerEditorOpener(opener: ICodeEditorOpener): IDisposable$2;
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterLinkOpener(LinkOpener linkOpener)
+            => RegisterLinkOpener(null, linkOpener);
+
+        public static Task RegisterLinkOpener(IJSRuntime jsRuntime, LinkOpener linkOpener)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerLinkOpener", DotNetObjectReference.Create(linkOpener));
+
+        /**
+         * Register a handler that is called whenever a resource other than the current
+         * model is opened in an editor (e.g. "go to definition").
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterEditorOpener(CodeEditorOpener codeEditorOpener)
+            => RegisterEditorOpener(null, codeEditorOpener);
+
+        public static Task RegisterEditorOpener(IJSRuntime jsRuntime, CodeEditorOpener codeEditorOpener)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerEditorOpener", DotNetObjectReference.Create(codeEditorOpener));
+
+        /**
+         * Add a single global keybinding rule.
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterKeybindingRule(KeybindingRule rule)
+            => RegisterKeybindingRule(null, rule);
+
+        public static Task RegisterKeybindingRule(IJSRuntime jsRuntime, KeybindingRule rule)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.addKeybindingRule", rule);
+
+        /**
+         * Add multiple global keybinding rules at once.
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterKeybindingRules(List<KeybindingRule> rules)
+            => RegisterKeybindingRules(null, rules);
+
+        public static Task RegisterKeybindingRules(IJSRuntime jsRuntime, List<KeybindingRule> rules)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.addKeybindingRules", rules);
+
+        /**
+         * Register persistent global lifecycle listeners (onDidCreateEditor(s),
+         * onDidChangeMarkers, onDidChangeModelLanguage, onDidCreateModel, onWillDisposeModel)
+         * that fire the `MonacoLifecycle` hub. Call once; subsequent calls are no-ops.
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task RegisterLifecycleListeners()
+            => RegisterLifecycleListeners(null);
+
+        public static Task RegisterLifecycleListeners(IJSRuntime jsRuntime)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerLifecycleListeners", MonacoLifecycle.GetRef());
+
+
+        /**
+         * Create a new web worker (see `monaco.editor.createWebWorker`).
+         */
+        [Obsolete("This method is deprecated as it's WASM only. Use the overload that takes an IJSRuntime parameter.")]
+        public static Task<MonacoWebWorker<T>> CreateWebWorker<T>(WebWorkerOptions options) where T : class
+            => CreateWebWorker<T>(null, options);
+
+        public static async Task<MonacoWebWorker<T>> CreateWebWorker<T>(IJSRuntime jsRuntime, WebWorkerOptions options) where T : class
+        {
+            var runtime = JsRuntimeExt.UpdateRuntime(jsRuntime);
+            var id = await runtime.SafeInvokeAsync<string>("blazorMonaco.editor.createWebWorker", options);
+            return new MonacoWebWorker<T> { Id = id, JsRuntime = runtime };
+        }
+
     }
     public class BuiltinTheme
     {
@@ -1329,37 +1059,78 @@ namespace BlazorMonaco.Editor
     /**
      * A web worker that can provide a proxy to an arbitrary file.
      */
-    /* export interface MonacoWebWorker<T> {
-        / **
-         * Terminate the web worker, thus invalidating the returned proxy.
-         * /
-        dispose(): void;
-        / **
-         * Get a proxy to the arbitrary loaded code.
-         * /
-        getProxy(): Promise<T>;
-        / **
-         * Synchronize (send) the models at `resources` to the web worker,
-         * making them available in the monaco.worker.getMirrorModels().
-         * /
-        withSyncedResources(resources: Uri[]): Promise<T>;
-    }*/
 
-    /*export interface IInternalWebWorkerOptions {
+
+    /**
+     * Options passed to `Global.CreateWebWorker`.
+     */
+    public class WebWorkerOptions
+    {
         /**
-         * The worker.
-         * /
-        worker: Worker | Promise<Worker>;
+         * URL used to construct the underlying JavaScript `Worker`.
+         * monaco's `IInternalWebWorkerOptions.worker` is a `Worker`; from C# a URL string is the
+         * constructible equivalent, so JavaScript creates `new Worker(workerUrl)` for you.
+         */
+        public string WorkerUrl { get; set; }
         /**
          * An object that can be used by the web worker to make calls back to the main thread.
-         * /
-        host?: Record<string, Function>;
+         */
+        public object Host { get; set; }
         /**
-         * Keep idle models.
-         * Defaults to false, which means that idle models will stop syncing after a while.
-         * /
-        keepIdleModels?: boolean;
-    }*/
+         * Keep idle models. Defaults to false, which means that idle models will stop syncing after a while.
+         */
+        public bool? KeepIdleModels { get; set; }
+    }
+
+    /**
+     * A web worker that can provide a proxy to an arbitrary loaded file. Mirrors
+     * `monaco.editor.createWebWorker<T>` and `monaco.editor.MonacoWebWorker<T>`.
+     */
+    public class MonacoWebWorker<T> where T : class
+    {
+        internal IJSRuntime JsRuntime { get; set; }
+        internal string Id { get; set; }
+
+        /** Terminate the web worker, thus invalidating the returned proxy. */
+        public Task Dispose()
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.worker.dispose", Id);
+
+        /** Get a proxy to the arbitrary loaded code. */
+        public Task<T> GetProxy()
+            => JsRuntime.SafeInvokeAsync<T>("blazorMonaco.worker.getProxy", Id);
+
+        /** Synchronize (send) the models at `resources` (uris) to the web worker. */
+        public Task<T> WithSyncedResources(List<string> resources)
+            => JsRuntime.SafeInvokeAsync<T>("blazorMonaco.worker.withSyncedResources", Id, resources);
+    }
+
+    /**
+     * Editor zoom control. Mirrors `monaco.editor.EditorZoom`.
+     * Provides global zoom level get/set for all editor instances.
+     *
+     * To use with DI inBlazor Server: Inject EditorZoom and call methods.
+     * To use explicitly: pass IJSRuntime to each method call.
+     */
+    public class EditorZoom
+    {
+        private readonly IJSRuntime _jsRuntime;
+
+        public EditorZoom(IJSRuntime jsRuntime)
+            => _jsRuntime = JsRuntimeExt.UpdateRuntime(jsRuntime);
+
+        /**
+         * Gets the current zoom level.
+         */
+        public Task<double> GetZoomLevel()
+            => _jsRuntime.SafeInvokeAsync<double>("blazorMonaco.editor.getZoomLevel");
+
+        /**
+         * Sets the zoom level for all editor instances.
+         * @param zoomLevel The zoom level (1.0 = 100%).
+         */
+        public Task SetZoomLevel(double zoomLevel)
+            => _jsRuntime.SafeInvokeAsync("blazorMonaco.editor.setZoomLevel", null, zoomLevel);
+    }
 
     /**
      * Description of an action contribution
@@ -1444,7 +1215,7 @@ namespace BlazorMonaco.Editor
          * Controls whether completions should be computed based on words in the document.
          * Defaults to true.
          */
-        bool? WordBasedSuggestions { get; set; } // TODO wordBasedSuggestions?: 'off' | 'currentDocument' | 'matchingDocuments' | 'allDocuments';
+        object WordBasedSuggestions { get; set; }
         /**
          * Controls whether word based completions should be included from opened documents of the same language or any language.
          */
@@ -1457,7 +1228,7 @@ namespace BlazorMonaco.Editor
          * Defaults to 'byTheme'.
          */
         [JsonPropertyName("semanticHighlighting.enabled")]
-        bool? SemanticHighlightingEnabled { get; set; } // true | false | 'configuredByTheme';
+        object SemanticHighlightingEnabled { get; set; }
         /**
          * Keep peek editors open even when double-clicking their content or when hitting `Escape`.
          * Defaults to false.
@@ -1483,7 +1254,6 @@ namespace BlazorMonaco.Editor
         bool? AutoDetectHighContrast { get; set; }
     }
 
-    // This class is not included in the monaco.d.ts file. It's added for translating the updateOptions method parameter
     public class EditorUpdateOptions : EditorOptions, IGlobalEditorOptions
     {
         public int? TabSize { get; set; }
@@ -1491,10 +1261,10 @@ namespace BlazorMonaco.Editor
         public bool? DetectIndentation { get; set; }
         public bool? TrimAutoWhitespace { get; set; }
         public bool? LargeFileOptimizations { get; set; }
-        public bool? WordBasedSuggestions { get; set; }
+        public object WordBasedSuggestions { get; set; }
         public bool? WordBasedSuggestionsOnlySameLanguage { get; set; }
         [JsonPropertyName("semanticHighlighting.enabled")]
-        public bool? SemanticHighlightingEnabled { get; set; } // true | false | 'configuredByTheme';
+        public object SemanticHighlightingEnabled { get; set; }
         public bool? StablePeek { get; set; }
         public int? MaxTokenizationLineLength { get; set; }
         public string Theme { get; set; }
@@ -1547,16 +1317,15 @@ namespace BlazorMonaco.Editor
         */
         //ariaContainerElement?: HTMLElement;
 
-        // IGlobalEditorOptions implementation
         public int? TabSize { get; set; }
         public bool? InsertSpaces { get; set; }
         public bool? DetectIndentation { get; set; }
         public bool? TrimAutoWhitespace { get; set; }
         public bool? LargeFileOptimizations { get; set; }
-        public bool? WordBasedSuggestions { get; set; }
+        public object WordBasedSuggestions { get; set; }
         public bool? WordBasedSuggestionsOnlySameLanguage { get; set; }
         [JsonPropertyName("semanticHighlighting.enabled")]
-        public bool? SemanticHighlightingEnabled { get; set; } // true | false | 'configuredByTheme';
+        public object SemanticHighlightingEnabled { get; set; }
         public bool? StablePeek { get; set; }
         public int? MaxTokenizationLineLength { get; set; }
     }
@@ -1581,42 +1350,8 @@ namespace BlazorMonaco.Editor
         public bool? AutoDetectHighContrast { get; set; }
     }
 
-    // Translated in the StandaloneCodeEditor.razor.cs file
-    /*export interface IStandaloneCodeEditor extends ICodeEditor {
-        updateOptions(newOptions: IEditorOptions & IGlobalEditorOptions): void;
-        addCommand(keybinding: number, handler: ICommandHandler, context?: string): string | null;
-        createContextKey<T extends ContextKeyValue = ContextKeyValue>(key: string, defaultValue: T): IContextKey<T>;
-        addAction(descriptor: IActionDescriptor): IDisposable$2;
-    }*/
-
-    // Translated in the StandaloneDiffEditor.razor.cs file
-    /*export interface IStandaloneDiffEditor extends IDiffEditor {
-        addCommand(keybinding: number, handler: ICommandHandler, context?: string): string | null;
-        createContextKey<T extends ContextKeyValue = ContextKeyValue>(key: string, defaultValue: T): IContextKey<T>;
-        addAction(descriptor: IActionDescriptor): IDisposable$2;
-        getOriginalEditor(): IStandaloneCodeEditor;
-        getModifiedEditor(): IStandaloneCodeEditor;
-    }*/
 
     public delegate void CommandHandler(params object[] args);
-
-    /*export interface ILocalizedString
-    {
-        original: string;
-        value: string;
-    }*/
-    /*export interface ICommandMetadata
-    {
-        readonly description: ILocalizedString | string;
-    }*/
-
-    /*export interface IContextKey<T extends ContextKeyValue = ContextKeyValue> {
-        set(value: T): void;
-        reset(): void;
-        get(): T | undefined;
-    }*/
-
-    //export type ContextKeyValue = null | undefined | boolean | number | string | Array<null | undefined | boolean | number | string> | Record<string, null | undefined | boolean | number | string>;
 
     public class EditorOverrideServices : Dictionary<string, object>
     { }
@@ -1794,27 +1529,6 @@ namespace BlazorMonaco.Editor
         Right = 3
     }
 
-    /*export interface IGlyphMarginLanesModel
-    {
-        / **
-         * The number of lanes that should be rendered in the editor.
-         * /
-        readonly requiredLanes: number;
-        / **
-         * Gets the lanes that should be rendered starting at a given line number.
-         * /
-        getLanesAtLine(lineNumber: number) : GlyphMarginLane[];
-        / **
-         * Resets the model and ensures it can contain at least `maxLine` lines.
-         * /
-        reset(maxLine: number) : void;
-        / **
-         * Registers that a lane should be visible at the Range in the model.
-         * @param persist - if true, notes that the lane should always be visible,
-         * even on lines where there's no specific request for that lane.
-         * /
-        push(lane: GlyphMarginLane, range: Range, persist?: boolean) : void;
-    }*/
 
     /**
      * Position in the minimap to render the decoration.
@@ -2191,26 +1905,19 @@ namespace BlazorMonaco.Editor
 
     public class TextModelResolvedOptions
     {
-        //_textModelResolvedOptionsBrand: void;
         public int TabSize { get; set; }
         public int IndentSize { get; set; }
         public bool InsertSpaces { get; set; }
         public DefaultEndOfLine DefaultEOL { get; set; }
         public bool TrimAutoWhitespace { get; set; }
         public BracketPairColorizationOptions BracketPairColorizationOptions { get; set; }
-        //get originalIndentSize(): number | 'tabSize';
     }
 
-    /*export interface BracketPairColorizationOptions
-    {
-        enabled: boolean;
-        independentColorPoolPerBracketType: boolean;
-    }*/
 
     public class TextModelUpdateOptions
     {
         public int? TabSize { get; set; }
-        public int? IndentSize { get; set; } // TODO indentSize?: number | 'tabSize';
+        public object IndentSize { get; set; }
         public bool? InsertSpaces { get; set; }
         public bool? TrimAutoWhitespace { get; set; }
         public BracketPairColorizationOptions BracketColorizationOptions { get; set; }
@@ -2218,7 +1925,6 @@ namespace BlazorMonaco.Editor
 
     public class FindMatch
     {
-        //_findMatchBrand: void;
         public Range Range { get; set; }
         public string[] Matches { get; set; }
     }
@@ -2240,483 +1946,35 @@ namespace BlazorMonaco.Editor
      * Will try to return chunks of roughly ~64KB size.
      * Will return null when finished.
      */
-    /*export interface ITextSnapshot
+    public interface ITextSnapshot
     {
-        read() : string | null;
-    }*/
+        string Read();
+    }
 
-    // Translated in the TextModel.cs file
-    /**
-     * A model.
-     */
-    /*export interface ITextModel {
-        /**
-         * Gets the resource associated with this editor model.
-         * /
-        readonly uri: Uri;
-        /**
-         * A unique identifier associated with this model.
-         * /
-        readonly id: string;
-        /**
-         * Get the resolved options for this model.
-         * /
-        getOptions(): TextModelResolvedOptions;
-        /**
-         * Get the current version id of the model.
-         * Anytime a change happens to the model (even undo/redo),
-         * the version id is incremented.
-         * /
-        getVersionId(): number;
-        /**
-         * Get the alternative version id of the model.
-         * This alternative version id is not always incremented,
-         * it will return the same values in the case of undo-redo.
-         * /
-        getAlternativeVersionId(): number;
-        /**
-         * Replace the entire text buffer value contained in this model.
-         * /
-        setValue(newValue: string | ITextSnapshot): void;
-        /**
-         * Get the text stored in this model.
-         * @param eol The end of line character preference. Defaults to `EndOfLinePreference.TextDefined`.
-         * @param preserverBOM Preserve a BOM character if it was detected when the model was constructed.
-         * @return The text.
-         * /
-        getValue(eol?: EndOfLinePreference, preserveBOM?: boolean): string;
-        /**
-         * Get the text stored in this model.
-         * @param preserverBOM Preserve a BOM character if it was detected when the model was constructed.
-         * @return The text snapshot (it is safe to consume it asynchronously).
-         * /
-        createSnapshot(preserveBOM?: boolean) : ITextSnapshot;
-        /**
-         * Get the length of the text stored in this model.
-         * /
-        getValueLength(eol?: EndOfLinePreference, preserveBOM?: boolean): number;
-        /**
-         * Get the text in a certain range.
-         * @param range The range describing what text to get.
-         * @param eol The end of line character preference. This will only be used for multiline ranges. Defaults to `EndOfLinePreference.TextDefined`.
-         * @return The text.
-         * /
-        getValueInRange(range: IRange, eol?: EndOfLinePreference): string;
-        /**
-         * Get the length of text in a certain range.
-         * @param range The range describing what text length to get.
-         * @return The text length.
-         * /
-        getValueLengthInRange(range: IRange, eol?: EndOfLinePreference): number;
-        /**
-         * Get the character count of text in a certain range.
-         * @param range The range describing what text length to get.
-         * /
-        getCharacterCountInRange(range: IRange, eol?: EndOfLinePreference): number;
-        /**
-         * Get the number of lines in the model.
-         * /
-        getLineCount(): number;
-        /**
-         * Get the text for a certain line.
-         * /
-        getLineContent(lineNumber: number): string;
-        /**
-         * Get the text length for a certain line.
-         * /
-        getLineLength(lineNumber: number): number;
-        /**
-         * Get the text for all lines.
-         * /
-        getLinesContent(): string[];
-        /**
-         * Get the end of line sequence predominantly used in the text buffer.
-         * @return EOL char sequence (e.g.: '\n' or '\r\n').
-         * /
-        getEOL(): string;
-        /**
-         * Get the end of line sequence predominantly used in the text buffer.
-         * /
-        getEndOfLineSequence(): EndOfLineSequence;
-        /**
-         * Get the minimum legal column for line at `lineNumber`
-         * /
-        getLineMinColumn(lineNumber: number): number;
-        /**
-         * Get the maximum legal column for line at `lineNumber`
-         * /
-        getLineMaxColumn(lineNumber: number): number;
-        /**
-         * Returns the column before the first non whitespace character for line at `lineNumber`.
-         * Returns 0 if line is empty or contains only whitespace.
-         * /
-        getLineFirstNonWhitespaceColumn(lineNumber: number): number;
-        /**
-         * Returns the column after the last non whitespace character for line at `lineNumber`.
-         * Returns 0 if line is empty or contains only whitespace.
-         * /
-        getLineLastNonWhitespaceColumn(lineNumber: number): number;
-        /**
-         * Create a valid position.
-         * /
-        validatePosition(position: IPosition): Position;
-        /**
-         * Advances the given position by the given offset (negative offsets are also accepted)
-         * and returns it as a new valid position.
-         *
-         * If the offset and position are such that their combination goes beyond the beginning or
-         * end of the model, throws an exception.
-         *
-         * If the offset is such that the new position would be in the middle of a multi-byte
-         * line terminator, throws an exception.
-         * /
-        modifyPosition(position: IPosition, offset: number): Position;
-        /**
-         * Create a valid range.
-         * /
-        validateRange(range: IRange): Range;
-        /**
-         * Verifies the range is valid.
-         * /
-        isValidRange(range: IRange): boolean;
-        /**
-         * Converts the position to a zero-based offset.
-         *
-         * The position will be [adjusted](#TextDocument.validatePosition).
-         *
-         * @param position A position.
-         * @return A valid zero-based offset.
-         * /
-        getOffsetAt(position: IPosition): number;
-        /**
-         * Converts a zero-based offset to a position.
-         *
-         * @param offset A zero-based offset.
-         * @return A valid [position](#Position).
-         * /
-        getPositionAt(offset: number): Position;
-        /**
-         * Get a range covering the entire model.
-         * /
-        getFullModelRange(): Range;
-        /**
-         * Returns if the model was disposed or not.
-         * /
-        isDisposed(): boolean;
-        /**
-         * Search the model.
-         * @param searchString The string used to search. If it is a regular expression, set `isRegex` to true.
-         * @param searchOnlyEditableRange Limit the searching to only search inside the editable range of the model.
-         * @param isRegex Used to indicate that `searchString` is a regular expression.
-         * @param matchCase Force the matching to match lower/upper case exactly.
-         * @param wordSeparators Force the matching to match entire words only. Pass null otherwise.
-         * @param captureMatches The result will contain the captured groups.
-         * @param limitResultCount Limit the number of results
-         * @return The ranges where the matches are. It is empty if not matches have been found.
-         * /
-        findMatches(searchString: string, searchOnlyEditableRange: boolean, isRegex: boolean, matchCase: boolean, wordSeparators: string | null, captureMatches: boolean, limitResultCount?: number): FindMatch[];
-        /**
-         * Search the model.
-         * @param searchString The string used to search. If it is a regular expression, set `isRegex` to true.
-         * @param searchScope Limit the searching to only search inside these ranges.
-         * @param isRegex Used to indicate that `searchString` is a regular expression.
-         * @param matchCase Force the matching to match lower/upper case exactly.
-         * @param wordSeparators Force the matching to match entire words only. Pass null otherwise.
-         * @param captureMatches The result will contain the captured groups.
-         * @param limitResultCount Limit the number of results
-         * @return The ranges where the matches are. It is empty if no matches have been found.
-         * /
-        findMatches(searchString: string, searchScope: IRange | IRange[], isRegex: boolean, matchCase: boolean, wordSeparators: string | null, captureMatches: boolean, limitResultCount?: number): FindMatch[];
-        /**
-         * Search the model for the next match. Loops to the beginning of the model if needed.
-         * @param searchString The string used to search. If it is a regular expression, set `isRegex` to true.
-         * @param searchStart Start the searching at the specified position.
-         * @param isRegex Used to indicate that `searchString` is a regular expression.
-         * @param matchCase Force the matching to match lower/upper case exactly.
-         * @param wordSeparators Force the matching to match entire words only. Pass null otherwise.
-         * @param captureMatches The result will contain the captured groups.
-         * @return The range where the next match is. It is null if no next match has been found.
-         * /
-        findNextMatch(searchString: string, searchStart: IPosition, isRegex: boolean, matchCase: boolean, wordSeparators: string | null, captureMatches: boolean): FindMatch | null;
-        /**
-         * Search the model for the previous match. Loops to the end of the model if needed.
-         * @param searchString The string used to search. If it is a regular expression, set `isRegex` to true.
-         * @param searchStart Start the searching at the specified position.
-         * @param isRegex Used to indicate that `searchString` is a regular expression.
-         * @param matchCase Force the matching to match lower/upper case exactly.
-         * @param wordSeparators Force the matching to match entire words only. Pass null otherwise.
-         * @param captureMatches The result will contain the captured groups.
-         * @return The range where the previous match is. It is null if no previous match has been found.
-         * /
-        findPreviousMatch(searchString: string, searchStart: IPosition, isRegex: boolean, matchCase: boolean, wordSeparators: string | null, captureMatches: boolean): FindMatch | null;
-        /**
-         * Get the language associated with this model.
-         * /
-        getLanguageId(): string;
-        /**
-         * Get the word under or besides `position`.
-         * @param position The position to look for a word.
-         * @return The word under or besides `position`. Might be null.
-         * /
-        getWordAtPosition(position: IPosition): IWordAtPosition | null;
-        /**
-         * Get the word under or besides `position` trimmed to `position`.column
-         * @param position The position to look for a word.
-         * @return The word under or besides `position`. Will never be null.
-         * /
-        getWordUntilPosition(position: IPosition): IWordAtPosition;
-        /**
-         * Perform a minimum amount of operations, in order to transform the decorations
-         * identified by `oldDecorations` to the decorations described by `newDecorations`
-         * and returns the new identifiers associated with the resulting decorations.
-         *
-         * @param oldDecorations Array containing previous decorations identifiers.
-         * @param newDecorations Array describing what decorations should result after the call.
-         * @param ownerId Identifies the editor id in which these decorations should appear. If no `ownerId` is provided, the decorations will appear in all editors that attach this model.
-         * @return An array containing the new decorations identifiers.
-         * /
-        deltaDecorations(oldDecorations: string[], newDecorations: IModelDeltaDecoration[], ownerId?: number): string[];
-        /**
-         * Get the options associated with a decoration.
-         * @param id The decoration id.
-         * @return The decoration options or null if the decoration was not found.
-         * /
-        getDecorationOptions(id: string): IModelDecorationOptions | null;
-        /**
-         * Get the range associated with a decoration.
-         * @param id The decoration id.
-         * @return The decoration range or null if the decoration was not found.
-         * /
-        getDecorationRange(id: string): Range | null;
-        /**
-         * Gets all the decorations for the line `lineNumber` as an array.
-         * @param lineNumber The line number
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
-         * @param filterFontDecorations If set, it will ignore font decorations.
-         * @return An array with the decorations
-         * /
-        getLineDecorations(lineNumber: number, ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean): IModelDecoration[];
-        /**
-         * Gets all the decorations for the lines between `startLineNumber` and `endLineNumber` as an array.
-         * @param startLineNumber The start line number
-         * @param endLineNumber The end line number
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
-         * @param filterFontDecorations If set, it will ignore font decorations.
-         * @return An array with the decorations
-         * /
-        getLinesDecorations(startLineNumber: number, endLineNumber: number, ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean): IModelDecoration[];
-        /**
-         * Gets all the decorations in a range as an array. Only `startLineNumber` and `endLineNumber` from `range` are used for filtering.
-         * So for now it returns all the decorations on the same line as `range`.
-         * @param range The range to search in
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
-         * @param filterFontDecorations If set, it will ignore font decorations.
-         * @param onlyMinimapDecorations If set, it will return only decorations that render in the minimap.
-         * @param onlyMarginDecorations If set, it will return only decorations that render in the glyph margin.
-         * @return An array with the decorations
-         * /
-        getDecorationsInRange(range: IRange, ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean, onlyMinimapDecorations?: boolean, onlyMarginDecorations?: boolean): IModelDecoration[];
-        /**
-         * Gets all the decorations as an array.
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
-         * @param filterFontDecorations If set, it will ignore font decorations.
-         * /
-        getAllDecorations(ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean): IModelDecoration[];
-        /**
-         * Gets all decorations that render in the glyph margin as an array.
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * /
-        getAllMarginDecorations(ownerId?: number) : IModelDecoration[];
-        /**
-         * Gets all the decorations that should be rendered in the overview ruler as an array.
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
-         * @param filterFontDecorations If set, it will ignore font decorations.
-         * /
-        getOverviewRulerDecorations(ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean): IModelDecoration[];
-        /**
-         * Gets all the decorations that contain injected text.
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * /
-        getInjectedTextDecorations(ownerId?: number): IModelDecoration[];
-        /**
-         * Gets all the decorations that contain custom line heights.
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * /
-        getCustomLineHeightsDecorations(ownerId?: number): IModelDecoration[];
-        /**
-         * Gets all the decorations that contain custom line heights.
-         * @param range The range to search in
-         * @param ownerId If set, it will ignore decorations belonging to other owners.
-         * /
-        getCustomLineHeightsDecorationsInRange(range: Range, ownerId?: number): IModelDecoration[];
-        /**
-         * Normalize a string containing whitespace according to indentation rules (converts to spaces or to tabs).
-         * /
-        normalizeIndentation(str: string): string;
-        /**
-         * Change the options of this model.
-         * /
-        updateOptions(newOpts: ITextModelUpdateOptions): void;
-        /**
-         * Detect the indentation options for this model from its content.
-         * /
-        detectIndentation(defaultInsertSpaces: boolean, defaultTabSize: number): void;
-        /**
-         * Close the current undo-redo element.
-         * This offers a way to create an undo/redo stop point.
-         * /
-        pushStackElement(): void;
-        /**
-         * Open the current undo-redo element.
-         * This offers a way to remove the current undo/redo stop point.
-         * /
-        popStackElement(): void;
-        /**
-         * Push edit operations, basically editing the model. This is the preferred way
-         * of editing the model. The edit operations will land on the undo stack.
-         * @param beforeCursorState The cursor state before the edit operations. This cursor state will be returned when `undo` or `redo` are invoked.
-         * @param editOperations The edit operations.
-         * @param cursorStateComputer A callback that can compute the resulting cursors state after the edit operations have been executed.
-         * @return The cursor state returned by the `cursorStateComputer`.
-         * /
-        pushEditOperations(beforeCursorState: Selection[] | null, editOperations: IIdentifiedSingleEditOperation[], cursorStateComputer: ICursorStateComputer): Selection[] | null;
-        /**
-         * Change the end of line sequence. This is the preferred way of
-         * changing the eol sequence. This will land on the undo stack.
-         * /
-        pushEOL(eol: EndOfLineSequence): void;
-        /**
-         * Edit the model without adding the edits to the undo stack.
-         * This can have dire consequences on the undo stack! See @pushEditOperations for the preferred way.
-         * @param operations The edit operations.
-         * @return If desired, the inverse edit operations, that, when applied, will bring the model back to the previous state.
-         * /
-        applyEdits(operations: readonly IIdentifiedSingleEditOperation[]): void;
-        applyEdits(operations: readonly IIdentifiedSingleEditOperation[], computeUndoEdits: false): void;
-        applyEdits(operations: readonly IIdentifiedSingleEditOperation[], computeUndoEdits: true): IValidEditOperation[];
-        /**
-         * Change the end of line sequence without recording in the undo stack.
-         * This can have dire consequences on the undo stack! See @pushEOL for the preferred way.
-         * /
-        setEOL(eol: EndOfLineSequence): void;
-        /**
-         * Undo edit operations until the previous undo/redo point.
-         * The inverse edit operations will be pushed on the redo stack.
-         * /
-        undo(): void | Promise<void>;
-        /**
-         * Is there anything in the undo stack?
-         * /
-        canUndo(): boolean;
-        /**
-         * Redo edit operations until the next undo/redo point.
-         * The inverse edit operations will be pushed on the undo stack.
-         * /
-        redo(): void | Promise<void>;
-        /**
-         * Is there anything in the redo stack?
-         * /
-        canRedo(): boolean;
-        /**
-         * An event emitted when the contents of the model have changed.
-         * @event
-         * /
-        onDidChangeContent(listener: (e: IModelContentChangedEvent) => void): IDisposable$2;
-        /**
-         * An event emitted when decorations of the model have changed.
-         * @event
-         * /
-        readonly onDidChangeDecorations: IEvent$1<IModelDecorationsChangedEvent>;
-        /**
-         * An event emitted when the model options have changed.
-         * @event
-         * /
-        readonly onDidChangeOptions: IEvent$1<IModelOptionsChangedEvent>;
-        /**
-         * An event emitted when the language associated with the model has changed.
-         * @event
-         * /
-        readonly onDidChangeLanguage: IEvent$1<IModelLanguageChangedEvent>;
-        /**
-         * An event emitted when the language configuration associated with the model has changed.
-         * @event
-         * /
-        readonly onDidChangeLanguageConfiguration: IEvent$1<IModelLanguageConfigurationChangedEvent>;
-        /**
-         * An event emitted when the model has been attached to the first editor or detached from the last editor.
-         * @event
-         * /
-        readonly onDidChangeAttached: IEvent$1<void>;
-        /**
-         * An event emitted right before disposing the model.
-         * @event
-         * /
-        readonly onWillDispose: IEvent$1<void>;
-        /**
-         * Destroy this model.
-         * /
-        dispose(): void;
-        /**
-         * Returns if this model is attached to an editor or not.
-         * /
-        isAttachedToEditor(): boolean;
-    }*/
 
     public enum PositionAffinity
     {
         /**
          * Prefers the left most position.
-        */
+         */
         Left = 0,
         /**
          * Prefers the right most position.
-        */
+         */
         Right = 1,
         /**
          * No preference.
-        */
+         */
         None = 2,
         /**
          * If the given position is on injected text, prefers the position left of it.
-        */
+         */
         LeftOfInjectedText = 3,
         /**
          * If the given position is on injected text, prefers the position right of it.
-        */
+         */
         RightOfInjectedText = 4
     }
-
-    /**
-     * A change
-     */
-    /*export interface IChange {
-        readonly originalStartLineNumber: number;
-        readonly originalEndLineNumber: number;
-        readonly modifiedStartLineNumber: number;
-        readonly modifiedEndLineNumber: number;
-    }*/
-
-    /**
-     * A character level change.
-     */
-    /*export interface ICharChange extends IChange {
-        readonly originalStartColumn: number;
-        readonly originalEndColumn: number;
-        readonly modifiedStartColumn: number;
-        readonly modifiedEndColumn: number;
-    }*/
-
-    /**
-     * A line change
-     */
-    /*export interface ILineChange extends IChange {
-        readonly charChanges: ICharChange[] | undefined;
-    }*/
 
     public class Dimension
     {
@@ -2724,73 +1982,6 @@ namespace BlazorMonaco.Editor
         public int Height { get; set; }
     }
 
-    /**
-     * A builder and helper for edit operations for a command.
-     */
-    /*export interface IEditOperationBuilder {
-        /**
-         * Add a new edit operation (a replace operation).
-         * @param range The range to replace (delete). May be empty to represent a simple insert.
-         * @param text The text to replace with. May be null to represent a simple delete.
-         * /
-        addEditOperation(range: IRange, text: string | null, forceMoveMarkers?: boolean): void;
-        /**
-         * Add a new edit operation (a replace operation).
-         * The inverse edits will be accessible in `ICursorStateComputerData.getInverseEditOperations()`
-         * @param range The range to replace (delete). May be empty to represent a simple insert.
-         * @param text The text to replace with. May be null to represent a simple delete.
-         * /
-        addTrackedEditOperation(range: IRange, text: string | null, forceMoveMarkers?: boolean): void;
-        /**
-         * Track `selection` when applying edit operations.
-         * A best effort will be made to not grow/expand the selection.
-         * An empty selection will clamp to a nearby character.
-         * @param selection The selection to track.
-         * @param trackPreviousOnEmpty If set, and the selection is empty, indicates whether the selection
-         *           should clamp to the previous or the next character.
-         * @return A unique identifier.
-         * /
-        trackSelection(selection: Selection, trackPreviousOnEmpty?: boolean): string;
-    }*/
-
-    /**
-     * A helper for computing cursor state after a command.
-     */
-    /*export interface ICursorStateComputerData {
-        /**
-         * Get the inverse edit operations of the added edit operations.
-         * /
-        getInverseEditOperations(): IValidEditOperation[];
-        /**
-         * Get a previously tracked selection.
-         * @param id The unique identifier returned by `trackSelection`.
-         * @return The selection.
-         * /
-        getTrackedSelection(id: string): Selection;
-    }*/
-
-    /**
-     * A command that modifies text / cursor state on a model.
-     */
-    /*export interface ICommand {
-        /**
-         * Get the edit operations needed to execute this command.
-         * @param model The model the command will execute on.
-         * @param builder A helper to collect the needed edit operations and to track selections.
-         * /
-        getEditOperations(model: ITextModel, builder: IEditOperationBuilder): void;
-        /**
-         * Compute the cursor state after the edit operations were applied.
-         * @param model The model the command has executed on.
-         * @param helper A helper to get inverse edit operations and to get previously tracked selections.
-         * @return The cursor state after the command executed.
-         * /
-        computeCursorState(model: ITextModel, helper: ICursorStateComputerData): Selection;
-    }*/
-
-    /**
-     * A model for the diff editor.
-     */
     public class DiffEditorModel
     {
         /**
@@ -2802,11 +1993,6 @@ namespace BlazorMonaco.Editor
          */
         public TextModel Modified { get; set; }
     }
-
-    /*export interface IDiffEditorViewModel extends IDisposable$2 {
-        readonly model: IDiffEditorModel;
-        waitForDiff(): Promise<void>;
-    }*/
 
     /**
      * An event describing that an editor has had its model reset (i.e. `editor.setModel()`).
@@ -2837,63 +2023,69 @@ namespace BlazorMonaco.Editor
         public double ScrollTop { get; set; }
     }
 
-    /*export interface IEditorAction {
-        readonly id: string;
-        readonly label: string;
-        readonly alias: string;
-        readonly metadata: ICommandMetadata | undefined;
-        isSupported(): boolean;
-        run(args?: unknown): Promise<void>;
-    }*/
+    public class EditorAction
+    {
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Alias { get; set; }
+        public CommandMetadata Metadata { get; set; }
+        public bool IsSupported() => true;
+        public Task Run(object args = null) => Task.CompletedTask;
+    }
 
-    //export type IEditorModel = ITextModel | IDiffEditorModel | IDiffEditorViewModel;
+    public class CommandMetadata
+    {
+        public string Description { get; set; }
+    }
+
 
     /**
      * A (serializable) state of the cursors.
      */
-    /*export interface ICursorState {
-        inSelectionMode: boolean;
-        selectionStart: IPosition;
-        position: IPosition;
-    }*/
+    public class CursorState
+    {
+        public bool InSelectionMode { get; set; }
+        public Position SelectionStart { get; set; }
+        public Position Position { get; set; }
+    }
 
     /**
      * A (serializable) state of the view.
      */
-    /*export interface IViewState {
-        /** written by previous versions * /
-        scrollTop?: number;
-        /** written by previous versions * /
-        scrollTopWithoutViewZones?: number;
-        scrollLeft: number;
-        firstPosition: IPosition;
-        firstPositionDeltaTop: number;
-    }*/
+    public class ViewState
+    {
+        /** written by previous versions */
+        public int? ScrollTop { get; set; }
+        /** written by previous versions */
+        public int? ScrollTopWithoutViewZones { get; set; }
+        public int ScrollLeft { get; set; }
+        public Position FirstPosition { get; set; }
+        public int FirstPositionDeltaTop { get; set; }
+    }
 
     /**
      * A (serializable) state of the code editor.
      */
-    /*export interface ICodeEditorViewState {
-        cursorState: ICursorState[];
-        viewState: IViewState;
-        contributionsState: {
-            [id: string]: unknown;
-        };
-    }*/
+    public class CodeEditorViewState
+    {
+        public List<CursorState> CursorState { get; set; }
+        public ViewState ViewState { get; set; }
+        public Dictionary<string, object> ContributionsState { get; set; }
+    }
 
     /**
      * (Serializable) View state for the diff editor.
      */
-    /*export interface IDiffEditorViewState {
-        original: ICodeEditorViewState | null;
-        modified: ICodeEditorViewState | null;
-        modelState?: unknown;
-    }*/
+    public class DiffEditorViewState
+    {
+        public CodeEditorViewState Original { get; set; }
+        public CodeEditorViewState Modified { get; set; }
+        public object ModelState { get; set; }
+    }
 
     /**
      * An editor view state.
      */
-    //export type IEditorViewState = ICodeEditorViewState | IDiffEditorViewState;
 
     public enum ScrollType
     {
@@ -2901,286 +2093,21 @@ namespace BlazorMonaco.Editor
         Immediate = 1
     }
 
-    // Translated in the Editor.cs file
     /**
      * An editor.
      */
-    /*export interface IEditor {
-        /**
-         * An event emitted when the editor has been disposed.
-         * @event
-         * /
-        onDidDispose(listener: () => void): IDisposable$2;
-        /**
-         * Dispose the editor.
-         * /
-        dispose(): void;
-        /**
-         * Get a unique id for this editor instance.
-         * /
-        getId(): string;
-        /**
-         * Get the editor type. Please see `EditorType`.
-         * This is to avoid an instanceof check
-         * /
-        getEditorType(): string;
-        /**
-         * Update the editor's options after the editor has been created.
-         * /
-        updateOptions(newOptions: IEditorOptions): void;
-        /**
-         * Instructs the editor to remeasure its container. This method should
-         * be called when the container of the editor gets resized.
-         *
-         * If a dimension is passed in, the passed in value will be used.
-         *
-         * By default, this will also render the editor immediately.
-         * If you prefer to delay rendering to the next animation frame, use postponeRendering == true.
-         * /
-        layout(dimension?: IDimension, postponeRendering?: boolean) : void;
-        /**
-         * Brings browser focus to the editor text
-         * /
-        focus() : void;
-        /**
-         * Returns true if the text inside this editor is focused (i.e. cursor is blinking).
-         * /
-        hasTextFocus() : boolean;
-        /**
-         * Returns all actions associated with this editor.
-         * /
-        getSupportedActions(): IEditorAction[];
-        /**
-         * Saves current view state of the editor in a serializable object.
-         * /
-        saveViewState(): IEditorViewState | null;
-        /**
-         * Restores the view state of the editor from a serializable object generated by `saveViewState`.
-         * /
-        restoreViewState(state: IEditorViewState | null): void;
-        /**
-         * Given a position, returns a column number that takes tab-widths into account.
-         * /
-        getVisibleColumnFromPosition(position: IPosition): number;
-        /**
-         * Returns the primary position of the cursor.
-         * /
-        getPosition(): Position | null;
-        /**
-         * Set the primary position of the cursor. This will remove any secondary cursors.
-         * @param position New primary cursor's position
-         * @param source Source of the call that caused the position
-         * /
-        setPosition(position: IPosition, source?: string): void;
-        /**
-         * Scroll vertically as necessary and reveal a line.
-         * /
-        revealLine(lineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal a line centered vertically.
-         * /
-        revealLineInCenter(lineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal a line centered vertically only if it lies outside the viewport.
-         * /
-        revealLineInCenterIfOutsideViewport(lineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal a line close to the top of the viewport,
-         * optimized for viewing a code definition.
-         * /
-        revealLineNearTop(lineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a position.
-         * /
-        revealPosition(position: IPosition, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a position centered vertically.
-         * /
-        revealPositionInCenter(position: IPosition, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a position centered vertically only if it lies outside the viewport.
-         * /
-        revealPositionInCenterIfOutsideViewport(position: IPosition, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a position close to the top of the viewport,
-         * optimized for viewing a code definition.
-         * /
-        revealPositionNearTop(position: IPosition, scrollType?: ScrollType): void;
-        /**
-         * Returns the primary selection of the editor.
-         * /
-        getSelection(): Selection | null;
-        /**
-         * Returns all the selections of the editor.
-         * /
-        getSelections(): Selection[] | null;
-        /**
-         * Set the primary selection of the editor. This will remove any secondary cursors.
-         * @param selection The new selection
-         * @param source Source of the call that caused the selection
-         * /
-        setSelection(selection: IRange, source?: string): void;
-        /**
-         * Set the primary selection of the editor. This will remove any secondary cursors.
-         * @param selection The new selection
-         * @param source Source of the call that caused the selection
-         * /
-        setSelection(selection: Range, source?: string): void;
-        /**
-         * Set the primary selection of the editor. This will remove any secondary cursors.
-         * @param selection The new selection
-         * @param source Source of the call that caused the selection
-         * /
-        setSelection(selection: ISelection, source?: string): void;
-        /**
-         * Set the primary selection of the editor. This will remove any secondary cursors.
-         * @param selection The new selection
-         * @param source Source of the call that caused the selection
-         * /
-        setSelection(selection: Selection, source?: string): void;
-        /**
-         * Set the selections for all the cursors of the editor.
-         * Cursors will be removed or added, as necessary.
-         * @param selections The new selection
-         * @param source Source of the call that caused the selection
-         * /
-        setSelections(selections: readonly ISelection[], source?: string): void;
-        /**
-         * Scroll vertically as necessary and reveal lines.
-         * /
-        revealLines(startLineNumber: number, endLineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal lines centered vertically.
-         * /
-        revealLinesInCenter(lineNumber: number, endLineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal lines centered vertically only if it lies outside the viewport.
-         * /
-        revealLinesInCenterIfOutsideViewport(lineNumber: number, endLineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically as necessary and reveal lines close to the top of the viewport,
-         * optimized for viewing a code definition.
-         * /
-        revealLinesNearTop(lineNumber: number, endLineNumber: number, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range.
-         * /
-        revealRange(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range centered vertically.
-         * /
-        revealRangeInCenter(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range at the top of the viewport.
-         * /
-        revealRangeAtTop(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range centered vertically only if it lies outside the viewport.
-         * /
-        revealRangeInCenterIfOutsideViewport(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range close to the top of the viewport,
-         * optimized for viewing a code definition.
-         * /
-        revealRangeNearTop(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal a range close to the top of the viewport,
-         * optimized for viewing a code definition. Only if it lies outside the viewport.
-         * /
-        revealRangeNearTopIfOutsideViewport(range: IRange, scrollType?: ScrollType): void;
-        /**
-         * Directly trigger a handler or an editor action.
-         * @param source The source of the call.
-         * @param handlerId The id of the handler or the id of a contribution.
-         * @param payload Extra data to be sent to the handler.
-         * /
-        trigger(source: string | null | undefined, handlerId: string, payload: unknown): void;
-        /**
-         * Gets the current model attached to this editor.
-         * /
-        getModel(): IEditorModel | null;
-        /**
-         * Sets the current model attached to this editor.
-         * If the previous model was created by the editor via the value key in the options
-         * literal object, it will be destroyed. Otherwise, if the previous model was set
-         * via setModel, or the model key in the options literal object, the previous model
-         * will not be destroyed.
-         * It is safe to call setModel(null) to simply detach the current model from the editor.
-         * /
-        setModel(model: IEditorModel | null): void;
-        /**
-         * Create a collection of decorations. All decorations added through this collection
-         * will get the ownerId of the editor (meaning they will not show up in other editors).
-         * These decorations will be automatically cleared when the editor's model changes.
-         * /
-        createDecorationsCollection(decorations?: IModelDeltaDecoration[]) : IEditorDecorationsCollection;
-    }*/
 
     /**
      * A collection of decorations
      */
-    /*export interface IEditorDecorationsCollection
-    {
-        /**
-         * An event emitted when decorations change in the editor,
-         * but the change is not caused by us setting or clearing the collection.
-         * /
-        readonly onDidChange: IEvent$1<IModelDecorationsChangedEvent>;
-        /**
-         * Get the decorations count.
-         * /
-        length: number;
-        /**
-         * Get the range for a decoration.
-         * /
-        getRange(index: number) : Range | null;
-        /**
-         * Get all ranges for decorations.
-         * /
-        getRanges() : Range[];
-        /**
-         * Determine if a decoration is in this collection.
-         * /
-        has(decoration: IModelDecoration) : boolean;
-        /**
-         * Replace all previous decorations with `newDecorations`.
-         * /
-        set(newDecorations: readonly IModelDeltaDecoration[]): string[];
-        /**
-         * Append `newDecorations` to this collection.
-         * /
-        append(newDecorations: readonly IModelDeltaDecoration[]) : string[];
-        /**
-         * Remove all previous decorations.
-         * /
-        clear() : void;
-    }*/
 
     /**
      * An editor contribution that gets created every time a new editor gets created and gets disposed when the editor gets disposed.
      */
-    /*export interface IEditorContribution {
-        /**
-         * Dispose this contribution.
-         * /
-        dispose(): void;
-        /**
-         * Store view state.
-         * /
-        saveViewState?(): unknown;
-        /**
-         * Restore view state.
-         * /
-        restoreViewState?(state: unknown): void;
-    }*/
 
     /**
      * The type of the `IEditor`.
      */
-    /*export const EditorType: {
-        ICodeEditor: string;
-        IDiffEditor: string;
-    };*/
 
     /**
      * An event describing that the current language associated with a model has changed.
@@ -3427,17 +2354,14 @@ namespace BlazorMonaco.Editor
     /**
      * Configuration options for auto closing quotes and brackets
      */
-    //export type EditorAutoClosingStrategy = 'always' | 'languageDefined' | 'beforeWhitespace' | 'never';
 
     /**
      * Configuration options for auto wrapping quotes and brackets
      */
-    //export type EditorAutoSurroundStrategy = 'languageDefined' | 'quotes' | 'brackets' | 'never';
 
     /**
      * Configuration options for typing over closing quotes or brackets
      */
-    //export type EditorAutoClosingEditStrategy = 'always' | 'auto' | 'never';
 
     /**
      * Configuration options for auto indentation in the editor
@@ -3492,14 +2416,14 @@ namespace BlazorMonaco.Editor
          * Render vertical lines at the specified columns.
          * Defaults to empty array.
          */
-        public int[] Rulers { get; set; } // (number | IRulerOption)[];
+        public int[] Rulers { get; set; }
         /**
          * Locales used for segmenting lines into words when doing word related navigations or operations.
          *
          * Specify the BCP 47 language tag of the word you wish to recognize (e.g., ja, zh-CN, zh-Hant-TW, etc.).
          * Defaults to empty array
          */
-        public List<string> WordSegmenterLocales { get; set; } // ?: string | string[];
+        public List<string> WordSegmenterLocales { get; set; }
         /**
          * A string containing the word separators used when doing word navigation.
          * Defaults to `~!@#$%^&*()-=+[{]}\\|;:\'",.<>/?
@@ -3517,7 +2441,7 @@ namespace BlazorMonaco.Editor
          * Otherwise, line numbers will not be rendered.
          * Defaults to `on`.
          */
-        public string LineNumbers { get; set; } // 'on' | 'off' | 'relative' | 'interval'
+        public string LineNumbers { get; set; }
         public Func<int, string> LineNumbersLambda { get; set; }
         /**
          * Controls the minimal number of visible leading and trailing lines surrounding the cursor.
@@ -3529,17 +2453,17 @@ namespace BlazorMonaco.Editor
          * Defaults to `default`, `cursorSurroundingLines` is not enforced when cursor position is changed
          * by mouse.
         */
-        public string CursorSurroundingLinesStyle { get; set; } // 'default' | 'all';
+        public string CursorSurroundingLinesStyle { get; set; }
         /**
          * Render last line number when the file ends with a newline.
          * Defaults to 'on' for Windows and macOS and 'dimmed' for Linux.
         */
-        public string RenderFinalNewline { get; set; } // 'on' | 'off' | 'dimmed';
+        public string RenderFinalNewline { get; set; }
         /**
          * Remove unusual line terminators like LINE SEPARATOR (LS), PARAGRAPH SEPARATOR (PS).
          * Defaults to 'prompt'.
          */
-        public string UnusualLineTerminators { get; set; } // 'auto' | 'off' | 'prompt';
+        public string UnusualLineTerminators { get; set; }
         /**
          * Should the corresponding line be selected when clicking on the line number?
          * Defaults to true.
@@ -3605,7 +2529,7 @@ namespace BlazorMonaco.Editor
          * Should the editor render validation decorations.
          * Defaults to editable.
          */
-        public string RenderValidationDecorations { get; set; } // 'editable' | 'on' | 'off';
+        public string RenderValidationDecorations { get; set; }
         /**
          * Control the behavior and rendering of the scrollbars.
          */
@@ -3646,7 +2570,7 @@ namespace BlazorMonaco.Editor
          * Control the cursor animation style, possible values are 'blink', 'smooth', 'phase', 'expand' and 'solid'.
          * Defaults to 'blink'.
          */
-        public string CursorBlinking { get; set; } // 'blink' | 'smooth' | 'phase' | 'expand' | 'solid';
+        public string CursorBlinking { get; set; }
         /**
          * Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl.
          * Defaults to false.
@@ -3656,22 +2580,22 @@ namespace BlazorMonaco.Editor
          * Control the mouse pointer style, either 'text' or 'default' or 'copy'
          * Defaults to 'text'
          */
-        public string MouseStyle { get; set; } // 'text' | 'default' | 'copy';
+        public string MouseStyle { get; set; }
         /**
          * Enable smooth caret animation.
          * Defaults to 'off'.
          */
-        public string CursorSmoothCaretAnimation { get; set; } // 'off' | 'explicit' | 'on';
+        public string CursorSmoothCaretAnimation { get; set; }
         /**
          * Control the cursor style in insert mode.
          * Defaults to 'line'.
          */
-        public string CursorStyle { get; set; } // 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin';
+        public string CursorStyle { get; set; }
         /**
          * Control the cursor style in overtype mode.
          * Defaults to 'block'.
          */
-        public string OvertypeCursorStyle { get; set; } // 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin';
+        public string OvertypeCursorStyle { get; set; }
         /**
          *  Controls whether paste in overtype mode should overwrite or insert.
          */
@@ -3688,16 +2612,16 @@ namespace BlazorMonaco.Editor
          * Enable font ligatures.
          * Defaults to false.
          */
-        public bool? FontLigatures { get; set; } // boolean | string;
+        public object FontLigatures { get; set; }
         /**
          * Enable font variations.
          * Defaults to false.
          */
-        public bool? FontVariations { get; set; } // boolean | string;
+        public object FontVariations { get; set; }
         /**
          * Controls whether to use default color decorations or not using the default document color provider
          */
-        public string DefaultColorDecorators { get; set; } // 'auto' | 'always' | 'never';
+        public string DefaultColorDecorators { get; set; }
         /**
          * Disable the use of `transform: translate3d(0px, 0px, 0px)` for the editor margin and lines layers.
          * The usage of `transform: translate3d(0px, 0px, 0px)` acts as a hint for browsers to create an extra layer.
@@ -3746,7 +2670,7 @@ namespace BlazorMonaco.Editor
          * When `wordWrap` = "bounded", the lines will wrap at min(viewport width, wordWrapColumn).
          * Defaults to "off".
          */
-        public string WordWrap { get; set; } // 'off' | 'on' | 'wordWrapColumn' | 'bounded';
+        public string WordWrap { get; set; }
         /**
          * Control whether an indicator is rendered at the wrapping column of soft wrapped lines.
          * Defaults to false.
@@ -3755,11 +2679,11 @@ namespace BlazorMonaco.Editor
         /**
          * Override the `wordWrap` setting.
          */
-        public string WordWrapOverride1 { get; set; } // 'off' | 'on' | 'inherit';
+        public string WordWrapOverride1 { get; set; }
         /**
          * Override the `wordWrapOverride1` setting.
          */
-        public string WordWrapOverride2 { get; set; } // 'off' | 'on' | 'inherit';
+        public string WordWrapOverride2 { get; set; }
         /**
          * Control the wrapping of the editor.
          * When `wordWrap` = "off", the lines will never wrap.
@@ -3773,12 +2697,12 @@ namespace BlazorMonaco.Editor
          * Control indentation of wrapped lines. Can be: 'none', 'same', 'indent' or 'deepIndent'.
          * Defaults to 'same' in vscode and to 'none' in monaco-editor.
          */
-        public string WrappingIndent { get; set; } // 'none' | 'same' | 'indent' | 'deepIndent';
+        public string WrappingIndent { get; set; }
         /**
          * Controls the wrapping strategy to use.
          * Defaults to 'simple'.
          */
-        public string WrappingStrategy { get; set; } // 'simple' | 'advanced';
+        public string WrappingStrategy { get; set; }
         /**
          * Create a softwrap on every quoted "\n" literal.
          * Defaults to false.
@@ -3797,7 +2721,7 @@ namespace BlazorMonaco.Editor
          * When wordBreak = 'normal', Use the default line break rule.
          * When wordBreak = 'keepAll', Word breaks should not be used for Chinese/Japanese/Korean (CJK) text. Non-CJK text behavior is the same as for normal.
          */
-        public string WordBreak { get; set; } // 'normal' | 'keepAll';
+        public string WordBreak { get; set; }
         /**
          * Performance guard: Stop rendering a line after x characters.
          * Defaults to 10000.
@@ -3820,7 +2744,7 @@ namespace BlazorMonaco.Editor
         /**
          * Controls what is the condition to spawn a color picker from a color dectorator
          */
-        public string ColorDecoratorsActivatedOn { get; set; } // 'clickAndHover' | 'click' | 'hover';
+        public string ColorDecoratorsActivatedOn { get; set; }
         /**
          * Controls the max number of color decorators that can be rendered in an editor at once.
          */
@@ -3862,7 +2786,7 @@ namespace BlazorMonaco.Editor
          * The modifier to be used to add multiple cursors with the mouse.
          * Defaults to 'alt'
          */
-        public string MultiCursorModifier { get; set; } // 'ctrlCmd' | 'alt';
+        public string MultiCursorModifier { get; set; }
         /**
          * Merge overlapping selections.
          * Defaults to true
@@ -3872,7 +2796,7 @@ namespace BlazorMonaco.Editor
          * Configure the behaviour when pasting a text with the line count equal to the cursor count.
          * Defaults to 'spread'.
          */
-        public string MultiCursorPaste { get; set; } // 'spread' | 'full';
+        public string MultiCursorPaste { get; set; }
         /**
          * Controls the max number of text cursors that can be in an active editor at once.
          */
@@ -3880,12 +2804,12 @@ namespace BlazorMonaco.Editor
         /**
          * Enables middle mouse button to open links and Go To Definition
          */
-        public string MouseMiddleClickAction { get; set; } // 'default' | 'openLink' | 'ctrlLeftClick';
+        public string MouseMiddleClickAction { get; set; }
         /**
          * Configure the editor's accessibility support.
          * Defaults to 'auto'. It is best to leave this to 'auto'.
          */
-        public string AccessibilitySupport { get; set; } // 'auto' | 'off' | 'on';
+        public string AccessibilitySupport { get; set; }
         /**
          * Controls the number of lines in the editor that can be read out by a screen reader
          */
@@ -3907,7 +2831,7 @@ namespace BlazorMonaco.Editor
          * Enable quick suggestions (shadow suggestions)
          * Defaults to true.
          */
-        public QuickSuggestionsOptions QuickSuggestions { get; set; } // boolean | QuickSuggestionsValue | IQuickSuggestionsOptions;
+        public object QuickSuggestions { get; set; }
         /**
          * Quick suggestions show delay (in ms)
          * Defaults to 10 (ms)
@@ -3925,35 +2849,35 @@ namespace BlazorMonaco.Editor
          * Options for auto closing brackets.
          * Defaults to language defined behavior.
          */
-        public string AutoClosingBrackets { get; set; } // 'always' | 'languageDefined' | 'beforeWhitespace' | 'never';
+        public string AutoClosingBrackets { get; set; }
         /**
          * Options for auto closing comments.
          * Defaults to language defined behavior.
          */
-        public string AutoClosingComments { get; set; } // 'always' | 'languageDefined' | 'beforeWhitespace' | 'never';
+        public string AutoClosingComments { get; set; }
         /**
          * Options for auto closing quotes.
          * Defaults to language defined behavior.
          */
-        public string AutoClosingQuotes { get; set; } // 'always' | 'languageDefined' | 'beforeWhitespace' | 'never';
+        public string AutoClosingQuotes { get; set; }
         /**
          * Options for pressing backspace near quotes or bracket pairs.
          */
-        public string AutoClosingDelete { get; set; } // 'always' | 'auto' | 'never';
+        public string AutoClosingDelete { get; set; }
         /**
          * Options for typing over closing quotes or brackets.
          */
-        public string AutoClosingOvertype { get; set; } // 'always' | 'auto' | 'never';
+        public string AutoClosingOvertype { get; set; }
         /**
          * Options for auto surrounding.
          * Defaults to always allowing auto surrounding.
          */
-        public string AutoSurround { get; set; } // 'languageDefined' | 'quotes' | 'brackets' | 'never';
+        public string AutoSurround { get; set; }
         /**
          * Controls whether the editor should automatically adjust the indentation when users type, paste, move or indent lines.
          * Defaults to advanced.
          */
-        public string AutoIndent { get; set; } // 'none' | 'keep' | 'brackets' | 'advanced' | 'full';
+        public string AutoIndent { get; set; }
         /**
          * Boolean which controls whether to autoindent on paste
          */
@@ -3981,7 +2905,7 @@ namespace BlazorMonaco.Editor
          * Controls the width used to render full-width characters.
          * Defaults to 'font'.
          */
-        public string FullwidthCharacterWidth { get; set; } // 'font' | 'twoCells';
+        public string FullwidthCharacterWidth { get; set; }
         /**
          * Controls whether double-clicking next to a bracket or quote selects the content inside.
          * Defaults to true.
@@ -4001,7 +2925,7 @@ namespace BlazorMonaco.Editor
          * Accept suggestions on ENTER.
          * Defaults to 'on'.
          */
-        public string AcceptSuggestionOnEnter { get; set; } // 'on' | 'smart' | 'off';
+        public string AcceptSuggestionOnEnter { get; set; }
         /**
          * Accept suggestions on provider defined characters.
          * Defaults to true.
@@ -4010,7 +2934,7 @@ namespace BlazorMonaco.Editor
         /**
          * Enable snippet suggestions. Default to 'true'.
          */
-        public string SnippetSuggestions { get; set; } // 'top' | 'bottom' | 'inline' | 'none';
+        public string SnippetSuggestions { get; set; }
         /**
          * Copying without a selection copies the current line.
          */
@@ -4022,7 +2946,7 @@ namespace BlazorMonaco.Editor
         /**
          * The history mode for suggestions.
          */
-        public string SuggestSelection { get; set; } // 'first' | 'recentlyUsed' | 'recentlyUsedByPrefix';
+        public string SuggestSelection { get; set; }
         /**
          * The font size for the suggest widget.
          * Defaults to the editor font size.
@@ -4036,7 +2960,7 @@ namespace BlazorMonaco.Editor
         /**
          * Enable tab completion.
          */
-        public string TabCompletion { get; set; } // 'on' | 'off' | 'onlySnippets';
+        public string TabCompletion { get; set; }
         /**
          * Enable selection highlight.
          * Defaults to true.
@@ -4059,7 +2983,7 @@ namespace BlazorMonaco.Editor
          * 'singleFile' triggers occurrence highlighting in the current document
          * 'multiFile'  triggers occurrence highlighting across valid open documents
          */
-        public string OccurrencesHighlight { get; set; } // 'off' | 'singleFile' | 'multiFile';
+        public string OccurrencesHighlight { get; set; }
         /**
          * Controls delay for occurrences highlighting
          * Defaults to 250.
@@ -4097,7 +3021,7 @@ namespace BlazorMonaco.Editor
          * Selects the folding strategy. 'auto' uses the strategies contributed for the current document, 'indentation' uses the indentation based folding strategy.
          * Defaults to 'auto'.
          */
-        public string FoldingStrategy { get; set; } // 'auto' | 'indentation';
+        public string FoldingStrategy { get; set; }
         /**
          * Enable highlight for folded regions.
          * Defaults to true.
@@ -4117,7 +3041,7 @@ namespace BlazorMonaco.Editor
          * Controls whether the fold actions in the gutter stay always visible or hide unless the mouse is over the gutter.
          * Defaults to 'mouseover'.
          */
-        public string ShowFoldingControls { get; set; } // 'always' | 'never' | 'mouseover';
+        public string ShowFoldingControls { get; set; }
         /**
          * Controls whether clicking on the empty content after a folded line will unfold the line.
          * Defaults to false.
@@ -4127,22 +3051,22 @@ namespace BlazorMonaco.Editor
          * Enable highlighting of matching brackets.
          * Defaults to 'always'.
          */
-        public string MatchBrackets { get; set; } // 'never' | 'near' | 'always';
+        public string MatchBrackets { get; set; }
         /**
          * Enable experimental rendering using WebGPU.
          * Defaults to 'off'.
          */
-        public string ExperimentalGpuAcceleration { get; set; } // 'on' | 'off';
+        public string ExperimentalGpuAcceleration { get; set; }
         /**
          * Enable experimental whitespace rendering.
          * Defaults to 'svg'.
          */
-        public string ExperimentalWhitespaceRendering { get; set; } // 'svg' | 'font' | 'off';
+        public string ExperimentalWhitespaceRendering { get; set; }
         /**
          * Enable rendering of whitespace.
          * Defaults to 'selection'.
          */
-        public string RenderWhitespace { get; set; } // 'none' | 'boundary' | 'selection' | 'trailing' | 'all';
+        public string RenderWhitespace { get; set; }
         /**
          * Enable rendering of control characters.
          * Defaults to true.
@@ -4152,7 +3076,7 @@ namespace BlazorMonaco.Editor
          * Enable rendering of current line highlight.
          * Defaults to all.
          */
-        public string RenderLineHighlight { get; set; } // 'none' | 'gutter' | 'line' | 'all';
+        public string RenderLineHighlight { get; set; }
         /**
          * Control if the current line highlight should be rendered only the editor is focused.
          * Defaults to false.
@@ -4195,7 +3119,7 @@ namespace BlazorMonaco.Editor
          * Controls whether to focus the inline editor in the peek widget by default.
          * Defaults to false.
          */
-        public string PeekWidgetDefaultFocus { get; set; } // 'tree' | 'editor';
+        public string PeekWidgetDefaultFocus { get; set; }
         /**
          * Sets a placeholder for the editor.
          * If set, the placeholder is shown if the editor is empty.
@@ -4350,11 +3274,11 @@ namespace BlazorMonaco.Editor
         /**
          * Control the wrapping of the diff editor.
          */
-        string DiffWordWrap { get; set; } // 'off' | 'on' | 'inherit';
+        string DiffWordWrap { get; set; }
         /**
          * Diff Algorithm
         */
-        string DiffAlgorithm { get; set; } // 'legacy' | 'advanced' | 'advanced-external' | 'advanced-wasm';
+        string DiffAlgorithm { get; set; }
         /**
          * Whether the diff editor aria label should be verbose.
          */
@@ -4454,7 +3378,6 @@ namespace BlazorMonaco.Editor
         /**
          * Might modify `value`.
         */
-        //applyUpdate(value: V | undefined, update: V): ApplyUpdateResult<V>;
     }
 
     /*public class ApplyUpdateResult<T> {
@@ -4562,11 +3485,11 @@ namespace BlazorMonaco.Editor
         /**
          * Controls if we seed search string in the Find Widget with editor selection.
          */
-        public string SeedSearchStringFromSelection { get; set; } //'never' | 'always' | 'selection';
+        public string SeedSearchStringFromSelection { get; set; }
         /**
          * Controls if Find in Selection flag is turned on in the editor.
          */
-        public bool? AutoFindInSelection { get; set; } // 'never' | 'always' | 'multiline';
+        public string AutoFindInSelection { get; set; }
         public bool? AddExtraSpaceOnTop { get; set; }
         /**
          * Controls whether the search result and diff result automatically restarts from the beginning (or the end) when no further matches can be found
@@ -4578,7 +3501,6 @@ namespace BlazorMonaco.Editor
         public bool? CloseOnResult { get; set; }
     }
 
-    //export type GoToLocationValues = 'peek' | 'gotoAndPeek' | 'goto';
 
     /**
      * Configuration options for go to location
@@ -4609,7 +3531,7 @@ namespace BlazorMonaco.Editor
          * Enable the hover.
          * Defaults to 'on'.
          */
-        public string Enabled { get; set; } // 'on' | 'off' | 'onKeyboardModifier';
+        public string Enabled { get; set; }
         /**
          * Delay for showing the hover.
          * Defaults to 300.
@@ -4778,7 +3700,7 @@ namespace BlazorMonaco.Editor
          * `on` shows the code action menu on code and on empty lines.
          * `onCode` shows the code action menu on code only.
          */
-        public string Enabled { get; set; } // 'off', 'on', 'onCode'
+        public string Enabled { get; set; }
     }
 
     public class EditorStickyScrollOptions
@@ -4794,7 +3716,7 @@ namespace BlazorMonaco.Editor
         /**
          * Model to choose for sticky scroll by default
          */
-        public string DefaultModel { get; set; } // 'outlineModel' | 'foldingProviderModel' | 'indentationModel';
+        public string DefaultModel { get; set; }
         /**
          * Define whether to scroll sticky scroll with editor horizontal scrollbae
          */
@@ -4810,7 +3732,7 @@ namespace BlazorMonaco.Editor
          * Enable the inline hints.
          * Defaults to true.
          */
-        public string Enabled { get; set; } // 'on' | 'off' | 'offUnlessPressed' | 'onUnlessPressed';
+        public string Enabled { get; set; }
         /**
          * Font size of inline hints.
          * Default to 90% of the editor font size.
@@ -4846,22 +3768,22 @@ namespace BlazorMonaco.Editor
         /**
          * Control the rendering of minimap.
          */
-        public string Autohide { get; set; } // 'none' | 'mouseover' | 'scroll';
+        public string Autohide { get; set; }
         /**
          * Control the side of the minimap in editor.
          * Defaults to 'right'.
          */
-        public string Side { get; set; } // 'right' | 'left';
+        public string Side { get; set; }
         /**
          * Control the minimap rendering mode.
          * Defaults to 'actual'.
          */
-        public string Size { get; set; } // 'proportional' | 'fill' | 'fit';
+        public string Size { get; set; }
         /**
          * Control the rendering of the minimap slider.
          * Defaults to 'mouseover'.
          */
-        public string ShowSlider { get; set; } // 'always' | 'mouseover';
+        public string ShowSlider { get; set; }
         /**
          * Render the actual text on a line (as opposed to color blocks).
          * Defaults to true.
@@ -4950,19 +3872,11 @@ namespace BlazorMonaco.Editor
      */
     public class QuickSuggestionsOptions
     {
-        public string Other { get; set; } // QuickSuggestionsValue
-        public string Comments { get; set; } // QuickSuggestionsValue
-        public string Strings { get; set; } // QuickSuggestionsValue
+        public string Other { get; set; }
+        public string Comments { get; set; }
+        public string Strings { get; set; }
     }
 
-    /*export interface InternalQuickSuggestionsOptions
-    {
-        readonly other: QuickSuggestionsValue;
-        readonly comments: QuickSuggestionsValue;
-        readonly strings: QuickSuggestionsValue;
-    }*/
-
-    //export type LineNumbersType = 'on' | 'off' | 'relative' | 'interval' | ((lineNumber: number) => string);
 
     public enum RenderLineNumbersType
     {
@@ -4973,15 +3887,6 @@ namespace BlazorMonaco.Editor
         Custom = 4
     }
 
-    /*export interface InternalEditorRenderLineNumbersOptions {
-        readonly renderType: RenderLineNumbersType;
-        readonly renderFn: ((lineNumber: number) => string) | null;
-    }*/
-
-    /*export interface IRulerOption {
-        readonly column: number;
-        readonly color: string | null;
-    }*/
 
     /**
      * Configuration options for editor scrollbars
@@ -4998,12 +3903,12 @@ namespace BlazorMonaco.Editor
          * Render vertical scrollbar.
          * Defaults to 'auto'.
          */
-        public string Vertical { get; set; } // 'auto' | 'visible' | 'hidden';
+        public string Vertical { get; set; }
         /**
          * Render horizontal scrollbar.
          * Defaults to 'auto'.
          */
-        public string Horizontal { get; set; } // 'auto' | 'visible' | 'hidden';
+        public string Horizontal { get; set; }
         /**
          * Cast horizontal and vertical shadows when the content is scrolled.
          * Defaults to true.
@@ -5067,24 +3972,6 @@ namespace BlazorMonaco.Editor
         public bool? IgnoreHorizontalScrollbarInContentHeight { get; set; }
     }
 
-    /*export interface InternalEditorScrollbarOptions {
-        readonly arrowSize: number;
-        readonly vertical: ScrollbarVisibility;
-        readonly horizontal: ScrollbarVisibility;
-        readonly useShadows: boolean;
-        readonly verticalHasArrows: boolean;
-        readonly horizontalHasArrows: boolean;
-        readonly handleMouseWheel: boolean;
-        readonly alwaysConsumeMouseWheel: boolean;
-        readonly horizontalScrollbarSize: number;
-        readonly horizontalSliderSize: number;
-        readonly verticalScrollbarSize: number;
-        readonly verticalSliderSize: number;
-        readonly scrollByPage: boolean;
-        readonly ignoreHorizontalScrollbarInContentHeight: boolean;
-    }*/
-
-    //export type InUntrustedWorkspace = 'inUntrustedWorkspace';
 
     /**
      * Configuration options for unicode highlighting.
@@ -5094,7 +3981,7 @@ namespace BlazorMonaco.Editor
         /**
          * Controls whether all non-basic ASCII characters are highlighted. Only characters between U+0020 and U+007E, tab, line-feed and carriage-return are considered basic ASCII.
          */
-        public bool? NonBasicASCII { get; set; } // 'inUntrustedWorkspace';
+        public bool? NonBasicASCII { get; set; }
         /**
          * Controls whether characters that just reserve space or have no width at all are highlighted.
          */
@@ -5106,19 +3993,17 @@ namespace BlazorMonaco.Editor
         /**
          * Controls whether characters in comments should also be subject to unicode highlighting.
          */
-        public bool? IncludeComments { get; set; } // 'inUntrustedWorkspace';
+        public bool? IncludeComments { get; set; }
         /**
          * Controls whether characters in strings should also be subject to unicode highlighting.
          */
-        public bool? IncludeStrings { get; set; } // 'inUntrustedWorkspace';
+        public bool? IncludeStrings { get; set; }
         /**
          * Defines allowed characters that are not being highlighted.
          */
-        //public bool? AllowedCharacters?: Record<string, true>;
         /**
          * Unicode characters that are common in allowed locales are not being highlighted.
          */
-        //public bool? AllowedLocales?: Record<string | '_os' | '_vscode', true>;
     }
 
     public class InlineSuggestOptions
@@ -5134,8 +4019,8 @@ namespace BlazorMonaco.Editor
          * Use `subwordSmart` to only show ghost text if the replace text is a subword of the suggestion text, but the subword must start after the cursor position.
          * Defaults to `prefix`.
         */
-        public string Mode { get; set; } // 'prefix' | 'subword' | 'subwordSmart';
-        public string ShowToolbar { get; set; } // 'always' | 'onHover' | 'never';
+        public string Mode { get; set; }
+        public string ShowToolbar { get; set; }
         public bool? SyntaxHighlightingEnabled { get; set; }
         public bool? SuppressSuggestions { get; set; }
         public int? MinShowDelay { get; set; }
@@ -5150,9 +4035,6 @@ namespace BlazorMonaco.Editor
         public string FontFamily { get; set; }
     }
 
-    /*type RequiredRecursive<T> = {
-        [P in keyof T]-?: T[P] extends object | undefined ? RequiredRecursive<T[P]> : T[P];
-    };*/
 
     public class BracketPairColorizationOptions
     {
@@ -5172,12 +4054,12 @@ namespace BlazorMonaco.Editor
          * Enable rendering of bracket pair guides.
          * Defaults to false.
         */
-        public string BracketPairs { get; set; } //?: boolean | 'active';
+        public string BracketPairs { get; set; }
         /**
          * Enable rendering of vertical bracket pair guides.
          * Defaults to 'active'.
          */
-        public string BracketPairsHorizontal { get; set; } //?: boolean | 'active';
+        public string BracketPairsHorizontal { get; set; }
         /**
          * Enable highlighting of the active bracket pair.
          * Defaults to true.
@@ -5192,7 +4074,7 @@ namespace BlazorMonaco.Editor
          * Enable highlighting of the active indent guide.
          * Defaults to true.
          */
-        public bool? HighlightActiveIndentation { get; set; } // TODO boolean | 'always';
+        public object HighlightActiveIndentation { get; set; }
     }
 
     /**
@@ -5203,7 +4085,7 @@ namespace BlazorMonaco.Editor
         /**
          * Overwrite word ends on accept. Default to false.
          */
-        public string InsertMode { get; set; } // 'insert' | 'replace';
+        public string InsertMode { get; set; }
         /**
          * Enable graceful matching. Defaults to true.
          */
@@ -5223,7 +4105,7 @@ namespace BlazorMonaco.Editor
         /**
          * Select suggestions when triggered via quick suggest or trigger characters
          */
-        public string SelectionMode { get; set; } // 'always' | 'never' | 'whenTriggerCharacter' | 'whenQuickSuggestion';
+        public string SelectionMode { get; set; }
         /**
          * Enable or disable icons in suggestions. Defaults to true.
          */
@@ -5239,7 +4121,7 @@ namespace BlazorMonaco.Editor
         /**
          * Configures the mode of the preview.
         */
-        public string PreviewModel { get; set; } // 'prefix' | 'subword' | 'subwordSmart';
+        public string PreviewModel { get; set; }
         /**
          * Show details inline with the label. Defaults to true.
          */
@@ -5391,12 +4273,6 @@ namespace BlazorMonaco.Editor
         DeepIndent = 3
     }
 
-    /*export interface EditorWrappingInfo {
-        readonly isDominatedByLongLines: boolean;
-        readonly isWordWrapMinified: boolean;
-        readonly isViewportWrapping: boolean;
-        readonly wrappingColumn: number;
-    }*/
 
     /**
      * Configuration options for editor drop into behavior
@@ -5412,7 +4288,7 @@ namespace BlazorMonaco.Editor
          * Controls if a widget is shown after a drop.
          * Defaults to 'afterDrop'.
          */
-        public string ShowDropSelector { get; set; } // 'afterDrop' | 'never';
+        public string ShowDropSelector { get; set; }
     }
 
     /**
@@ -5429,7 +4305,7 @@ namespace BlazorMonaco.Editor
          * Controls if a widget is shown after a drop.
          * Defaults to 'afterPaste'.
          */
-        public string ShowPasteSelector { get; set; } // 'afterPaste' | 'never';
+        public string ShowPasteSelector { get; set; }
     }
 
     public enum EditorOption
@@ -5613,197 +4489,6 @@ namespace BlazorMonaco.Editor
         effectiveFullwidthCharacterWidth = 176
     }
 
-    /*export const EditorOptions: {
-        acceptSuggestionOnCommitCharacter: IEditorOption<EditorOption.acceptSuggestionOnCommitCharacter, boolean>;
-        acceptSuggestionOnEnter: IEditorOption<EditorOption.acceptSuggestionOnEnter, 'on' | 'off' | 'smart'>;
-        accessibilitySupport: IEditorOption<EditorOption.accessibilitySupport, any>;
-        accessibilityPageSize: IEditorOption<EditorOption.accessibilityPageSize, number>;
-        allowOverflow: IEditorOption<EditorOption.allowOverflow, boolean>;
-        allowVariableLineHeights: IEditorOption<EditorOption.allowVariableLineHeights, boolean>;
-        allowVariableFonts: IEditorOption<EditorOption.allowVariableFonts, boolean>;
-        allowVariableFontsInAccessibilityMode: IEditorOption<EditorOption.allowVariableFontsInAccessibilityMode, boolean>;
-        ariaLabel: IEditorOption<EditorOption.ariaLabel, string>;
-        ariaRequired: IEditorOption<EditorOption.ariaRequired, boolean>;
-        screenReaderAnnounceInlineSuggestion: IEditorOption<EditorOption.screenReaderAnnounceInlineSuggestion, boolean>;
-        autoClosingBrackets: IEditorOption<EditorOption.autoClosingBrackets, 'always' | 'never' | 'languageDefined' | 'beforeWhitespace'>;
-        autoClosingComments: IEditorOption<EditorOption.autoClosingComments, 'always' | 'never' | 'languageDefined' | 'beforeWhitespace'>;
-        autoClosingDelete: IEditorOption<EditorOption.autoClosingDelete, 'auto' | 'always' | 'never'>;
-        autoClosingOvertype: IEditorOption<EditorOption.autoClosingOvertype, 'auto' | 'always' | 'never'>;
-        autoClosingQuotes: IEditorOption<EditorOption.autoClosingQuotes, 'always' | 'never' | 'languageDefined' | 'beforeWhitespace'>;
-        autoIndent: IEditorOption<EditorOption.autoIndent, EditorAutoIndentStrategy>;
-        autoIndentOnPaste: IEditorOption<EditorOption.autoIndentOnPaste, boolean>;
-        autoIndentOnPasteWithinString: IEditorOption<EditorOption.autoIndentOnPasteWithinString, boolean>;
-        automaticLayout: IEditorOption<EditorOption.automaticLayout, boolean>;
-        autoSurround: IEditorOption<EditorOption.autoSurround, 'never' | 'languageDefined' | 'quotes' | 'brackets'>;
-        bracketPairColorization: IEditorOption<EditorOption.bracketPairColorization, Readonly<Required<IBracketPairColorizationOptions>>>;
-        bracketPairGuides: IEditorOption<EditorOption.guides, Readonly<Required<IGuidesOptions>>>;
-        stickyTabStops: IEditorOption<EditorOption.stickyTabStops, boolean>;
-        codeLens: IEditorOption<EditorOption.codeLens, boolean>;
-        codeLensFontFamily: IEditorOption<EditorOption.codeLensFontFamily, string>;
-        codeLensFontSize: IEditorOption<EditorOption.codeLensFontSize, number>;
-        colorDecorators: IEditorOption<EditorOption.colorDecorators, boolean>;
-        colorDecoratorActivatedOn: IEditorOption<EditorOption.colorDecoratorsActivatedOn, 'hover' | 'clickAndHover' | 'click'>;
-        colorDecoratorsLimit: IEditorOption<EditorOption.colorDecoratorsLimit, number>;
-        columnSelection: IEditorOption<EditorOption.columnSelection, boolean>;
-        comments: IEditorOption<EditorOption.comments, Readonly<Required<IEditorCommentsOptions>>>;
-        contextmenu: IEditorOption<EditorOption.contextmenu, boolean>;
-        copyWithSyntaxHighlighting: IEditorOption<EditorOption.copyWithSyntaxHighlighting, boolean>;
-        cursorBlinking: IEditorOption<EditorOption.cursorBlinking, TextEditorCursorBlinkingStyle>;
-        cursorSmoothCaretAnimation: IEditorOption<EditorOption.cursorSmoothCaretAnimation, 'on' | 'off' | 'explicit'>;
-        cursorStyle: IEditorOption<EditorOption.cursorStyle, TextEditorCursorStyle>;
-        overtypeCursorStyle: IEditorOption<EditorOption.overtypeCursorStyle, TextEditorCursorStyle>;
-        cursorSurroundingLines: IEditorOption<EditorOption.cursorSurroundingLines, number>;
-        cursorSurroundingLinesStyle: IEditorOption<EditorOption.cursorSurroundingLinesStyle, 'default' | 'all'>;
-        cursorWidth: IEditorOption<EditorOption.cursorWidth, number>;
-        cursorHeight: IEditorOption<EditorOption.cursorHeight, number>;
-        disableLayerHinting: IEditorOption<EditorOption.disableLayerHinting, boolean>;
-        disableMonospaceOptimizations: IEditorOption<EditorOption.disableMonospaceOptimizations, boolean>;
-        domReadOnly: IEditorOption<EditorOption.domReadOnly, boolean>;
-        doubleClickSelectsBlock: IEditorOption<EditorOption.doubleClickSelectsBlock, boolean>;
-        dragAndDrop: IEditorOption<EditorOption.dragAndDrop, boolean>;
-        emptySelectionClipboard: IEditorOption<EditorOption.emptySelectionClipboard, boolean>;
-        dropIntoEditor: IEditorOption<EditorOption.dropIntoEditor, Readonly<Required<IDropIntoEditorOptions>>>;
-        editContext: IEditorOption<EditorOption.editContext, boolean>;
-        renderRichScreenReaderContent: IEditorOption<EditorOption.renderRichScreenReaderContent, boolean>;
-        stickyScroll: IEditorOption<EditorOption.stickyScroll, Readonly<Required<IEditorStickyScrollOptions>>>;
-        experimentalGpuAcceleration: IEditorOption<EditorOption.experimentalGpuAcceleration, 'on' | 'off'>;
-        experimentalWhitespaceRendering: IEditorOption<EditorOption.experimentalWhitespaceRendering, 'off' | 'font' | 'svg'>;
-        extraEditorClassName: IEditorOption<EditorOption.extraEditorClassName, string>;
-        fastScrollSensitivity: IEditorOption<EditorOption.fastScrollSensitivity, number>;
-        find: IEditorOption<EditorOption.find, Readonly<Required<IEditorFindOptions>>>;
-        fixedOverflowWidgets: IEditorOption<EditorOption.fixedOverflowWidgets, boolean>;
-        folding: IEditorOption<EditorOption.folding, boolean>;
-        foldingStrategy: IEditorOption<EditorOption.foldingStrategy, 'auto' | 'indentation'>;
-        foldingHighlight: IEditorOption<EditorOption.foldingHighlight, boolean>;
-        foldingImportsByDefault: IEditorOption<EditorOption.foldingImportsByDefault, boolean>;
-        foldingMaximumRegions: IEditorOption<EditorOption.foldingMaximumRegions, number>;
-        unfoldOnClickAfterEndOfLine: IEditorOption<EditorOption.unfoldOnClickAfterEndOfLine, boolean>;
-        fontFamily: IEditorOption<EditorOption.fontFamily, string>;
-        fontInfo: IEditorOption<EditorOption.fontInfo, any>;
-        fontLigatures2: IEditorOption<EditorOption.fontLigatures, string>;
-        fontSize: IEditorOption<EditorOption.fontSize, number>;
-        fontWeight: IEditorOption<EditorOption.fontWeight, string>;
-        fontVariations: IEditorOption<EditorOption.fontVariations, string>;
-        formatOnPaste: IEditorOption<EditorOption.formatOnPaste, boolean>;
-        formatOnType: IEditorOption<EditorOption.formatOnType, boolean>;
-        fullwidthCharacterWidth: IEditorOption<EditorOption.fullwidthCharacterWidth, 'font' | 'twoCells'>;
-        glyphMargin: IEditorOption<EditorOption.glyphMargin, boolean>;
-        gotoLocation: IEditorOption<EditorOption.gotoLocation, Readonly<Required<IGotoLocationOptions>>>;
-        hideCursorInOverviewRuler: IEditorOption<EditorOption.hideCursorInOverviewRuler, boolean>;
-        hover: IEditorOption<EditorOption.hover, Readonly<Required<IEditorHoverOptions>>>;
-        inDiffEditor: IEditorOption<EditorOption.inDiffEditor, boolean>;
-        inertialScroll: IEditorOption<EditorOption.inertialScroll, boolean>;
-        letterSpacing: IEditorOption<EditorOption.letterSpacing, number>;
-        lightbulb: IEditorOption<EditorOption.lightbulb, Readonly<Required<IEditorLightbulbOptions>>>;
-        lineDecorationsWidth: IEditorOption<EditorOption.lineDecorationsWidth, number>;
-        lineHeight: IEditorOption<EditorOption.lineHeight, number>;
-        lineNumbers: IEditorOption<EditorOption.lineNumbers, InternalEditorRenderLineNumbersOptions>;
-        lineNumbersMinChars: IEditorOption<EditorOption.lineNumbersMinChars, number>;
-        linkedEditing: IEditorOption<EditorOption.linkedEditing, boolean>;
-        links: IEditorOption<EditorOption.links, boolean>;
-        matchBrackets: IEditorOption<EditorOption.matchBrackets, 'always' | 'never' | 'near'>;
-        minimap: IEditorOption<EditorOption.minimap, Readonly<Required<IEditorMinimapOptions>>>;
-        mouseStyle: IEditorOption<EditorOption.mouseStyle, 'default' | 'text' | 'copy'>;
-        mouseWheelScrollSensitivity: IEditorOption<EditorOption.mouseWheelScrollSensitivity, number>;
-        mouseWheelZoom: IEditorOption<EditorOption.mouseWheelZoom, boolean>;
-        multiCursorMergeOverlapping: IEditorOption<EditorOption.multiCursorMergeOverlapping, boolean>;
-        multiCursorModifier: IEditorOption<EditorOption.multiCursorModifier, 'altKey' | 'metaKey' | 'ctrlKey'>;
-        mouseMiddleClickAction: IEditorOption<EditorOption.mouseMiddleClickAction, MouseMiddleClickAction>;
-        multiCursorPaste: IEditorOption<EditorOption.multiCursorPaste, 'spread' | 'full'>;
-        multiCursorLimit: IEditorOption<EditorOption.multiCursorLimit, number>;
-        occurrencesHighlight: IEditorOption<EditorOption.occurrencesHighlight, 'off' | 'singleFile' | 'multiFile'>;
-        occurrencesHighlightDelay: IEditorOption<EditorOption.occurrencesHighlightDelay, number>;
-        overtypeOnPaste: IEditorOption<EditorOption.overtypeOnPaste, boolean>;
-        overviewRulerBorder: IEditorOption<EditorOption.overviewRulerBorder, boolean>;
-        overviewRulerLanes: IEditorOption<EditorOption.overviewRulerLanes, number>;
-        padding: IEditorOption<EditorOption.padding, Readonly<Required<IEditorPaddingOptions>>>;
-        pasteAs: IEditorOption<EditorOption.pasteAs, Readonly<Required<IPasteAsOptions>>>;
-        parameterHints: IEditorOption<EditorOption.parameterHints, Readonly<Required<IEditorParameterHintOptions>>>;
-        peekWidgetDefaultFocus: IEditorOption<EditorOption.peekWidgetDefaultFocus, 'tree' | 'editor'>;
-        placeholder: IEditorOption<EditorOption.placeholder, string | undefined>;
-        definitionLinkOpensInPeek: IEditorOption<EditorOption.definitionLinkOpensInPeek, boolean>;
-        quickSuggestions: IEditorOption<EditorOption.quickSuggestions, InternalQuickSuggestionsOptions>;
-        quickSuggestionsDelay: IEditorOption<EditorOption.quickSuggestionsDelay, number>;
-        readOnly: IEditorOption<EditorOption.readOnly, boolean>;
-        readOnlyMessage: IEditorOption<EditorOption.readOnlyMessage, any>;
-        renameOnType: IEditorOption<EditorOption.renameOnType, boolean>;
-        renderControlCharacters: IEditorOption<EditorOption.renderControlCharacters, boolean>;
-        renderFinalNewline: IEditorOption<EditorOption.renderFinalNewline, 'on' | 'off' | 'dimmed'>;
-        renderLineHighlight: IEditorOption<EditorOption.renderLineHighlight, 'all' | 'line' | 'none' | 'gutter'>;
-        renderLineHighlightOnlyWhenFocus: IEditorOption<EditorOption.renderLineHighlightOnlyWhenFocus, boolean>;
-        renderValidationDecorations: IEditorOption<EditorOption.renderValidationDecorations, 'on' | 'off' | 'editable'>;
-        renderWhitespace: IEditorOption<EditorOption.renderWhitespace, 'all' | 'none' | 'boundary' | 'selection' | 'trailing'>;
-        revealHorizontalRightPadding: IEditorOption<EditorOption.revealHorizontalRightPadding, number>;
-        roundedSelection: IEditorOption<EditorOption.roundedSelection, boolean>;
-        rulers: IEditorOption<EditorOption.rulers, IRulerOption[]>;
-        scrollbar: IEditorOption<EditorOption.scrollbar, InternalEditorScrollbarOptions>;
-        scrollBeyondLastColumn: IEditorOption<EditorOption.scrollBeyondLastColumn, number>;
-        scrollBeyondLastLine: IEditorOption<EditorOption.scrollBeyondLastLine, boolean>;
-        scrollOnMiddleClick: IEditorOption<EditorOption.scrollOnMiddleClick, boolean>;
-        scrollPredominantAxis: IEditorOption<EditorOption.scrollPredominantAxis, boolean>;
-        selectionClipboard: IEditorOption<EditorOption.selectionClipboard, boolean>;
-        selectionHighlight: IEditorOption<EditorOption.selectionHighlight, boolean>;
-        selectionHighlightMaxLength: IEditorOption<EditorOption.selectionHighlightMaxLength, number>;
-        selectionHighlightMultiline: IEditorOption<EditorOption.selectionHighlightMultiline, boolean>;
-        selectOnLineNumbers: IEditorOption<EditorOption.selectOnLineNumbers, boolean>;
-        showFoldingControls: IEditorOption<EditorOption.showFoldingControls, 'always' | 'never' | 'mouseover'>;
-        showUnused: IEditorOption<EditorOption.showUnused, boolean>;
-        showDeprecated: IEditorOption<EditorOption.showDeprecated, boolean>;
-        inlayHints: IEditorOption<EditorOption.inlayHints, Readonly<Required<IEditorInlayHintsOptions>>>;
-        snippetSuggestions: IEditorOption<EditorOption.snippetSuggestions, 'none' | 'inline' | 'top' | 'bottom'>;
-        smartSelect: IEditorOption<EditorOption.smartSelect, Readonly<Required<ISmartSelectOptions>>>;
-        smoothScrolling: IEditorOption<EditorOption.smoothScrolling, boolean>;
-        stopRenderingLineAfter: IEditorOption<EditorOption.stopRenderingLineAfter, number>;
-        suggest: IEditorOption<EditorOption.suggest, Readonly<Required<ISuggestOptions>>>;
-        inlineSuggest: IEditorOption<EditorOption.inlineSuggest, Readonly<RequiredRecursive<IInlineSuggestOptions>>>;
-        inlineCompletionsAccessibilityVerbose: IEditorOption<EditorOption.inlineCompletionsAccessibilityVerbose, boolean>;
-        suggestFontSize: IEditorOption<EditorOption.suggestFontSize, number>;
-        suggestLineHeight: IEditorOption<EditorOption.suggestLineHeight, number>;
-        suggestOnTriggerCharacters: IEditorOption<EditorOption.suggestOnTriggerCharacters, boolean>;
-        suggestSelection: IEditorOption<EditorOption.suggestSelection, 'first' | 'recentlyUsed' | 'recentlyUsedByPrefix'>;
-        tabCompletion: IEditorOption<EditorOption.tabCompletion, 'on' | 'off' | 'onlySnippets'>;
-        tabIndex: IEditorOption<EditorOption.tabIndex, number>;
-        trimWhitespaceOnDelete: IEditorOption<EditorOption.trimWhitespaceOnDelete, boolean>;
-        unicodeHighlight: IEditorOption<EditorOption.unicodeHighlighting, Required<Readonly<IUnicodeHighlightOptions>>>;
-        unusualLineTerminators: IEditorOption<EditorOption.unusualLineTerminators, 'off' | 'auto' | 'prompt'>;
-        useShadowDOM: IEditorOption<EditorOption.useShadowDOM, boolean>;
-        useTabStops: IEditorOption<EditorOption.useTabStops, boolean>;
-        wordBreak: IEditorOption<EditorOption.wordBreak, 'normal' | 'keepAll'>;
-        wordSegmenterLocales: IEditorOption<EditorOption.wordSegmenterLocales, string[]>;
-        wordSeparators: IEditorOption<EditorOption.wordSeparators, string>;
-        wordWrap: IEditorOption<EditorOption.wordWrap, 'wordWrapColumn' | 'on' | 'off' | 'bounded'>;
-        wordWrapIndicator: IEditorOption<EditorOption.wordWrapIndicator, boolean>;
-        wordWrapBreakAfterCharacters: IEditorOption<EditorOption.wordWrapBreakAfterCharacters, string>;
-        wordWrapBreakBeforeCharacters: IEditorOption<EditorOption.wordWrapBreakBeforeCharacters, string>;
-        wordWrapColumn: IEditorOption<EditorOption.wordWrapColumn, number>;
-        wordWrapOverride1: IEditorOption<EditorOption.wordWrapOverride1, 'on' | 'off' | 'inherit'>;
-        wordWrapOverride2: IEditorOption<EditorOption.wordWrapOverride2, 'on' | 'off' | 'inherit'>;
-        wrapOnEscapedLineFeeds: IEditorOption<EditorOption.wrapOnEscapedLineFeeds, boolean>;
-        effectiveCursorStyle: IEditorOption<EditorOption.effectiveCursorStyle, TextEditorCursorStyle>;
-        editorClassName: IEditorOption<EditorOption.editorClassName, string>;
-        defaultColorDecorators: IEditorOption<EditorOption.defaultColorDecorators, 'auto' | 'always' | 'never'>;
-        pixelRatio: IEditorOption<EditorOption.pixelRatio, number>;
-        tabFocusMode: IEditorOption<EditorOption.tabFocusMode, boolean>;
-        layoutInfo: IEditorOption<EditorOption.layoutInfo, EditorLayoutInfo>;
-        wrappingInfo: IEditorOption<EditorOption.wrappingInfo, EditorWrappingInfo>;
-        wrappingIndent: IEditorOption<EditorOption.wrappingIndent, WrappingIndent>;
-        wrappingStrategy: IEditorOption<EditorOption.wrappingStrategy, 'simple' | 'advanced'>;
-        effectiveEditContextEnabled: IEditorOption<EditorOption.effectiveEditContext, boolean>;
-        effectiveAllowVariableFonts: IEditorOption<EditorOption.effectiveAllowVariableFonts, boolean>;
-        effectiveFullwidthCharacterWidth: IEditorOption<EditorOption.effectiveFullwidthCharacterWidth, 'font' | 'twoCells'>;
-    };*/
-
-    //type EditorOptionsType = typeof EditorOptions;
-
-    /*type FindEditorOptionsKeyById<T extends EditorOption> = {
-        [K in keyof EditorOptionsType]: EditorOptionsType[K]['id'] extends T ? K : never;
-    }[keyof EditorOptionsType];*/
-
-    //type ComputedEditorOptionValue<T extends IEditorOption<any, any>> = T extends IEditorOption<any, infer R> ? R : never;
-
-    //export type FindComputedEditorOptionValueById<T extends EditorOption> = ComputedEditorOptionValue<EditorOptionsType[FindEditorOptionsKeyById<T>]>;
-
-    //export type MouseMiddleClickAction = 'default' | 'openLink' | 'ctrlLeftClick';
 
     public class EditorConstructionOptions : EditorOptions
     {
@@ -5815,100 +4500,16 @@ namespace BlazorMonaco.Editor
          * Place overflow widgets inside an external DOM node.
          * Defaults to an internal DOM node.
          */
-        //overflowWidgetsDomNode?: HTMLElement;
     }
 
     /**
      * A view zone is a full horizontal rectangle that 'pushes' text down.
      * The editor reserves space for view zones when rendering.
      */
-    /*export interface IViewZone {
-        /**
-         * The line number after which this zone should appear.
-         * Use 0 to place a view zone before the first line number.
-         * /
-        afterLineNumber: number;
-        /**
-         * The column after which this zone should appear.
-         * If not set, the maxLineColumn of `afterLineNumber` will be used.
-         * This is relevant for wrapped lines.
-         * /
-        afterColumn?: number;
-        /**
-         * If the `afterColumn` has multiple view columns, the affinity specifies which one to use. Defaults to `none`.
-        * /
-        afterColumnAffinity?: PositionAffinity;
-        /**
-         * Render the zone even when its line is hidden.
-         * /
-        showInHiddenAreas?: boolean;
-        /**
-         * Tiebreaker that is used when multiple view zones want to be after the same line.
-         * Defaults to `afterColumn` otherwise 10000;
-         * /
-        ordinal?: number;
-        /**
-         * Suppress mouse down events.
-         * If set, the editor will attach a mouse down listener to the view zone and .preventDefault on it.
-         * Defaults to false
-         * /
-        suppressMouseDown?: boolean;
-        /**
-         * The height in lines of the view zone.
-         * If specified, `heightInPx` will be used instead of this.
-         * If neither `heightInPx` nor `heightInLines` is specified, a default of `heightInLines` = 1 will be chosen.
-         * /
-        heightInLines?: number;
-        /**
-         * The height in px of the view zone.
-         * If this is set, the editor will give preference to it rather than `heightInLines` above.
-         * If neither `heightInPx` nor `heightInLines` is specified, a default of `heightInLines` = 1 will be chosen.
-         * /
-        heightInPx?: number;
-        /**
-         * The minimum width in px of the view zone.
-         * If this is set, the editor will ensure that the scroll width is >= than this value.
-         * /
-        minWidthInPx?: number;
-        /**
-         * The dom node of the view zone
-         * /
-        domNode: HTMLElement;
-        /**
-         * An optional dom node for the view zone that will be placed in the margin area.
-         * /
-        marginDomNode?: HTMLElement | null;
-        /**
-         * Callback which gives the relative top of the view zone as it appears (taking scrolling into account).
-         * /
-        onDomNodeTop?: (top: number) => void;
-        /**
-         * Callback which gives the height in pixels of the view zone.
-         * /
-        onComputedHeight?: (height: number) => void;
-    }*/
 
     /**
      * An accessor that allows for zones to be added or removed.
      */
-    /*export interface IViewZoneChangeAccessor {
-        /**
-         * Create a new view zone.
-         * @param zone Zone to create
-         * @return A unique identifier to the view zone.
-         * /
-        addZone(zone: IViewZone): string;
-        /**
-         * Remove a zone
-         * @param id A unique identifier to the view zone, as returned by the `addZone` call.
-         * /
-        removeZone(id: string): void;
-        /**
-         * Change a zone's position.
-         * The editor will rescan the `afterLineNumber` and `afterColumn` properties of a view zone.
-         * /
-        layoutZone(id: string): void;
-    }*/
 
     /**
      * A positioning preference for rendering content widgets.
@@ -5932,95 +4533,14 @@ namespace BlazorMonaco.Editor
     /**
      * A position for rendering content widgets.
      */
-    /*export interface IContentWidgetPosition {
-        /**
-         * Desired position which serves as an anchor for placing the content widget.
-         * The widget will be placed above, at, or below the specified position, based on the
-         * provided preference. The widget will always touch this position.
-         *
-         * Given sufficient horizontal space, the widget will be placed to the right of the
-         * passed in position. This can be tweaked by providing a `secondaryPosition`.
-         *
-         * @see preference
-         * @see secondaryPosition
-         * /
-        position: IPosition | null;
-        /**
-         * Optionally, a secondary position can be provided to further define the placing of
-         * the content widget. The secondary position must have the same line number as the
-         * primary position. If possible, the widget will be placed such that it also touches
-         * the secondary position.
-         * /
-        secondaryPosition?: IPosition | null;
-        /**
-         * Placement preference for position, in order of preference.
-         * /
-        preference: ContentWidgetPositionPreference[];
-        /**
-         * Placement preference when multiple view positions refer to the same (model) position.
-         * This plays a role when injected text is involved.
-         * /
-        positionAffinity?: PositionAffinity;
-    }
-*/
 
     /**
      * A content widget renders inline with the text and can be easily placed 'near' an editor position.
      */
-    /*export interface IContentWidget {
-        /**
-         * Render this content widget in a location where it could overflow the editor's view dom node.
-         * /
-        allowEditorOverflow?: boolean;
-        /**
-         * If true, this widget doesn't have a visual representation.
-         * The element will have display set to 'none'.
-        * /
-        useDisplayNone?: boolean;
-        /**
-         * Call preventDefault() on mousedown events that target the content widget.
-         * /
-        suppressMouseDown?: boolean;
-        /**
-         * Get a unique identifier of the content widget.
-         * /
-        getId(): string;
-        /**
-         * Get the dom node of the content widget.
-         * /
-        getDomNode(): HTMLElement;
-        /**
-         * Get the placement of the content widget.
-         * If null is returned, the content widget will be placed off screen.
-         * /
-        getPosition(): IContentWidgetPosition | null;
-        /**
-         * Optional function that is invoked before rendering
-         * the content widget. If a dimension is returned the editor will
-         * attempt to use it.
-         * /
-        beforeRender?(): IDimension | null;
-        /**
-         * Optional function that is invoked after rendering the content
-         * widget. Is being invoked with the selected position preference
-         * or `null` if not rendered.
-         * /
-        afterRender?(position: ContentWidgetPositionPreference | null, coordinate: IContentWidgetRenderedCoordinate | null): void;
-    }*/
 
     /**
      * Coordinatees passed in {@link IContentWidget.afterRender}
      */
-    /*export interface IContentWidgetRenderedCoordinate {
-        /**
-         * Top position relative to the editor content.
-         * /
-        readonly top: number;
-        /**
-         * Left position relative to the editor content.
-         * /
-        readonly left: number;
-    }*/
 
     /**
      * A positioning preference for rendering overlay widgets.
@@ -6044,102 +4564,22 @@ namespace BlazorMonaco.Editor
     /**
      * Represents editor-relative coordinates of an overlay widget.
      */
-    /*export interface IOverlayWidgetPositionCoordinates
-    {
-        /**
-         * The top position for the overlay widget, relative to the editor.
-         * /
-        top: number;
-        /**
-         * The left position for the overlay widget, relative to the editor.
-         * /
-        left: number;
-    }*/
 
     /**
      * A position for rendering overlay widgets.
      */
-    /*export interface IOverlayWidgetPosition {
-        /**
-         * The position preference for the overlay widget.
-         * /
-        preference: OverlayWidgetPositionPreference | IOverlayWidgetPositionCoordinates | null;
-        /**
-         * When set, stacks with other overlay widgets with the same preference,
-         * in an order determined by the ordinal value.
-         * /
-        stackOrdinal?: number;
-    }*/
 
     /**
      * An overlay widgets renders on top of the text.
      */
-    /*export interface IOverlayWidget {
-        /**
-         * Event fired when the widget layout changes.
-         * /
-        readonly onDidLayout?: IEvent$1<void>;
-        /**
-         * Render this overlay widget in a location where it could overflow the editor's view dom node.
-         * /
-        allowEditorOverflow?: boolean;
-        /**
-         * Get a unique identifier of the overlay widget.
-         * /
-        getId(): string;
-        /**
-         * Get the dom node of the overlay widget.
-         * /
-        getDomNode(): HTMLElement;
-        /**
-         * Get the placement of the overlay widget.
-         * If null is returned, the overlay widget is responsible to place itself.
-         * /
-        getPosition(): IOverlayWidgetPosition | null;
-        /**
-         * The editor will ensure that the scroll width is >= than this value.
-         * /
-        getMinContentWidthInPx? (): number;
-    }*/
 
     /**
      * A glyph margin widget renders in the editor glyph margin.
      */
-    /*export interface IGlyphMarginWidget
-    {
-        /**
-         * Get a unique identifier of the glyph widget.
-         * /
-        getId() : string;
-        /**
-         * Get the dom node of the glyph widget.
-         * /
-        getDomNode() : HTMLElement;
-        /**
-         * Get the placement of the glyph widget.
-         * /
-        getPosition() : IGlyphMarginWidgetPosition;
-    }*/
 
     /**
      * A position for rendering glyph margin widgets.
      */
-    /*export interface IGlyphMarginWidgetPosition
-    {
-        /**
-         * The glyph margin lane where the widget should be shown.
-         * /
-        lane: GlyphMarginLane;
-        /**
-         * The priority order of the widget, used for determining which widget
-         * to render when there are multiple.
-         * /
-        zIndex: number;
-        /**
-         * The editor range that this widget applies to.
-         * /
-        range: IRange;
-    }*/
 
     /**
      * Type of hit element with the mouse in the editor.
@@ -6228,14 +4668,10 @@ namespace BlazorMonaco.Editor
 
     public class MouseTargetUnknown : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.UNKNOWN;
     }
 
     public class MouseTargetTextarea : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.TEXTAREA;
-        //readonly position: null;
-        //readonly range: null;
     }
 
     public class MouseTargetMarginData
@@ -6250,9 +4686,6 @@ namespace BlazorMonaco.Editor
 
     public class MouseTargetMargin : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.GUTTER_GLYPH_MARGIN | MouseTargetType.GUTTER_LINE_NUMBERS | MouseTargetType.GUTTER_LINE_DECORATIONS;
-        //readonly position: Position;
-        //readonly range: Range;
         public new MouseTargetMarginData Detail { get; set; }
     }
 
@@ -6267,9 +4700,6 @@ namespace BlazorMonaco.Editor
 
     public class MouseTargetViewZone : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.GUTTER_VIEW_ZONE | MouseTargetType.CONTENT_VIEW_ZONE;
-        //readonly position: Position;
-        //readonly range: Range;
         public new MouseTargetViewZoneData Detail { get; set; }
     }
 
@@ -6280,9 +4710,6 @@ namespace BlazorMonaco.Editor
 
     public class MouseTargetContentText : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.CONTENT_TEXT;
-        //readonly position: Position;
-        //readonly range: Range;
         public new MouseTargetContentTextData Detail { get; set; }
     }
 
@@ -6294,51 +4721,34 @@ namespace BlazorMonaco.Editor
 
     public class MouseTargetContentEmpty : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.CONTENT_EMPTY;
-        //readonly position: Position;
-        //readonly range: Range;
         public new MouseTargetContentEmptyData Detail { get; set; }
     }
 
     public class MouseTargetContentWidget : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.CONTENT_WIDGET;
-        //readonly position: null;
-        //readonly range: null;
         public new string Detail { get; set; }
     }
 
     public class MouseTargetOverlayWidget : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.OVERLAY_WIDGET;
-        //readonly position: null;
-        //readonly range: null;
         public new string Detail { get; set; }
     }
 
     public class MouseTargetScrollbar : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.SCROLLBAR;
-        //readonly position: Position;
-        //readonly range: Range;
     }
 
     public class MouseTargetOverviewRuler : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.OVERVIEW_RULER;
     }
 
     public class MouseTargetOutsideEditor : BaseMouseTarget
     {
-        //readonly type: MouseTargetType.OUTSIDE_EDITOR;
-        //readonly outsidePosition: 'above' | 'below' | 'left' | 'right';
-        //readonly outsideDistance: number;
     }
 
     /**
      * Target hit with the mouse in the editor.
      */
-    //export type IMouseTarget = (IMouseTargetUnknown | IMouseTargetTextarea | IMouseTargetMargin | IMouseTargetViewZone | IMouseTargetContentText | IMouseTargetContentEmpty | IMouseTargetContentWidget | IMouseTargetOverlayWidget | IMouseTargetScrollbar | IMouseTargetOverviewRuler | IMouseTargetOutsideEditor);
 
     /**
      * A mouse event originating from the editor.
@@ -6362,7 +4772,6 @@ namespace BlazorMonaco.Editor
     {
         public Range Range { get; set; }
         public string LanguageId { get; set; }
-        //readonly clipboardEvent?: ClipboardEvent;
     }
 
     public class DiffEditorConstructionOptions : DiffEditorOptions
@@ -6370,13 +4779,11 @@ namespace BlazorMonaco.Editor
         /**
          * The initial editor dimension (to avoid measuring the container).
          */
-        // NOTE: The TS counterpart inherits from multiple classes and this property is here to cover the Dimension property in IEditorConstructionOptions
         public Dimension Dimension { get; set; }
         /**
          * Place overflow widgets inside an external DOM node.
          * Defaults to an internal DOM node.
          */
-        //overflowWidgetsDomNode?: HTMLElement;
         /**
          * Aria label for original editor.
          */
@@ -6387,579 +4794,19 @@ namespace BlazorMonaco.Editor
         public string ModifiedAriaLabel { get; set; }
     }
 
-    // Translated in the StandaloneCodeEditor.razor.cs file
     /**
      * A rich code editor.
      */
-    /*export interface ICodeEditor extends IEditor {
-        /**
-         * An event emitted when the content of the current model has changed.
-         * @event
-         * /
-        readonly onDidChangeModelContent: IEvent$1<IModelContentChangedEvent>;
-        /**
-         * An event emitted when the language of the current model has changed.
-         * @event
-         * /
-        readonly onDidChangeModelLanguage: IEvent$1<IModelLanguageChangedEvent>;
-        /**
-         * An event emitted when the language configuration of the current model has changed.
-         * @event
-         * /
-        readonly onDidChangeModelLanguageConfiguration: IEvent$1<IModelLanguageConfigurationChangedEvent>;
-        /**
-         * An event emitted when the options of the current model has changed.
-         * @event
-         * /
-        readonly onDidChangeModelOptions: IEvent$1<IModelOptionsChangedEvent>;
-        /**
-         * An event emitted when the configuration of the editor has changed. (e.g. `editor.updateOptions()`)
-         * @event
-         * /
-        readonly onDidChangeConfiguration: IEvent$1<ConfigurationChangedEvent>;
-        /**
-         * An event emitted when the cursor position has changed.
-         * @event
-         * /
-        readonly onDidChangeCursorPosition: IEvent$1<ICursorPositionChangedEvent>;
-        /**
-         * An event emitted when the cursor selection has changed.
-         * @event
-         * /
-        readonly onDidChangeCursorSelection: IEvent$1<ICursorSelectionChangedEvent>;
-        /**
-         * An event emitted when the model of this editor is about to change (e.g. from `editor.setModel()`).
-         * @event
-         * /
-        readonly onWillChangeModel: IEvent$1<IModelChangedEvent>;
-        /**
-         * An event emitted when the model of this editor has changed (e.g. `editor.setModel()`).
-         * @event
-         * /
-        readonly onDidChangeModel: IEvent$1<IModelChangedEvent>;
-        /**
-         * An event emitted when the decorations of the current model have changed.
-         * @event
-         * /
-        readonly onDidChangeModelDecorations: IEvent$1<IModelDecorationsChangedEvent>;
-        /**
-         * An event emitted when the text inside this editor gained focus (i.e. cursor starts blinking).
-         * @event
-         * /
-        readonly onDidFocusEditorText: IEvent$1<void>;
-        /**
-         * An event emitted when the text inside this editor lost focus (i.e. cursor stops blinking).
-         * @event
-         * /
-        readonly onDidBlurEditorText: IEvent$1<void>;
-        /**
-         * An event emitted when the text inside this editor or an editor widget gained focus.
-         * @event
-         * /
-        readonly onDidFocusEditorWidget: IEvent$1<void>;
-        /**
-         * An event emitted when the text inside this editor or an editor widget lost focus.
-         * @event
-         * /
-        readonly onDidBlurEditorWidget: IEvent$1<void>;
-        /**
-         * Boolean indicating whether input is in composition
-         * /
-        readonly inComposition: boolean;
-        /**
-         * An event emitted after composition has started.
-         * /
-        readonly onDidCompositionStart: IEvent$1<void>;
-        /**
-         * An event emitted after composition has ended.
-         * /
-        readonly onDidCompositionEnd: IEvent$1<void>;
-        /**
-         * An event emitted when editing failed because the editor is read-only.
-         * @event
-         * /
-        readonly onDidAttemptReadOnlyEdit: IEvent$1<void>;
-        /**
-         * An event emitted when users paste text in the editor.
-         * @event
-         * /
-        readonly onDidPaste: IEvent$1<IPasteEvent>;
-        /**
-         * An event emitted on a "mouseup".
-         * @event
-         * /
-        readonly onMouseUp: IEvent$1<IEditorMouseEvent>;
-        /**
-         * An event emitted on a "mousedown".
-         * @event
-         * /
-        readonly onMouseDown: IEvent$1<IEditorMouseEvent>;
-        /**
-         * An event emitted on a "contextmenu".
-         * @event
-         * /
-        readonly onContextMenu: IEvent$1<IEditorMouseEvent>;
-        /**
-         * An event emitted on a "mousemove".
-         * @event
-         * /
-        readonly onMouseMove: IEvent$1<IEditorMouseEvent>;
-        /**
-         * An event emitted on a "mouseleave".
-         * @event
-         * /
-        readonly onMouseLeave: IEvent$1<IPartialEditorMouseEvent>;
-        /**
-         * An event emitted on a "keyup".
-         * @event
-         * /
-        readonly onKeyUp: IEvent$1<IKeyboardEvent>;
-        /**
-         * An event emitted on a "keydown".
-         * @event
-         * /
-        readonly onKeyDown: IEvent$1<IKeyboardEvent>;
-        /**
-         * An event emitted when the layout of the editor has changed.
-         * @event
-         * /
-        readonly onDidLayoutChange: IEvent$1<EditorLayoutInfo>;
-        /**
-         * An event emitted when the content width or content height in the editor has changed.
-         * @event
-         * /
-        readonly onDidContentSizeChange: IEvent$1<IContentSizeChangedEvent>;
-        /**
-         * An event emitted when the scroll in the editor has changed.
-         * @event
-         * /
-        readonly onDidScrollChange: IEvent$1<IScrollEvent>;
-        /**
-         * An event emitted when hidden areas change in the editor (e.g. due to folding).
-         * @event
-         * /
-        readonly onDidChangeHiddenAreas: IEvent$1<void>;
-        /**
-         * Some editor operations fire multiple events at once.
-         * To allow users to react to multiple events fired by a single operation,
-         * the editor fires a begin update before the operation and an end update after the operation.
-         * Whenever the editor fires `onBeginUpdate`, it will also fire `onEndUpdate` once the operation finishes.
-         * Note that not all operations are bracketed by `onBeginUpdate` and `onEndUpdate`.
-        * /
-        readonly onBeginUpdate: IEvent$1<void>;
-        /**
-         * Fires after the editor completes the operation it fired `onBeginUpdate` for.
-        * /
-        readonly onEndUpdate: IEvent$1<void>;
-        readonly onDidChangeViewZones: IEvent$1<void>;
-        /**
-         * Saves current view state of the editor in a serializable object.
-         * /
-        saveViewState(): ICodeEditorViewState | null;
-        /**
-         * Restores the view state of the editor from a serializable object generated by `saveViewState`.
-         * /
-        restoreViewState(state: ICodeEditorViewState | null): void;
-        /**
-         * Returns true if the text inside this editor or an editor widget has focus.
-         * /
-        hasWidgetFocus(): boolean;
-        /**
-         * Get a contribution of this editor.
-         * @id Unique identifier of the contribution.
-         * @return The contribution or null if contribution not found.
-         * /
-        getContribution<T extends IEditorContribution>(id: string): T | null;
-        /**
-         * Type the getModel() of IEditor.
-         * /
-        getModel(): ITextModel | null;
-        /**
-         * Sets the current model attached to this editor.
-         * If the previous model was created by the editor via the value key in the options
-         * literal object, it will be destroyed. Otherwise, if the previous model was set
-         * via setModel, or the model key in the options literal object, the previous model
-         * will not be destroyed.
-         * It is safe to call setModel(null) to simply detach the current model from the editor.
-         * /
-        setModel(model: ITextModel | null): void;
-        /**
-         * Gets all the editor computed options.
-         * /
-        getOptions(): IComputedEditorOptions;
-        /**
-         * Gets a specific editor option.
-         * /
-        getOption<T extends EditorOption>(id: T): FindComputedEditorOptionValueById<T>;
-        /**
-         * Returns the editor's configuration (without any validation or defaults).
-         * /
-        getRawOptions(): IEditorOptions;
-        /**
-         * Get value of the current model attached to this editor.
-         * @see {@link ITextModel.getValue}
-         * /
-        getValue(options?: {
-            preserveBOM: boolean;
-            lineEnding: string;
-        }): string;
-        /**
-         * Set the value of the current model attached to this editor.
-         * @see {@link ITextModel.setValue}
-         * /
-        setValue(newValue: string): void;
-        /**
-         * Get the width of the editor's content.
-         * This is information that is "erased" when computing `scrollWidth = Math.max(contentWidth, width)`
-         * /
-        getContentWidth(): number;
-        /**
-         * Get the scrollWidth of the editor's viewport.
-         * /
-        getScrollWidth(): number;
-        /**
-         * Get the scrollLeft of the editor's viewport.
-         * /
-        getScrollLeft(): number;
-        /**
-         * Get the height of the editor's content.
-         * This is information that is "erased" when computing `scrollHeight = Math.max(contentHeight, height)`
-         * /
-        getContentHeight(): number;
-        /**
-         * Get the scrollHeight of the editor's viewport.
-         * /
-        getScrollHeight(): number;
-        /**
-         * Get the scrollTop of the editor's viewport.
-         * /
-        getScrollTop(): number;
-        /**
-         * Change the scrollLeft of the editor's viewport.
-         * /
-        setScrollLeft(newScrollLeft: number, scrollType?: ScrollType): void;
-        /**
-         * Change the scrollTop of the editor's viewport.
-         * /
-        setScrollTop(newScrollTop: number, scrollType?: ScrollType): void;
-        /**
-         * Change the scroll position of the editor's viewport.
-         * /
-        setScrollPosition(position: INewScrollPosition, scrollType?: ScrollType): void;
-        /**
-         * Check if the editor is currently scrolling towards a different scroll position.
-         * /
-        hasPendingScrollAnimation() : boolean;
-        /**
-         * Get an action that is a contribution to this editor.
-         * @id Unique identifier of the contribution.
-         * @return The action or null if action not found.
-         * /
-        getAction(id: string): IEditorAction | null;
-        /**
-         * Execute a command on the editor.
-         * The edits will land on the undo-redo stack, but no "undo stop" will be pushed.
-         * @param source The source of the call.
-         * @param command The command to execute
-         * /
-        executeCommand(source: string | null | undefined, command: ICommand): void;
-        /**
-         * Create an "undo stop" in the undo-redo stack.
-         * /
-        pushUndoStop(): boolean;
-        /**
-         * Remove the "undo stop" in the undo-redo stack.
-         * /
-        popUndoStop(): boolean;
-        /**
-         * Execute edits on the editor.
-         * The edits will land on the undo-redo stack, but no "undo stop" will be pushed.
-         * @param source The source of the call.
-         * @param edits The edits to execute.
-         * @param endCursorState Cursor state after the edits were applied.
-         * /
-        executeEdits(source: string | null | undefined, edits: IIdentifiedSingleEditOperation[], endCursorState?: ICursorStateComputer | Selection[]): boolean;
-        /**
-         * Execute multiple (concomitant) commands on the editor.
-         * @param source The source of the call.
-         * @param command The commands to execute
-         * /
-        executeCommands(source: string | null | undefined, commands: (ICommand | null)[]): void;
-        /**
-         * Scroll vertically or horizontally as necessary and reveal the current cursors.
-         * /
-        revealAllCursors(revealHorizontal: boolean, minimalReveal?: boolean): void;
-        /**
-         * Get all the decorations on a line (filtering out decorations from other editors).
-         * /
-        getLineDecorations(lineNumber: number): IModelDecoration[] | null;
-        /**
-         * Get all the decorations for a range (filtering out decorations from other editors).
-         * /
-        getDecorationsInRange(range: Range): IModelDecoration[] | null;
-        /**
-         * Get the font size at a given position
-         * @param position the position for which to fetch the font size
-         * /
-        getFontSizeAtPosition(position: IPosition): string | null;
-        /**
-         * All decorations added through this call will get the ownerId of this editor.
-         * @deprecated Use `createDecorationsCollection`
-         * @see createDecorationsCollection
-         * /
-        deltaDecorations(oldDecorations: string[], newDecorations: IModelDeltaDecoration[]): string[];
-        /**
-         * Remove previously added decorations.
-         * /
-        removeDecorations(decorationIds: string[]) : void;
-        /**
-         * Get the layout info for the editor.
-         * /
-        getLayoutInfo(): EditorLayoutInfo;
-        /**
-         * Returns the ranges that are currently visible.
-         * Does not account for horizontal scrolling.
-         * /
-        getVisibleRanges(): Range[];
-        /**
-         * Get the vertical position (top offset) for the line's top w.r.t. to the first line.
-         * /
-        getTopForLineNumber(lineNumber: number, includeViewZones?: boolean): number;
-        /**
-         * Get the vertical position (top offset) for the line's bottom w.r.t. to the first line.
-         * /
-        getBottomForLineNumber(lineNumber: number) : number;
-        /**
-         * Get the vertical position (top offset) for the position w.r.t. to the first line.
-         * /
-        getTopForPosition(lineNumber: number, column: number): number;
-        /**
-         * Get the line height for a model position.
-         * /
-        getLineHeightForPosition(position: IPosition): number;
-        /**
-         * Write the screen reader content to be the current selection
-         * /
-        writeScreenReaderContent(reason: string) : void;
-        /**
-         * Returns the editor's container dom node
-         * /
-        getContainerDomNode(): HTMLElement;
-        /**
-         * Returns the editor's dom node
-         * /
-        getDomNode(): HTMLElement | null;
-        /**
-         * Add a content widget. Widgets must have unique ids, otherwise they will be overwritten.
-         * /
-        addContentWidget(widget: IContentWidget): void;
-        /**
-         * Layout/Reposition a content widget. This is a ping to the editor to call widget.getPosition()
-         * and update appropriately.
-         * /
-        layoutContentWidget(widget: IContentWidget): void;
-        /**
-         * Remove a content widget.
-         * /
-        removeContentWidget(widget: IContentWidget): void;
-        /**
-         * Add an overlay widget. Widgets must have unique ids, otherwise they will be overwritten.
-         * /
-        addOverlayWidget(widget: IOverlayWidget): void;
-        /**
-         * Layout/Reposition an overlay widget. This is a ping to the editor to call widget.getPosition()
-         * and update appropriately.
-         * /
-        layoutOverlayWidget(widget: IOverlayWidget): void;
-        /**
-         * Remove an overlay widget.
-         * /
-        removeOverlayWidget(widget: IOverlayWidget): void;
-        /**
-         * Add a glyph margin widget. Widgets must have unique ids, otherwise they will be overwritten.
-         * /
-        addGlyphMarginWidget(widget: IGlyphMarginWidget) : void;
-        /**
-         * Layout/Reposition a glyph margin widget. This is a ping to the editor to call widget.getPosition()
-         * and update appropriately.
-         * /
-        layoutGlyphMarginWidget(widget: IGlyphMarginWidget) : void;
-        /**
-         * Remove a glyph margin widget.
-         * /
-        removeGlyphMarginWidget(widget: IGlyphMarginWidget) : void;
-        /**
-         * Change the view zones. View zones are lost when a new model is attached to the editor.
-         * /
-        changeViewZones(callback: (accessor: IViewZoneChangeAccessor) => void): void;
-        /**
-         * Get the horizontal position (left offset) for the column w.r.t to the beginning of the line.
-         * This method works only if the line `lineNumber` is currently rendered (in the editor's viewport).
-         * Use this method with caution.
-         * /
-        getOffsetForColumn(lineNumber: number, column: number): number;
-        getWidthOfLine(lineNumber: number): number;
-        /**
-         * Force an editor render now.
-         * /
-        render(forceRedraw?: boolean): void;
-        /**
-         * Render the editor at the next animation frame.
-         * /
-        renderAsync(forceRedraw?: boolean): void;
-        /**
-         * Get the hit test target at coordinates `clientX` and `clientY`.
-         * The coordinates are relative to the top-left of the viewport.
-         *
-         * @returns Hit test target or null if the coordinates fall outside the editor or the editor has no model.
-         * /
-        getTargetAtClientPoint(clientX: number, clientY: number): IMouseTarget | null;
-        /**
-         * Get the visible position for `position`.
-         * The result position takes scrolling into account and is relative to the top left corner of the editor.
-         * Explanation 1: the results of this method will change for the same `position` if the user scrolls the editor.
-         * Explanation 2: the results of this method will not change if the container of the editor gets repositioned.
-         * Warning: the results of this method are inaccurate for positions that are outside the current editor viewport.
-         * /
-        getScrolledVisiblePosition(position: IPosition): {
-            top: number;
-            left: number;
-            height: number;
-        } | null;
-        /**
-         * Apply the same font settings as the editor to `target`.
-         * /
-        applyFontInfo(target: HTMLElement): void;
-        setBanner(bannerDomNode: HTMLElement | null, height: number): void;
-        /**
-         * Is called when the model has been set, view state was restored and options are updated.
-         * This is the best place to compute data for the viewport (such as tokens).
-         * /
-        handleInitialized? (): void;
-    }*/
 
-    // Translated in the StandaloneDiffEditor.razor.cs file
     /**
      * A rich diff editor.
      */
-    /*export interface IDiffEditor extends IEditor {
-        /**
-         * @see {@link ICodeEditor.getContainerDomNode}
-         * /
-        getContainerDomNode(): HTMLElement;
-        /**
-         * An event emitted when the diff information computed by this diff editor has been updated.
-         * @event
-         * /
-        readonly onDidUpdateDiff: IEvent$1<void>;
-        /**
-         * An event emitted when the diff model is changed (i.e. the diff editor shows new content).
-         * @event
-         * /
-        readonly onDidChangeModel: IEvent$1<void>;
-        /**
-         * Saves current view state of the editor in a serializable object.
-         * /
-        saveViewState(): IDiffEditorViewState | null;
-        /**
-         * Restores the view state of the editor from a serializable object generated by `saveViewState`.
-         * /
-        restoreViewState(state: IDiffEditorViewState | null): void;
-        /**
-         * Type the getModel() of IEditor.
-         * /
-        getModel(): IDiffEditorModel | null;
-        createViewModel(model: IDiffEditorModel): IDiffEditorViewModel;
-        /**
-         * Sets the current model attached to this editor.
-         * If the previous model was created by the editor via the value key in the options
-         * literal object, it will be destroyed. Otherwise, if the previous model was set
-         * via setModel, or the model key in the options literal object, the previous model
-         * will not be destroyed.
-         * It is safe to call setModel(null) to simply detach the current model from the editor.
-         * /
-        setModel(model: IDiffEditorModel | null): void;
-        /**
-         * Get the `original` editor.
-         * /
-        getOriginalEditor(): ICodeEditor;
-        /**
-         * Get the `modified` editor.
-         * /
-        getModifiedEditor(): ICodeEditor;
-        /**
-         * Get the computed diff information.
-         * /
-        getLineChanges(): ILineChange[] | null;
-        /**
-         * Update the editor's options after the editor has been created.
-         * /
-        updateOptions(newOptions: IDiffEditorOptions) : void;
-        /**
-         * Jumps to the next or previous diff.
-         * /
-        goToDiff(target: 'next' | 'previous') : void;
-        /**
-         * Scrolls to the first diff.
-         * (Waits until the diff computation finished.)
-         * /
-        revealFirstDiff() : unknown;
-        accessibleDiffViewerNext() : void;
-        accessibleDiffViewerPrev() : void;
-        handleInitialized() : void;
-    }*/
 
-    /*export class FontInfo extends BareFontInfo {
-        readonly _editorStylingBrand: void;
-        readonly version: number;
-        readonly isTrusted: boolean;
-        readonly isMonospace: boolean;
-        readonly typicalHalfwidthCharacterWidth: number;
-        readonly typicalFullwidthCharacterWidth: number;
-        readonly canUseHalfwidthRightwardsArrow: boolean;
-        readonly spaceWidth: number;
-        readonly middotWidth: number;
-        readonly wsmiddotWidth: number;
-        readonly maxDigitWidth: number;
-    }*/
 
-    /*export class BareFontInfo {
-        readonly _bareFontInfoBrand: void;
-        readonly pixelRatio: number;
-        readonly fontFamily: string;
-        readonly fontWeight: string;
-        readonly fontSize: number;
-        readonly fontFeatureSettings: string;
-        readonly fontVariationSettings: string;
-        readonly lineHeight: number;
-        readonly letterSpacing: number;
-    }*/
-
-    //export const EditorZoom: IEditorZoom;
-
-    /*export interface IEditorZoom
-    {
-        readonly onDidChangeZoomLevel: IEvent$1<number>;
-        getZoomLevel() : number;
-        setZoomLevel(zoomLevel: number) : void;
-    }*/
-
-    //compatibility:
-    //export type IReadOnlyModel = ITextModel;
-    //export type IModel = ITextModel;
 }
 
 namespace BlazorMonaco.Languages
 {
-    /*export class EditDeltaInfo {
-        readonly linesAdded: number;
-        readonly linesRemoved: number;
-        readonly charsAdded: number;
-        readonly charsRemoved: number;
-        static fromText(text: string): EditDeltaInfo;
-        static tryCreate(linesAdded: number | undefined, linesRemoved: number | undefined, charsAdded: number | undefined, charsRemoved: number | undefined): EditDeltaInfo | undefined;
-        constructor(linesAdded: number, linesRemoved: number, charsAdded: number, charsRemoved: number);
-    }*/
 
     public class RelativePattern
     {
@@ -7034,186 +4881,37 @@ namespace BlazorMonaco.Languages
 
     public partial class Global
     {
-        /**
-         * Register information about a new language.
-         */
-        //export function register(language: ILanguageExtensionPoint): void;
 
-        /**
-         * Get the information of all the registered languages.
-         */
-        //export function getLanguages(): ILanguageExtensionPoint[];
 
-        //export function getEncodedLanguageId(languageId: string): number;
-
-        /**
-         * Compute the score of a language selector against a candidate Uri and language.
-         */
-        //export function score(selector: LanguageSelector | undefined, candidateUri: Uri, candidateLanguage: string): number;
-
-        /**
-         * An event emitted when a language is associated for the first time with a text model.
-         * @event
-         */
-        //export function onLanguage(languageId: string, callback: () => void): IDisposable$2;
-
-        /**
-         * An event emitted when a language is associated for the first time with a text model or
-         * when a language is encountered during the tokenization of another language.
-         * @event
-         */
-        //export function onLanguageEncountered(languageId: string, callback: () => void): IDisposable$2;
-
-        /**
-         * Set the editing configuration for a language.
-         */
-        //export function setLanguageConfiguration(languageId: string, configuration: LanguageConfiguration): IDisposable$2;
     }
 
     /**
      * A token.
      */
-    /*export interface IToken {
-        startIndex: number;
-        scopes: string;
-    }*/
 
     /**
      * The result of a line tokenization.
      */
-    /*export interface ILineTokens {
-        /**
-         * The list of tokens on the line.
-         * /
-        tokens: IToken[];
-        /**
-         * The tokenization end state.
-         * A pointer will be held to this and the object should not be modified by the tokenizer after the pointer is returned.
-         * /
-        endState: IState;
-    }*/
 
     /**
      * The result of a line tokenization.
      */
-    /*export interface IEncodedLineTokens {
-        /**
-         * The tokens on the line in a binary, encoded format. Each token occupies two array indices. For token i:
-         *  - at offset 2*i => startIndex
-         *  - at offset 2*i + 1 => metadata
-         * Meta data is in binary format:
-         * - -------------------------------------------
-         *     3322 2222 2222 1111 1111 1100 0000 0000
-         *     1098 7654 3210 9876 5432 1098 7654 3210
-         * - -------------------------------------------
-         *     bbbb bbbb bfff ffff ffFF FFTT LLLL LLLL
-         * - -------------------------------------------
-         *  - L = EncodedLanguageId (8 bits): Use `getEncodedLanguageId` to get the encoded ID of a language.
-         *  - T = StandardTokenType (2 bits): Other = 0, Comment = 1, String = 2, RegEx = 3.
-         *  - F = FontStyle (4 bits): None = 0, Italic = 1, Bold = 2, Underline = 4, Strikethrough = 8.
-         *  - f = foreground ColorId (9 bits)
-         *  - b = background ColorId (9 bits)
-         *  - The color value for each colorId is defined in IStandaloneThemeData.customTokenColors:
-         * e.g. colorId = 1 is stored in IStandaloneThemeData.customTokenColors[1]. Color id = 0 means no color,
-         * id = 1 is for the default foreground color, id = 2 for the default background.
-         * /
-        tokens: Uint32Array;
-        /**
-         * The tokenization end state.
-         * A pointer will be held to this and the object should not be modified by the tokenizer after the pointer is returned.
-         * /
-        endState: IState;
-    }*/
 
     /**
      * A factory for token providers.
      */
-    /*export interface TokensProviderFactory {
-        create(): ProviderResult<TokensProvider | EncodedTokensProvider | IMonarchLanguage>;
-    }*/
 
     /**
      * A "manual" provider of tokens.
      */
-    /*export interface TokensProvider {
-        /**
-         * The initial state of a language. Will be the state passed in to tokenize the first line.
-         * /
-        getInitialState(): IState;
-        /**
-         * Tokenize a line given the state at the beginning of the line.
-         * /
-        tokenize(line: string, state: IState): ILineTokens;
-    }*/
 
     /**
      * A "manual" provider of tokens, returning tokens in a binary form.
      */
-    /*export interface EncodedTokensProvider {
-        /**
-         * The initial state of a language. Will be the state passed in to tokenize the first line.
-         * /
-        getInitialState(): IState;
-        /**
-         * Tokenize a line given the state at the beginning of the line.
-         * /
-        tokenizeEncoded(line: string, state: IState): IEncodedLineTokens;
-        /**
-         * Tokenize a line given the state at the beginning of the line.
-         * /
-        tokenize?(line: string, state: IState): ILineTokens;
-    }*/
 
     public partial class Global
     {
-        /**
-         * Change the color map that is used for token colors.
-         * Supported formats (hex): #RRGGBB, $RRGGBBAA, #RGB, #RGBA
-         */
-        //export function setColorMap(colorMap: string[] | null): void;
 
-        /**
-         * Register a tokens provider factory for a language. This tokenizer will be exclusive with a tokenizer
-         * set using `setTokensProvider` or one created using `setMonarchTokensProvider`, but will work together
-         * with a tokens provider set using `registerDocumentSemanticTokensProvider` or `registerDocumentRangeSemanticTokensProvider`.
-         */
-        //export function registerTokensProviderFactory(languageId: string, factory: TokensProviderFactory): IDisposable$2;
-
-        /**
-         * Set the tokens provider for a language (manual implementation). This tokenizer will be exclusive
-         * with a tokenizer created using `setMonarchTokensProvider`, or with `registerTokensProviderFactory`,
-         * but will work together with a tokens provider set using `registerDocumentSemanticTokensProvider`
-         * or `registerDocumentRangeSemanticTokensProvider`.
-         */
-        //export function setTokensProvider(languageId: string, provider: TokensProvider | EncodedTokensProvider | Thenable<TokensProvider | EncodedTokensProvider>): IDisposable$2;
-
-        /**
-         * Set the tokens provider for a language (monarch implementation). This tokenizer will be exclusive
-         * with a tokenizer set using `setTokensProvider`, or with `registerTokensProviderFactory`, but will
-         * work together with a tokens provider set using `registerDocumentSemanticTokensProvider` or
-         * `registerDocumentRangeSemanticTokensProvider`.
-         */
-        //export function setMonarchTokensProvider(languageId: string, languageDef: IMonarchLanguage | Thenable<IMonarchLanguage>): IDisposable$2;
-
-        /**
-         * Register a reference provider (used by e.g. reference search).
-         */
-        //export function registerReferenceProvider(languageSelector: LanguageSelector, provider: ReferenceProvider): IDisposable$2;
-
-        /**
-         * Register a rename provider (used by e.g. rename symbol).
-         */
-        //export function registerRenameProvider(languageSelector: LanguageSelector, provider: RenameProvider) : IDisposable$2;
-
-        /**
-        * Register a new symbol-name provider (e.g., when a symbol is being renamed, show new possible symbol-names)
-        */
-        //export function registerNewSymbolNameProvider(languageSelector: LanguageSelector, provider: NewSymbolNamesProvider): IDisposable$2;
-
-        /**
-         * Register a signature help provider (used by e.g. parameter hints).
-         */
-        //export function registerSignatureHelpProvider(languageSelector: LanguageSelector, provider: SignatureHelpProvider) : IDisposable$2;
 
         /**
          * Register a hover provider (used by e.g. editor hover).
@@ -7223,40 +4921,7 @@ namespace BlazorMonaco.Languages
 
         public static Task RegisterHoverProviderAsync(IJSRuntime jsRuntime, LanguageSelector language, HoverProvider hoverProvider)
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerHoverProvider", language, DotNetObjectReference.Create(hoverProvider));
-        /**
-         * Register a document symbol provider (used by e.g. outline).
-         */
-        //export function registerDocumentSymbolProvider(languageSelector: LanguageSelector, provider: DocumentSymbolProvider) : IDisposable$2;
 
-        /**
-         * Register a document highlight provider (used by e.g. highlight occurrences).
-         */
-        //export function registerDocumentHighlightProvider(languageSelector: LanguageSelector, provider: DocumentHighlightProvider) : IDisposable$2;
-
-        /**
-         * Register an linked editing range provider.
-         */
-        //export function registerLinkedEditingRangeProvider(languageSelector: LanguageSelector, provider: LinkedEditingRangeProvider) : IDisposable$2;
-
-        /**
-         * Register a definition provider (used by e.g. go to definition).
-         */
-        //export function registerDefinitionProvider(languageSelector: LanguageSelector, provider: DefinitionProvider) : IDisposable$2;
-
-        /**
-         * Register a implementation provider (used by e.g. go to implementation).
-         */
-        //export function registerImplementationProvider(languageSelector: LanguageSelector, provider: ImplementationProvider) : IDisposable$2;
-
-        /**
-         * Register a type definition provider (used by e.g. go to type definition).
-         */
-        //export function registerTypeDefinitionProvider(languageSelector: LanguageSelector, provider: TypeDefinitionProvider) : IDisposable$2;
-
-        /**
-         * Register a code lens provider (used by e.g. inline code lenses).
-         */
-        //export function registerCodeLensProvider(languageSelector: LanguageSelector, provider: CodeLensProvider) : IDisposable$2;
 
         /**
          * Register a code action provider (used by e.g. quick fix).
@@ -7280,20 +4945,6 @@ namespace BlazorMonaco.Languages
         public static Task RegisterDocumentFormattingEditProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentFormattingEditProvider documentFormattingEditProvider)
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentFormattingEditProvider", language, documentFormattingEditProvider.DisplayName, DotNetObjectReference.Create(documentFormattingEditProvider));
 
-        /**
-         * Register a formatter that can handle a range inside a model.
-         */
-        //export function registerDocumentRangeFormattingEditProvider(languageSelector: LanguageSelector, provider: DocumentRangeFormattingEditProvider) : IDisposable$2;
-
-        /**
-         * Register a formatter than can do formatting as the user types.
-         */
-        //export function registerOnTypeFormattingEditProvider(languageSelector: LanguageSelector, provider: OnTypeFormattingEditProvider) : IDisposable$2;
-
-        /**
-         * Register a link provider that can find links in text.
-         */
-        //export function registerLinkProvider(languageSelector: LanguageSelector, provider: LinkProvider) : IDisposable$2;
 
         /**
          * Register a completion item provider (use by e.g. suggestions).
@@ -7309,52 +4960,210 @@ namespace BlazorMonaco.Languages
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerCompletionItemProvider", language, completionItemProvider.TriggerCharacters, DotNetObjectReference.Create(completionItemProvider));
 
         /**
-         * Register a document color provider (used by Color Picker, Color Decorator).
+         * Register a definition provider.
          */
-        //export function registerColorProvider(languageSelector: LanguageSelector, provider: DocumentColorProvider) : IDisposable$2;
+        public static Task RegisterDefinitionProvider(IJSRuntime jsRuntime, LanguageSelector language, DefinitionProvider definitionProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDefinitionProvider", language, DotNetObjectReference.Create(definitionProvider));
 
         /**
-         * Register a folding range provider
+         * Register a reference provider.
          */
-        //export function registerFoldingRangeProvider(languageSelector: LanguageSelector, provider: FoldingRangeProvider) : IDisposable$2;
+        public static Task RegisterReferenceProvider(IJSRuntime jsRuntime, LanguageSelector language, ReferenceProvider referenceProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerReferenceProvider", language, DotNetObjectReference.Create(referenceProvider));
 
         /**
-         * Register a declaration provider
+         * Register an implementation provider.
          */
-        //export function registerDeclarationProvider(languageSelector: LanguageSelector, provider: DeclarationProvider) : IDisposable$2;
+        public static Task RegisterImplementationProvider(IJSRuntime jsRuntime, LanguageSelector language, ImplementationProvider implementationProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerImplementationProvider", language, DotNetObjectReference.Create(implementationProvider));
 
         /**
-         * Register a selection range provider
+         * Register a type definition provider.
          */
-        //export function registerSelectionRangeProvider(languageSelector: LanguageSelector, provider: SelectionRangeProvider) : IDisposable$2;
+        public static Task RegisterTypeDefinitionProvider(IJSRuntime jsRuntime, LanguageSelector language, TypeDefinitionProvider typeDefinitionProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerTypeDefinitionProvider", language, DotNetObjectReference.Create(typeDefinitionProvider));
 
         /**
-         * Register a document semantic tokens provider. A semantic tokens provider will complement and enhance a
-         * simple top-down tokenizer. Simple top-down tokenizers can be set either via `setMonarchTokensProvider`
-         * or `setTokensProvider`.
+         * Register a declaration provider.
+         */
+        public static Task RegisterDeclarationProvider(IJSRuntime jsRuntime, LanguageSelector language, DeclarationProvider declarationProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDeclarationProvider", language, DotNetObjectReference.Create(declarationProvider));
+
+        /**
+         * Register a document symbol provider.
+         */
+        public static Task RegisterDocumentSymbolProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentSymbolProvider documentSymbolProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentSymbolProvider", language, DotNetObjectReference.Create(documentSymbolProvider));
+
+        /**
+         * Register a folding range provider.
+         */
+        public static Task RegisterFoldingRangeProvider(IJSRuntime jsRuntime, LanguageSelector language, FoldingRangeProvider foldingRangeProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerFoldingRangeProvider", language, DotNetObjectReference.Create(foldingRangeProvider));
+
+        /**
+         * Register a document highlight provider.
+         */
+        public static Task RegisterDocumentHighlightProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentHighlightProvider documentHighlightProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentHighlightProvider", language, DotNetObjectReference.Create(documentHighlightProvider));
+
+        /**
+         * Register a document color provider.
+         */
+        public static Task RegisterColorProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentColorProvider documentColorProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerColorProvider", language, DotNetObjectReference.Create(documentColorProvider));
+
+        /**
+         * Register a selection range provider.
+         */
+        public static Task RegisterSelectionRangeProvider(IJSRuntime jsRuntime, LanguageSelector language, SelectionRangeProvider selectionRangeProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerSelectionRangeProvider", language, DotNetObjectReference.Create(selectionRangeProvider));
+
+        /**
+         * Register a linked editing range provider.
+         */
+        public static Task RegisterLinkedEditingRangeProvider(IJSRuntime jsRuntime, LanguageSelector language, LinkedEditingRangeProvider linkedEditingRangeProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerLinkedEditingRangeProvider", language, DotNetObjectReference.Create(linkedEditingRangeProvider));
+
+        /**
+         * Register a link provider.
+         */
+        public static Task RegisterLinkProvider(IJSRuntime jsRuntime, LanguageSelector language, LinkProvider linkProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerLinkProvider", language, DotNetObjectReference.Create(linkProvider));
+
+        /**
+         * Register a new symbol names provider.
+         */
+        public static Task RegisterNewSymbolNameProvider(IJSRuntime jsRuntime, LanguageSelector language, NewSymbolNamesProvider newSymbolNamesProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerNewSymbolNameProvider", language, DotNetObjectReference.Create(newSymbolNamesProvider));
+
+        /**
+         * Register a language via a language extension point.
          *
-         * For the best user experience, register both a semantic tokens provider and a top-down tokenizer.
-         */
-        //export function registerDocumentSemanticTokensProvider(languageSelector: LanguageSelector, provider: DocumentSemanticTokensProvider) : IDisposable$2;
-
-        /**
-         * Register a document range semantic tokens provider. A semantic tokens provider will complement and enhance a
-         * simple top-down tokenizer. Simple top-down tokenizers can be set either via `setMonarchTokensProvider`
-         * or `setTokensProvider`.
+         * **Note**: The language id and the language extensions should match.
+         * **Note**: To associate a Monaco editor language with this registered language you must also call SetModelLanguage with a model and the language id.
          *
-         * For the best user experience, register both a semantic tokens provider and a top-down tokenizer.
+         * @param language The language extension point.
          */
-        //export function registerDocumentRangeSemanticTokensProvider(languageSelector: LanguageSelector, provider: DocumentRangeSemanticTokensProvider) : IDisposable$2;
+        public static Task RegisterLanguage(IJSRuntime jsRuntime, LanguageExtensionPoint language)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerLanguage", language);
 
         /**
-         * Register an inline completions provider.
+         * Set a language configuration for a language.
          */
-        //export function registerInlineCompletionsProvider(languageSelector: LanguageSelector, provider: InlineCompletionsProvider) : IDisposable$2;
+        public static Task SetLanguageConfiguration(IJSRuntime jsRuntime, string languageId, object configuration)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.setLanguageConfiguration", languageId, configuration);
+
+        /**
+         * Set a Monarch tokens provider for a language.
+         */
+        public static Task SetMonarchTokensProvider(IJSRuntime jsRuntime, string languageId, object languageDef)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.setMonarchTokensProvider", languageId, languageDef);
+
+        /**
+         * Set the Monarch color map.
+         */
+        public static Task SetColorMap(IJSRuntime jsRuntime, string[] colorMap)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.setColorMap", colorMap);
+
+        /**
+         * Get the encoded language id for a language.
+         */
+        public static Task<int> GetEncodedLanguageId(IJSRuntime jsRuntime, string languageId)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<int>("blazorMonaco.languages.getEncodedLanguageId", languageId);
+
+        /**
+         * Get the information of all the registered languages.
+         */
+        public static Task<LanguageExtensionPoint[]> GetLanguages(IJSRuntime jsRuntime)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<LanguageExtensionPoint[]>("blazorMonaco.languages.getLanguages");
+
+        /**
+         * Register a listener that is called when a language is loaded for the first time.
+         */
+        public static Task OnLanguage(IJSRuntime jsRuntime, string languageId)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.onLanguage", languageId);
+
+        /**
+         * Register a listener that is called when a language is encountered for the first time.
+         */
+        public static Task OnLanguageEncountered(IJSRuntime jsRuntime, string languageId)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.onLanguageEncountered", languageId);
+
+        /**
+         * Compute the score of a language selector against a resource.
+         */
+        public static Task<int> Score(IJSRuntime jsRuntime, LanguageSelector selector, string candidateUri, string candidateLanguage)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync<int>("blazorMonaco.languages.score", selector, candidateUri, candidateLanguage);
+
+        /**
+         * Set the tokens provider for a language (manual implementation).
+         */
+        public static Task SetTokensProvider(IJSRuntime jsRuntime, string languageId, TokensProvider tokensProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.setTokensProvider", languageId, DotNetObjectReference.Create(tokensProvider));
+
+        /**
+         * Set an encoded tokens provider for a language (binary, manual implementation).
+         */
+        public static Task SetTokensProvider(IJSRuntime jsRuntime, string languageId, EncodedTokensProvider tokensProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.setEncodedTokensProvider", languageId, DotNetObjectReference.Create(tokensProvider));
+
+        /**
+         * Register a signature help provider.
+         */
+        public static Task RegisterSignatureHelpProvider(IJSRuntime jsRuntime, LanguageSelector language, SignatureHelpProvider signatureHelpProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerSignatureHelpProvider", language, DotNetObjectReference.Create(signatureHelpProvider));
+
+        /**
+         * Register a code lens provider.
+         */
+        public static Task RegisterCodeLensProvider(IJSRuntime jsRuntime, LanguageSelector language, CodeLensProvider codeLensProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerCodeLensProvider", language, DotNetObjectReference.Create(codeLensProvider));
+
+        /**
+         * Register a rename provider.
+         */
+        public static Task RegisterRenameProvider(IJSRuntime jsRuntime, LanguageSelector language, RenameProvider renameProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerRenameProvider", language, DotNetObjectReference.Create(renameProvider));
+
+        /**
+         * Register a document semantic tokens provider.
+         */
+        public static Task RegisterDocumentSemanticTokensProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentSemanticTokensProvider documentSemanticTokensProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentSemanticTokensProvider", language, DotNetObjectReference.Create(documentSemanticTokensProvider), documentSemanticTokensProvider.Legend);
+
+        /**
+         * Register a document range semantic tokens provider.
+         */
+        public static Task RegisterDocumentRangeSemanticTokensProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentRangeSemanticTokensProvider documentRangeSemanticTokensProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentRangeSemanticTokensProvider", language, DotNetObjectReference.Create(documentRangeSemanticTokensProvider), documentRangeSemanticTokensProvider.Legend);
 
         /**
          * Register an inlay hints provider.
          */
-        //export function registerInlayHintsProvider(languageSelector: LanguageSelector, provider: InlayHintsProvider) : IDisposable$2;
+        public static Task RegisterInlayHintsProvider(IJSRuntime jsRuntime, LanguageSelector language, InlayHintsProvider inlayHintsProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerInlayHintsProvider", language, DotNetObjectReference.Create(inlayHintsProvider));
+
+        /**
+         * Register an inline completions provider.
+         */
+        public static Task RegisterInlineCompletionsProvider(IJSRuntime jsRuntime, LanguageSelector language, InlineCompletionsProvider inlineCompletionsProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerInlineCompletionsProvider", language, DotNetObjectReference.Create(inlineCompletionsProvider));
+
+        /**
+         * Register a document range formatting edit provider.
+         */
+        public static Task RegisterDocumentRangeFormattingEditProvider(IJSRuntime jsRuntime, LanguageSelector language, DocumentRangeFormattingEditProvider documentRangeFormattingEditProvider)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerDocumentRangeFormattingEditProvider", language, DotNetObjectReference.Create(documentRangeFormattingEditProvider));
+
+        /**
+         * Register an on-type formatting edit provider.
+         * @param triggerCharacters The characters that trigger formatting.
+         */
+        public static Task RegisterOnTypeFormattingEditProvider(IJSRuntime jsRuntime, LanguageSelector language, OnTypeFormattingEditProvider onTypeFormattingEditProvider, string[] triggerCharacters)
+            => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerOnTypeFormattingEditProvider", language, DotNetObjectReference.Create(onTypeFormattingEditProvider), triggerCharacters);
+
+
     }
 
     /**
@@ -7469,198 +5278,43 @@ namespace BlazorMonaco.Languages
     /**
      * Configuration for line comments.
      */
-    /*export interface LineCommentConfig {
-        /**
-         * The line comment token, like `//`
-         * /
-        comment: string;
-        /**
-         * Whether the comment token should not be indented and placed at the first column.
-         * Defaults to false.
-         * /
-        noIndent?: boolean;
-    }*/
 
     /**
      * Describes how comments for a language work.
      */
-    /*export interface CommentRule {
-        /**
-         * The line comment token, like `// this is a comment`.
-         * Can be a string or an object with comment and optional noIndent properties.
-         * /
-        lineComment?: string | LineCommentConfig | null;
-        /**
-         * The block comment character pair, like `/* block comment *&#47;`
-         * /
-        blockComment?: CharacterPair | null;
-    }*/
 
     /**
      * The language configuration interface defines the contract between extensions and
      * various editor features, like automatic bracket insertion, automatic indentation etc.
      */
-    /*export interface LanguageConfiguration {
-        /**
-         * The language's comment settings.
-         * /
-        comments?: CommentRule;
-        /**
-         * The language's brackets.
-         * This configuration implicitly affects pressing Enter around these brackets.
-         * /
-        brackets?: CharacterPair[];
-        /**
-         * The language's word definition.
-         * If the language supports Unicode identifiers (e.g. JavaScript), it is preferable
-         * to provide a word definition that uses exclusion of known separators.
-         * e.g.: A regex that matches anything except known separators (and dot is allowed to occur in a floating point number):
-         *   /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g
-         * /
-        wordPattern?: RegExp;
-        /**
-         * The language's indentation settings.
-         * /
-        indentationRules?: IndentationRule;
-        /**
-         * The language's rules to be evaluated when pressing Enter.
-         * /
-        onEnterRules?: OnEnterRule[];
-        /**
-         * The language's auto closing pairs. The 'close' character is automatically inserted with the
-         * 'open' character is typed. If not set, the configured brackets will be used.
-         * /
-        autoClosingPairs?: IAutoClosingPairConditional[];
-        /**
-         * The language's surrounding pairs. When the 'open' character is typed on a selection, the
-         * selected string is surrounded by the open and close characters. If not set, the autoclosing pairs
-         * settings will be used.
-         * /
-        surroundingPairs?: IAutoClosingPair[];
-        /**
-         * Defines a list of bracket pairs that are colorized depending on their nesting level.
-         * If not set, the configured brackets will be used.
-        * /
-        colorizedBracketPairs?: CharacterPair[];
-        /**
-         * Defines what characters must be after the cursor for bracket or quote autoclosing to occur when using the \'languageDefined\' autoclosing setting.
-         *
-         * This is typically the set of characters which can not start an expression, such as whitespace, closing brackets, non-unary operators, etc.
-         * /
-        autoCloseBefore?: string;
-        /**
-         * The language's folding rules.
-         * /
-        folding?: FoldingRules;
-        /**
-         * **Deprecated** Do not use.
-         *
-         * @deprecated Will be replaced by a better API soon.
-         * /
-        __electricCharacterSupport?: {
-            docComment?: IDocComment;
-        };
-    }*/
 
     /**
      * Describes indentation rules for a language.
      */
-    /*export interface IndentationRule {
-        /**
-         * If a line matches this pattern, then all the lines after it should be unindented once (until another rule matches).
-         * /
-        decreaseIndentPattern: RegExp;
-        /**
-         * If a line matches this pattern, then all the lines after it should be indented once (until another rule matches).
-         * /
-        increaseIndentPattern: RegExp;
-        /**
-         * If a line matches this pattern, then **only the next line** after it should be indented once.
-         * /
-        indentNextLinePattern?: RegExp | null;
-        /**
-         * If a line matches this pattern, then its indentation should not be changed and it should not be evaluated against the other rules.
-         * /
-        unIndentedLinePattern?: RegExp | null;
-    }*/
 
     /**
      * Describes language specific folding markers such as '#region' and '#endregion'.
      * The start and end regexes will be tested against the contents of all lines and must be designed efficiently:
      * - the regex should start with '^'
      */
-    /*export interface FoldingMarkers {
-        start: RegExp;
-        end: RegExp;
-    }*/
 
     /**
      * Describes folding rules for a language.
      */
-    /*export interface FoldingRules {
-        /**
-         * Used by the indentation based strategy to decide whether empty lines belong to the previous or the next block.
-         * A language adheres to the off-side rule if blocks in that language are expressed by their indentation.
-         * See [wikipedia](https://en.wikipedia.org/wiki/Off-side_rule) for more information.
-         * If not set, `false` is used and empty lines belong to the previous block.
-         * /
-        offSide?: boolean;
-        /**
-         * Region markers used by the language.
-         * /
-        markers?: FoldingMarkers;
-    }*/
 
     /**
      * Describes a rule to be evaluated when pressing Enter.
      */
-    /*export interface OnEnterRule {
-        /**
-         * This rule will only execute if the text before the cursor matches this regular expression.
-         * /
-        beforeText: RegExp;
-        /**
-         * This rule will only execute if the text after the cursor matches this regular expression.
-         * /
-        afterText?: RegExp;
-        /**
-         * This rule will only execute if the text above the this line matches this regular expression.
-         * /
-        previousLineText?: RegExp;
-        /**
-         * The action to execute.
-         * /
-        action: EnterAction;
-    }*/
 
     /**
      * Definition of documentation comments (e.g. Javadoc/JSdoc)
      */
-    /*export interface IDocComment {
-        /**
-         * The string that starts a doc comment (e.g. '/**')
-         * /
-        open: string;
-        /**
-         * The string that appears on the last line and closes the doc comment (e.g. ' * /').
-         * /
-        close?: string;
-    }*/
 
     /**
      * A tuple of two characters, like a pair of
      * opening and closing brackets.
      */
-    //export type CharacterPair = [string, string];
 
-    /*export interface IAutoClosingPair {
-        open: string;
-        close: string;
-    }*/
-
-    /*export interface IAutoClosingPairConditional extends IAutoClosingPair {
-        notIn?: string[];
-    }*/
 
     /**
      * Describes what to do with the indentation when pressing Enter.
@@ -7690,44 +5344,13 @@ namespace BlazorMonaco.Languages
     /**
      * Describes what to do when pressing Enter.
      */
-    /*export interface EnterAction {
-        /**
-         * Describe what to do with the indentation.
-         * /
-        indentAction: IndentAction;
-        /**
-         * Describes text to be appended after the new line and after the indentation.
-         * /
-        appendText?: string;
-        /**
-         * Describes the number of characters to remove from the new line's indentation.
-         * /
-        removeText?: number;
-    }*/
 
-    /*export interface SyntaxNode {
-        startIndex: number;
-        endIndex: number;
-        startPosition: IPosition;
-        endPosition: IPosition;
-    }*/
-
-    /*export interface QueryCapture {
-        name: string;
-        text?: string;
-        node: SyntaxNode;
-        encodedLanguageId: number;
-    }*/
 
     /**
      * The state of the tokenizer between two lines.
      * It is useful to store flags such as in multiline comment, etc.
      * The model will clone the previous line's state and pass it in to tokenize the next line.
      */
-    /*export interface IState {
-        clone(): IState;
-        equals(other: IState): boolean;
-    }*/
 
     /**
      * A provider result represents the values a provider, like the {@link HoverProvider},
@@ -7735,7 +5358,6 @@ namespace BlazorMonaco.Languages
      * to that type `T`. In addition, `null` and `undefined` can be returned - either directly or from a
      * thenable.
      */
-    //export type ProviderResult<T> = T | undefined | null | Thenable<T | undefined | null>;
 
     /**
      * A hover represents additional information for a symbol or word. Hovers are
@@ -7767,6 +5389,612 @@ namespace BlazorMonaco.Languages
      * The hover provider interface defines the contract between extensions and
      * the [hover](https://code.visualstudio.com/docs/editor/intellisense)-feature.
      */
+    /**
+     * The context for reference provider requests.
+     */
+    public class ReferenceContext
+    {
+        /**
+         * Reference provider is requested at the given position. The result should include the
+         * declaration of the symbol at the position if `includeDeclaration` is set to true.
+         */
+        public bool IncludeDeclaration { get; set; }
+    }
+
+    /**
+     * Color information sent to `provideColorPresentations`.
+     */
+    public class ColorInformation
+    {
+        public double R { get; set; }
+        public double G { get; set; }
+        public double B { get; set; }
+        public double Alpha { get; set; }
+    }
+
+    /**
+     * Legend describing the semantic tokens a `SemanticTokensProvider` supports.
+     */
+    public class SemanticTokensLegend
+    {
+        public string[] TokenTypes { get; set; }
+        public string[] TokenModifiers { get; set; }
+    }
+
+    /**
+     * A provider that returns definitions for a given position.
+     */
+    public class DefinitionProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDefinitions))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDefinitions(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public DefinitionProvider(ProvideDelegate provideDefinitions) => ProvideMethod = provideDefinitions;
+    }
+
+    /**
+     * A provider that returns references for a given position.
+     */
+    public class ReferenceProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position, ReferenceContext context);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideReferences))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideReferences(string modelUri, Position position, ReferenceContext context)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position, context));
+
+        public ReferenceProvider(ProvideDelegate provideReferences) => ProvideMethod = provideReferences;
+    }
+
+    /**
+     * A provider that returns implementations for a given position.
+     */
+    public class ImplementationProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideImplementations))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideImplementations(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public ImplementationProvider(ProvideDelegate provideImplementations) => ProvideMethod = provideImplementations;
+    }
+
+    /**
+     * A provider that returns type definitions for a given position.
+     */
+    public class TypeDefinitionProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideTypeDefinitions))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideTypeDefinitions(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public TypeDefinitionProvider(ProvideDelegate provideTypeDefinitions) => ProvideMethod = provideTypeDefinitions;
+    }
+
+    /**
+     * A provider that returns declarations for a given position.
+     */
+    public class DeclarationProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDeclarations))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDeclarations(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public DeclarationProvider(ProvideDelegate provideDeclarations) => ProvideMethod = provideDeclarations;
+    }
+
+    /**
+     * A provider that returns document symbols for a model.
+     */
+    public class DocumentSymbolProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDocumentSymbols))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDocumentSymbols(string modelUri)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri));
+
+        public DocumentSymbolProvider(ProvideDelegate provideDocumentSymbols) => ProvideMethod = provideDocumentSymbols;
+    }
+
+    /**
+     * A provider that returns folding ranges for a model.
+     */
+    public class FoldingRangeProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideFoldingRanges))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideFoldingRanges(string modelUri)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri));
+
+        public FoldingRangeProvider(ProvideDelegate provideFoldingRanges) => ProvideMethod = provideFoldingRanges;
+    }
+
+    /**
+     * A provider that returns document highlights for a given position.
+     */
+    public class DocumentHighlightProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDocumentHighlights))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDocumentHighlights(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public DocumentHighlightProvider(ProvideDelegate provideDocumentHighlights) => ProvideMethod = provideDocumentHighlights;
+    }
+
+    /**
+     * A provider that registers colors and color presentations for a model.
+     */
+    public class DocumentColorProvider
+    {
+        public delegate Task<object> ProvideColorsDelegate(string modelUri);
+        public ProvideColorsDelegate ProvideColorsMethod { get; set; }
+        public delegate Task<object> ProvideColorPresentationsDelegate(string modelUri, ColorInformation colorInfo);
+        public ProvideColorPresentationsDelegate ProvideColorPresentationsMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideColors))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideColors(string modelUri)
+            => JsonElementExt.FromObject(await ProvideColorsMethod?.Invoke(modelUri));
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideColorPresentations))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideColorPresentations(string modelUri, ColorInformation colorInfo)
+            => JsonElementExt.FromObject(await ProvideColorPresentationsMethod?.Invoke(modelUri, colorInfo));
+
+        public DocumentColorProvider(ProvideColorsDelegate provideColors, ProvideColorPresentationsDelegate provideColorPresentations = null)
+        {
+            ProvideColorsMethod = provideColors;
+            ProvideColorPresentationsMethod = provideColorPresentations;
+        }
+    }
+
+    /**
+     * A provider that returns selection ranges for a set of positions.
+     */
+    public class SelectionRangeProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position[] positions);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideSelectionRanges))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideSelectionRanges(string modelUri, Position[] positions)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, positions));
+
+        public SelectionRangeProvider(ProvideDelegate provideSelectionRanges) => ProvideMethod = provideSelectionRanges;
+    }
+
+    /**
+     * A provider that returns signature help for a given position.
+     */
+    public class SignatureHelpProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideSignatureHelp))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideSignatureHelp(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public SignatureHelpProvider(ProvideDelegate provideSignatureHelp) => ProvideMethod = provideSignatureHelp;
+    }
+
+    /**
+     * A provider that returns code lenses for a model.
+     */
+    public class CodeLensProvider
+    {
+        public delegate Task<object> ProvideCodeLensesDelegate(string modelUri);
+        public ProvideCodeLensesDelegate ProvideCodeLensesMethod { get; set; }
+        public delegate Task<object> ResolveCodeLensDelegate(string modelUri, object codeLens);
+        public ResolveCodeLensDelegate ResolveCodeLensMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideCodeLenses))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideCodeLenses(string modelUri)
+            => JsonElementExt.FromObject(await ProvideCodeLensesMethod?.Invoke(modelUri));
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ResolveCodeLens))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ResolveCodeLens(string modelUri, object codeLens)
+            => JsonElementExt.FromObject(await ResolveCodeLensMethod?.Invoke(modelUri, codeLens));
+
+        public CodeLensProvider(ProvideCodeLensesDelegate provideCodeLenses, ResolveCodeLensDelegate resolveCodeLens = null)
+        {
+            ProvideCodeLensesMethod = provideCodeLenses;
+            ResolveCodeLensMethod = resolveCodeLens;
+        }
+    }
+
+    /**
+     * A provider that returns rename edits for a given position.
+     */
+    public class RenameProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position, string newName);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideRenameEdits))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideRenameEdits(string modelUri, Position position, string newName)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position, newName));
+
+        public RenameProvider(ProvideDelegate provideRenameEdits) => ProvideMethod = provideRenameEdits;
+    }
+
+    /**
+     * A provider that returns document semantic tokens.
+     */
+    public class DocumentSemanticTokensProvider
+    {
+        public SemanticTokensLegend Legend { get; }
+
+        public delegate Task<object> ProvideDelegate(string modelUri, string lastResultId);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDocumentSemanticTokens))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDocumentSemanticTokens(string modelUri, string lastResultId)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, lastResultId));
+
+        public DocumentSemanticTokensProvider(SemanticTokensLegend legend, ProvideDelegate provideDocumentSemanticTokens)
+        {
+            Legend = legend;
+            ProvideMethod = provideDocumentSemanticTokens;
+        }
+    }
+
+    /**
+     * A provider that returns document range semantic tokens.
+     */
+    public class DocumentRangeSemanticTokensProvider
+    {
+        public SemanticTokensLegend Legend { get; }
+
+        public delegate Task<object> ProvideDelegate(string modelUri, Range range);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDocumentRangeSemanticTokens))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDocumentRangeSemanticTokens(string modelUri, Range range)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, range));
+
+        public DocumentRangeSemanticTokensProvider(SemanticTokensLegend legend, ProvideDelegate provideDocumentRangeSemanticTokens)
+        {
+            Legend = legend;
+            ProvideMethod = provideDocumentRangeSemanticTokens;
+        }
+    }
+
+    /**
+     * A provider that returns inlay hints for a model.
+     */
+    public class InlayHintsProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Range range);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideInlayHints))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideInlayHints(string modelUri, Range range)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, range));
+
+        public InlayHintsProvider(ProvideDelegate provideInlayHints) => ProvideMethod = provideInlayHints;
+    }
+
+    /**
+     * A provider that returns inline completions for a given position.
+     */
+    public class InlineCompletionsProvider
+    {
+        public delegate Task<object> ProvideInlineCompletionsDelegate(string modelUri, Position position);
+        public ProvideInlineCompletionsDelegate ProvideInlineCompletionsMethod { get; set; }
+        public delegate Task<object> ResolveInlineCompletionDelegate(string modelUri, object inlineCompletion);
+        public ResolveInlineCompletionDelegate ResolveInlineCompletionMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideInlineCompletions))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideInlineCompletions(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideInlineCompletionsMethod?.Invoke(modelUri, position));
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ResolveInlineCompletion))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ResolveInlineCompletion(string modelUri, object inlineCompletion)
+            => JsonElementExt.FromObject(await ResolveInlineCompletionMethod?.Invoke(modelUri, inlineCompletion));
+
+        public InlineCompletionsProvider(ProvideInlineCompletionsDelegate provideInlineCompletions, ResolveInlineCompletionDelegate resolveInlineCompletion = null)
+        {
+            ProvideInlineCompletionsMethod = provideInlineCompletions;
+            ResolveInlineCompletionMethod = resolveInlineCompletion;
+        }
+    }
+
+    /**
+     * A provider that returns formatting edits for a range of a document.
+     */
+    public class DocumentRangeFormattingEditProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Range range, FormattingOptions options);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideDocumentRangeFormattingEdits))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideDocumentRangeFormattingEdits(string modelUri, Range range, FormattingOptions options)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, range, options));
+
+        public DocumentRangeFormattingEditProvider(ProvideDelegate provideDocumentRangeFormattingEdits) => ProvideMethod = provideDocumentRangeFormattingEdits;
+    }
+
+    /**
+     * A provider that returns formatting edits as the user types.
+     */
+    public class OnTypeFormattingEditProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position, string character, FormattingOptions options);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideOnTypeFormattingEdits))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideOnTypeFormattingEdits(string modelUri, Position position, string character, FormattingOptions options)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position, character, options));
+
+        public OnTypeFormattingEditProvider(ProvideDelegate provideOnTypeFormattingEdits) => ProvideMethod = provideOnTypeFormattingEdits;
+    }
+
+
+    /**
+     * A language extension point that contributes a language.
+     */
+    public class LanguageExtensionPoint
+    {
+        /**
+         * The language's id.
+         */
+        public string Id { get; set; }
+        /**
+         * The language's extensions (e.g. `cs`).
+         */
+        public List<string> Extensions { get; set; }
+        /**
+         * The language's filenames (e.g. `mono.ts`).
+         */
+        public List<string> Filenames { get; set; }
+        /**
+         * The language's filename patterns (e.g. "*.cs", "templates/*.html").
+         */
+        public List<string> FilenamePatterns { get; set; }
+        /**
+         * The language's first line (e.g. `#!.*\bpython\b`).
+         */
+        public string FirstLine { get; set; }
+        /**
+         * The language's aliases (e.g. `["c#","csharp"]`).
+         */
+        public List<string> Aliases { get; set; }
+        /**
+         * The language's mime types (e.g. `["text/x-csharp"]`).
+         */
+        public List<string> Mimetypes { get; set; }
+        /**
+         * The language's configuration, specified as a `Uri` to a JSON file.
+         */
+        public Uri Configuration { get; set; }
+    }
+
+    /**
+     * A linked editing range provider supplies ranges that can be edited together.
+     */
+    public class LinkedEditingRangeProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Position position);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideLinkedEditingRanges))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideLinkedEditingRanges(string modelUri, Position position)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, position));
+
+        public LinkedEditingRangeProvider(ProvideDelegate provideLinkedEditingRanges)
+        {
+            ProvideMethod = provideLinkedEditingRanges;
+        }
+    }
+
+    /**
+     * A link provider supplies links to be found in a text model.
+     */
+    public class LinkProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+        public delegate Task<object> ResolveDelegate(object link);
+        public ResolveDelegate ResolveMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideLinks))]
+        [DynamicDependency(nameof(ResolveLink))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideLinks(string modelUri)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri));
+
+        [JSInvokable]
+        public async Task<JsonElement?> ResolveLink(object link)
+            => JsonElementExt.FromObject(await ResolveMethod?.Invoke(link));
+
+        public LinkProvider(ProvideDelegate provideLinks, ResolveDelegate resolveLink = null)
+        {
+            ProvideMethod = provideLinks;
+            ResolveMethod = resolveLink;
+        }
+    }
+
+    /**
+     * A new symbol names provider suggests names when creating new symbols.
+     */
+    public class NewSymbolNamesProvider
+    {
+        public delegate Task<object> ProvideDelegate(string modelUri, Range range, int triggerKind);
+        public ProvideDelegate ProvideMethod { get; set; }
+
+        public delegate Task<object> ResolveDelegate(object symbol);
+        public ResolveDelegate ResolveMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(ProvideNewSymbolNames))]
+        [DynamicDependency(nameof(ResolveNewSymbolName))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> ProvideNewSymbolNames(string modelUri, Range range, int triggerKind)
+            => JsonElementExt.FromObject(await ProvideMethod?.Invoke(modelUri, range, triggerKind));
+
+        [JSInvokable]
+        public async Task<JsonElement?> ResolveNewSymbolName(object symbol)
+            => JsonElementExt.FromObject(await ResolveMethod?.Invoke(symbol));
+
+        public NewSymbolNamesProvider(ProvideDelegate provideNewSymbolNames, ResolveDelegate resolveNewSymbolName = null)
+        {
+            ProvideMethod = provideNewSymbolNames;
+            ResolveMethod = resolveNewSymbolName;
+        }
+    }
+
+    /**
+     * A "manual" provider of tokens for a language.
+     */
+    public class TokensProvider
+    {
+        public delegate Task<object> GetInitialStateDelegate();
+        public GetInitialStateDelegate GetInitialStateMethod { get; set; }
+
+        public delegate Task<object> TokenizeDelegate(string line, object state);
+        public TokenizeDelegate TokenizeMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(GetInitialState))]
+        [DynamicDependency(nameof(Tokenize))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> GetInitialState()
+            => JsonElementExt.FromObject(await GetInitialStateMethod?.Invoke());
+
+        [JSInvokable]
+        public async Task<JsonElement?> Tokenize(string line, object state)
+            => JsonElementExt.FromObject(await TokenizeMethod?.Invoke(line, state));
+
+        public TokensProvider(GetInitialStateDelegate getInitialState, TokenizeDelegate tokenize)
+        {
+            GetInitialStateMethod = getInitialState;
+            TokenizeMethod = tokenize;
+        }
+    }
+
+    /**
+     * A "manual" provider of tokens, returning tokens in a binary, encoded form.
+     */
+    public class EncodedTokensProvider
+    {
+        public delegate Task<object> GetInitialStateDelegate();
+        public GetInitialStateDelegate GetInitialStateMethod { get; set; }
+
+        public delegate Task<object> TokenizeEncodedDelegate(string line, object state);
+        public TokenizeEncodedDelegate TokenizeEncodedMethod { get; set; }
+
+#if NET5_0_OR_GREATER
+        [DynamicDependency(nameof(GetInitialState))]
+        [DynamicDependency(nameof(TokenizeEncoded))]
+#endif
+        [JSInvokable]
+        public async Task<JsonElement?> GetInitialState()
+            => JsonElementExt.FromObject(await GetInitialStateMethod?.Invoke());
+
+        [JSInvokable]
+        public async Task<JsonElement?> TokenizeEncoded(string line, object state)
+            => JsonElementExt.FromObject(await TokenizeEncodedMethod?.Invoke(line, state));
+
+        public EncodedTokensProvider(GetInitialStateDelegate getInitialState, TokenizeEncodedDelegate tokenizeEncoded)
+        {
+            GetInitialStateMethod = getInitialState;
+            TokenizeEncodedMethod = tokenizeEncoded;
+        }
+    }
+
     public class HoverProvider
     {
         /**
@@ -7774,7 +6002,7 @@ namespace BlazorMonaco.Languages
          * position will be merged by the editor. A hover can have a range which defaults
          * to the word range at the position when omitted.
          */
-        public delegate Task<Hover> ProvideDelegate(string modelUri, Position position, /* TODO token: CancellationToken,*/ HoverContext context);
+        public delegate Task<Hover> ProvideDelegate(string modelUri, Position position, HoverContext context);
         public ProvideDelegate ProvideMethod { get; set; }
 
 #if NET5_0_OR_GREATER
@@ -8015,12 +6243,11 @@ namespace BlazorMonaco.Languages
         public Command Action { get; set; }
     }
 
-    public class CompletionList
+    public class CompletionList : IDisposable
     {
         public List<CompletionItem> Suggestions { get; set; }
         public bool? Incomplete { get; set; }
-        // TODO
-        // dispose?(): void;
+        public void Dispose() { }
     }
 
     /**
@@ -8197,27 +6424,6 @@ namespace BlazorMonaco.Languages
         public InlineCompletionChangeHint ChangeHint { get; set; }
     }
 
-    /*export interface IInlineCompletionModelInfo {
-        models: IInlineCompletionModel[];
-        currentModelId: string;
-    }
-
-    export interface IInlineCompletionModel {
-        name: string;
-        id: string;
-    }
-
-    export interface IInlineCompletionProviderOption {
-        readonly id: string;
-        readonly label: string;
-        readonly values: readonly IInlineCompletionProviderOptionValue[];
-        readonly currentValueId: string;
-    }
-
-    export interface IInlineCompletionProviderOptionValue {
-        readonly id: string;
-        readonly label: string;
-    }*/
 
     public class SelectedSuggestionInfo
     {
@@ -8225,229 +6431,8 @@ namespace BlazorMonaco.Languages
         public string Text { get; set; }
         public CompletionItemKind CompletionKind { get; set; }
         public bool IsSnippetText { get; set; }
-        //constructor(range: IRange, text: string, completionKind: CompletionItemKind, isSnippetText: boolean);
-        //equals(other: SelectedSuggestionInfo) : boolean;
     }
 
-    /*export interface InlineCompletion
-    {
-        /**
-		 * The text to insert.
-		 * If the text contains a line break, the range must end at the end of a line.
-		 * If existing text should be replaced, the existing text must be a prefix of the text to insert.
-		 *
-		 * The text can also be a snippet. In that case, a preview with default parameters is shown.
-		 * When accepting the suggestion, the full snippet is inserted.
-		* /
-		readonly insertText: string | {
-			snippet: string;
-		} | undefined;
-		/**
-		 * The range to replace.
-		 * Must begin and end on the same line.
-		 * Refers to the current document or `uri` if provided.
-		* /
-		readonly range?: IRange;
-		/**
-		 * An optional array of additional text edits that are applied when
-		 * selecting this completion. Edits must not overlap with the main edit
-		 * nor with themselves.
-		 * Refers to the current document or `uri` if provided.
-		 * /
-		readonly additionalTextEdits?: editor.ISingleEditOperation[];
-		/**
-		 * The file for which the edit applies to.
-		* /
-		readonly uri?: UriComponents;
-		/**
-		 * A command that is run upon acceptance of this item.
-		* /
-		readonly command?: Command;
-		readonly gutterMenuLinkAction?: Command;
-		/**
-		 * Is called the first time an inline completion is shown.
-		 * @deprecated. Use `onDidShow` of the provider instead.
-		* /
-		readonly shownCommand?: Command;
-		/**
-		 * If set to `true`, unopened closing brackets are removed and unclosed opening brackets are closed.
-		 * Defaults to `false`.
-		* /
-		readonly completeBracketPairs?: boolean;
-		readonly isInlineEdit?: boolean;
-		readonly showInlineEditMenu?: boolean;
-		/** Only show the inline suggestion when the cursor is in the showRange. * /
-		readonly showRange?: IRange;
-		readonly warning?: InlineCompletionWarning;
-		readonly hint?: IInlineCompletionHint;
-		readonly supportsRename?: boolean;
-		/**
-		 * Used for telemetry.
-		 * /
-		readonly correlationId?: string | undefined;
-		readonly jumpToPosition?: IPosition;
-		readonly doNotLog?: boolean;
-    }*/
-
-    /*export interface InlineCompletionWarning {
-        message: IMarkdownString | string;
-        icon?: IconPath;
-    }*/
-
-    /*export enum InlineCompletionHintStyle {
-        Code = 1,
-        Label = 2
-    }*/
-
-    /*export interface IInlineCompletionHint {
-		/** Refers to the current document. * /
-		range: IRange;
-		style: InlineCompletionHintStyle;
-		content: string;
-	}*/
-
-    //export type IconPath = editor.ThemeIcon;
-
-    /*export interface InlineCompletions<TItem extends InlineCompletion = InlineCompletion>
-    {
-        readonly items: readonly TItem[];
-        /**
-         * A list of commands associated with the inline completions of this list.
-         * /
-        readonly commands?: InlineCompletionCommand[];
-        readonly suppressSuggestions?: boolean | undefined;
-        /**
-         * When set and the user types a suggestion without derivating from it, the inline suggestion is not updated.
-         * /
-        readonly enableForwardStability?: boolean | undefined;
-    }*/
-
-    /*export type InlineCompletionCommand = {
-        command: Command;
-        icon?: editor.ThemeIcon;
-    };*/
-
-    //export type InlineCompletionProviderGroupId = string;
-
-    /*export interface InlineCompletionsProvider<T extends InlineCompletions = InlineCompletions> {
-        provideInlineCompletions(model: editor.ITextModel, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<T>;
-        /**
-         * Will be called when an item is shown.
-         * @param updatedInsertText Is useful to understand bracket completion.
-        * /
-        handleItemDidShow?(completions: T, item: T['items'][number], updatedInsertText: string, editDeltaInfo: EditDeltaInfo): void;
-        /**
-         * Will be called when an item is partially accepted. TODO: also handle full acceptance here!
-         * @param acceptedCharacters Deprecated. Use `info.acceptedCharacters` instead.
-         * /
-        handlePartialAccept?(completions: T, item: T['items'][number], acceptedCharacters: number, info: PartialAcceptInfo): void;
-        /**
-         * @deprecated Use `handleEndOfLifetime` instead.
-        * /
-        handleRejection?(completions: T, item: T['items'][number]): void;
-        /**
-         * Is called when an inline completion item is no longer being used.
-         * Provides a reason of why it is not used anymore.
-        * /
-        handleEndOfLifetime?(completions: T, item: T['items'][number], reason: InlineCompletionEndOfLifeReason<T['items'][number]>, lifetimeSummary: LifetimeSummary): void;
-        /**
-         * Will be called when a completions list is no longer in use and can be garbage-collected.
-        * /
-        disposeInlineCompletions(completions: T, reason: InlineCompletionsDisposeReason): void;
-        /**
-         * Fired when the provider wants to trigger a new completion request.
-         * The event can pass a {@link IInlineCompletionChangeHint} which will be
-         * included in the {@link InlineCompletionContext} of the subsequent request.
-         * /
-        onDidChangeInlineCompletions?: IEvent$1<IInlineCompletionChangeHint | void>;
-        /**
-         * Only used for {@link yieldsToGroupIds}.
-         * Multiple providers can have the same group id.
-         * /
-        groupId?: InlineCompletionProviderGroupId;
-        /**
-         * Returns a list of preferred provider {@link groupId}s.
-         * The current provider is only requested for completions if no provider with a preferred group id returned a result.
-         * /
-        yieldsToGroupIds?: InlineCompletionProviderGroupId[];
-        excludesGroupIds?: InlineCompletionProviderGroupId[];
-        displayName?: string;
-        debounceDelayMs?: number;
-        modelInfo?: IInlineCompletionModelInfo;
-        onDidModelInfoChange?: IEvent$1<void>;
-        setModelId?(modelId: string): Promise<void>;
-        providerOptions?: readonly IInlineCompletionProviderOption[];
-        onDidProviderOptionsChange?: IEvent$1<void>;
-        setProviderOption?(optionId: string, valueId: string): Promise<void>;
-        toString?(): string;
-    }*/
-
-    /*export type InlineCompletionsDisposeReason = {
-        kind: 'lostRace' | 'tokenCancellation' | 'other' | 'empty' | 'notTaken';
-    };*/
-
-    /*export enum InlineCompletionEndOfLifeReasonKind {
-        Accepted = 0,
-        Rejected = 1,
-        Ignored = 2
-    }*/
-
-    /*export type InlineCompletionEndOfLifeReason<TInlineCompletion = InlineCompletion> = {
-        kind: InlineCompletionEndOfLifeReasonKind.Accepted;
-        alternativeAction: boolean;
-    } | {
-        kind: InlineCompletionEndOfLifeReasonKind.Rejected;
-    } | {
-        kind: InlineCompletionEndOfLifeReasonKind.Ignored;
-        supersededBy?: TInlineCompletion;
-        userTypingDisagreed: boolean;
-    };*/
-
-    /*export type LifetimeSummary = {
-        requestUuid: string;
-        correlationId: string | undefined;
-        partiallyAccepted: number;
-        partiallyAcceptedCountSinceOriginal: number;
-        partiallyAcceptedRatioSinceOriginal: number;
-        partiallyAcceptedCharactersSinceOriginal: number;
-        shown: boolean;
-        shownDuration: number;
-        shownDurationUncollapsed: number;
-        timeUntilShown: number | undefined;
-        timeUntilActuallyShown: number | undefined;
-        timeUntilProviderRequest: number;
-        timeUntilProviderResponse: number;
-        notShownReason: string | undefined;
-        editorType: string;
-        viewKind: string | undefined;
-        preceeded: boolean;
-        languageId: string;
-        requestReason: string;
-        performanceMarkers?: string;
-        cursorColumnDistance?: number;
-        cursorLineDistance?: number;
-        lineCountOriginal?: number;
-        lineCountModified?: number;
-        characterCountOriginal?: number;
-        characterCountModified?: number;
-        disjointReplacements?: number;
-        sameShapeReplacements?: boolean;
-        typingInterval: number;
-        typingIntervalCharacterCount: number;
-        selectedSuggestionInfo: boolean;
-        availableProviders: string;
-        skuPlan: string | undefined;
-        skuType: string | undefined;
-        renameCreated: boolean | undefined;
-        renameDuration: number | undefined;
-        renameTimedOut: boolean | undefined;
-        renameDroppedOtherEdits: number | undefined;
-        renameDroppedRenameEdits: number | undefined;
-        editKind: string | undefined;
-        longDistanceHintVisible?: boolean;
-        longDistanceHintDistance?: number;
-        isForAnotherDocument?: boolean;
-    };*/
 
     public class CodeAction
     {
@@ -8468,79 +6453,29 @@ namespace BlazorMonaco.Languages
         Auto = 2
     }
 
-    public class CodeActionList /* TODO : IDisposable$2*/
+    public class CodeActionList : IDisposable
     {
         public List<CodeAction> Actions { get; set; }
+        public void Dispose() { }
     }
 
     /**
      * Represents a parameter of a callable-signature. A parameter can
      * have a label and a doc-comment.
      */
-    /*export interface ParameterInformation {
-        /**
-         * The label of this signature. Will be shown in
-         * the UI.
-         * /
-        label: string | [number, number];
-        /**
-         * The human-readable doc-comment of this signature. Will be shown
-         * in the UI but can be omitted.
-         * /
-        documentation?: string | IMarkdownString;
-    }*/
 
     /**
      * Represents the signature of something callable. A signature
      * can have a label, like a function-name, a doc-comment, and
      * a set of parameters.
      */
-    /*export interface SignatureInformation {
-        /**
-         * The label of this signature. Will be shown in
-         * the UI.
-         * /
-        label: string;
-        /**
-         * The human-readable doc-comment of this signature. Will be shown
-         * in the UI but can be omitted.
-         * /
-        documentation?: string | IMarkdownString;
-        /**
-         * The parameters of this signature.
-         * /
-        parameters: ParameterInformation[];
-        /**
-         * Index of the active parameter.
-         *
-         * If provided, this is used in place of `SignatureHelp.activeSignature`.
-         * /
-        activeParameter?: number;
-    }*/
 
     /**
      * Signature help represents the signature of something
      * callable. There can be multiple signatures but only one
      * active and only one active parameter.
      */
-    /*export interface SignatureHelp {
-        /**
-         * One or more signatures.
-         * /
-        signatures: SignatureInformation[];
-        /**
-         * The active signature.
-         * /
-        activeSignature: number;
-        /**
-         * The active parameter of the active signature.
-         * /
-        activeParameter: number;
-    }*/
 
-    /*export interface SignatureHelpResult extends IDisposable$2 {
-        value: SignatureHelp;
-    }*/
 
     public enum SignatureHelpTriggerKind
     {
@@ -8549,25 +6484,11 @@ namespace BlazorMonaco.Languages
         ContentChange = 3
     }
 
-    /*export interface SignatureHelpContext {
-        readonly triggerKind: SignatureHelpTriggerKind;
-        readonly triggerCharacter?: string;
-        readonly isRetrigger: boolean;
-        readonly activeSignatureHelp?: SignatureHelp;
-    }*/
 
     /**
      * The signature help provider interface defines the contract between extensions and
      * the [parameter hints](https://code.visualstudio.com/docs/editor/intellisense)-feature.
      */
-    /*export interface SignatureHelpProvider {
-        readonly signatureHelpTriggerCharacters?: ReadonlyArray<string>;
-        readonly signatureHelpRetriggerCharacters?: ReadonlyArray<string>;
-        /**
-         * Provide help for the signature at the given position and document.
-         * /
-        provideSignatureHelp(model: editor.ITextModel, position: Position, token: CancellationToken, context: SignatureHelpContext): ProviderResult<SignatureHelpResult>;
-    }*/
 
     /**
      * A document highlight kind.
@@ -8593,197 +6514,66 @@ namespace BlazorMonaco.Languages
      * special attention. Usually a document highlight is visualized by changing
      * the background color of its range.
      */
-    /*export interface DocumentHighlight {
-        /**
-         * The range this highlight applies to.
-         * /
-        range: IRange;
-        /**
-         * The highlight kind, default is {@link DocumentHighlightKind.Text text}.
-         * /
-        kind?: DocumentHighlightKind;
-    }*/
 
     /**
      * Represents a set of document highlights for a specific Uri.
      */
-    /*export interface MultiDocumentHighlight
-    {
-        /**
-         * The Uri of the document that the highlights belong to.
-         * /
-        uri: Uri;
-        /**
-         * The set of highlights for the document.
-         * /
-        highlights: DocumentHighlight[];
-    }*/
 
     /**
      * The document highlight provider interface defines the contract between extensions and
      * the word-highlight-feature.
      */
-    /*export interface DocumentHighlightProvider {
-        /**
-         * Provide a set of document highlights, like all occurrences of a variable or
-         * all exit-points of a function.
-         * /
-        provideDocumentHighlights(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<DocumentHighlight[]>;
-    }*/
 
     /**
      * A provider that can provide document highlights across multiple documents.
      */
-    /*export interface MultiDocumentHighlightProvider
-    {
-        readonly selector: LanguageSelector;
-        /**
-         * Provide a Map of Uri --> document highlights, like all occurrences of a variable or
-         * all exit-points of a function.
-         *
-         * Used in cases such as split view, notebooks, etc. where there can be multiple documents
-         * with shared symbols.
-         *
-         * @param primaryModel The primary text model.
-         * @param position The position at which to provide document highlights.
-         * @param otherModels The other text models to search for document highlights.
-         * @param token A cancellation token.
-         * @returns A map of Uri to document highlights.
-         * /
-        provideMultiDocumentHighlights(primaryModel: editor.ITextModel, position: Position, otherModels: editor.ITextModel[], token: CancellationToken) : ProviderResult<Map<Uri, DocumentHighlight[]>>;
-    }*/
 
     /**
      * The linked editing range provider interface defines the contract between extensions and
      * the linked editing feature.
      */
-    /*export interface LinkedEditingRangeProvider {
-        /**
-         * Provide a list of ranges that can be edited together.
-         * /
-        provideLinkedEditingRanges(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<LinkedEditingRanges>;
-    }*/
 
     /**
      * Represents a list of ranges that can be edited together along with a word pattern to describe valid contents.
      */
-    /*export interface LinkedEditingRanges {
-        /**
-         * A list of ranges that can be edited together. The ranges must have
-         * identical length and text content. The ranges cannot overlap
-         * /
-        ranges: IRange[];
-        /**
-         * An optional word pattern that describes valid contents for the given ranges.
-         * If no pattern is provided, the language configuration's word pattern will be used.
-         * /
-        wordPattern?: RegExp;
-    }*/
 
     /**
      * Value-object that contains additional information when
      * requesting references.
      */
-    /*export interface ReferenceContext {
-        /**
-         * Include the declaration of the current symbol.
-         * /
-        includeDeclaration: boolean;
-    }*/
 
     /**
      * The reference provider interface defines the contract between extensions and
      * the [find references](https://code.visualstudio.com/docs/editor/editingevolved#_peek)-feature.
      */
-    /*export interface ReferenceProvider {
-        /**
-         * Provide a set of project-wide references for the given position and document.
-         * /
-        provideReferences(model: editor.ITextModel, position: Position, context: ReferenceContext, token: CancellationToken): ProviderResult<Location[]>;
-    }*/
 
     /**
      * Represents a location inside a resource, such as a line
      * inside a text file.
      */
-    /*export interface Location {
-        /**
-         * The resource identifier of this location.
-         * /
-        uri: Uri;
-        /**
-         * The document range of this locations.
-         * /
-        range: IRange;
-    }*/
 
-    /*export interface LocationLink {
-        /**
-         * A range to select where this link originates from.
-         * /
-        originSelectionRange?: IRange;
-        /**
-         * The target uri this link points to.
-         * /
-        uri: Uri;
-        /**
-         * The full range this link points to.
-         * /
-        range: IRange;
-        /**
-         * A range to select this link points to. Must be contained
-         * in `LocationLink.range`.
-         * /
-        targetSelectionRange?: IRange;
-    }*/
-
-    //export type Definition = Location | Location[] | LocationLink[];
 
     /**
      * The definition provider interface defines the contract between extensions and
      * the [go to definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
      * and peek definition features.
      */
-    /*export interface DefinitionProvider {
-        /**
-         * Provide the definition of the symbol at the given position and document.
-         * /
-        provideDefinition(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<Definition | LocationLink[]>;
-    }*/
 
     /**
      * The definition provider interface defines the contract between extensions and
      * the [go to definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
      * and peek definition features.
      */
-    /*export interface DeclarationProvider {
-        /**
-         * Provide the declaration of the symbol at the given position and document.
-         * /
-        provideDeclaration(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<Definition | LocationLink[]>;
-    }*/
 
     /**
      * The implementation provider interface defines the contract between extensions and
      * the go to implementation feature.
      */
-    /*export interface ImplementationProvider {
-        /**
-         * Provide the implementation of the symbol at the given position and document.
-         * /
-        provideImplementation(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<Definition | LocationLink[]>;
-    }*/
 
     /**
      * The type definition provider interface defines the contract between extensions and
      * the go to type definition feature.
      */
-    /*export interface TypeDefinitionProvider {
-        /**
-         * Provide the type definition of the symbol at the given position and document.
-         * /
-        provideTypeDefinition(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<Definition | LocationLink[]>;
-    }*/
 
     /**
      * A symbol kind.
@@ -8823,28 +6613,11 @@ namespace BlazorMonaco.Languages
         Deprecated = 1
     }
 
-    /*export interface DocumentSymbol {
-        name: string;
-        detail: string;
-        kind: SymbolKind;
-        tags: ReadonlyArray<SymbolTag>;
-        containerName?: string;
-        range: IRange;
-        selectionRange: IRange;
-        children?: DocumentSymbol[];
-    }*/
 
     /**
      * The document symbol provider interface defines the contract between extensions and
      * the [go to symbol](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol)-feature.
      */
-    /*export interface DocumentSymbolProvider {
-        displayName?: string;
-        /**
-         * Provide symbol information for the given document.
-         * /
-        provideDocumentSymbols(model: editor.ITextModel, token: CancellationToken): ProviderResult<DocumentSymbol[]>;
-    }*/
 
     public class TextEdit
     {
@@ -8897,203 +6670,42 @@ namespace BlazorMonaco.Languages
      * The document formatting provider interface defines the contract between extensions and
      * the formatting-feature.
      */
-    /*export interface DocumentRangeFormattingEditProvider {
-        readonly displayName?: string;
-        /**
-         * Provide formatting edits for a range in a document.
-         *
-         * The given range is a hint and providers can decide to format a smaller
-         * or larger range. Often this is done by adjusting the start and end
-         * of the range to full syntax nodes.
-         * /
-        provideDocumentRangeFormattingEdits(model: editor.ITextModel, range: Range, options: FormattingOptions, token: CancellationToken): ProviderResult<TextEdit[]>;
-        provideDocumentRangesFormattingEdits?(model: editor.ITextModel, ranges: Range[], options: FormattingOptions, token: CancellationToken): ProviderResult<TextEdit[]>;
-    }*/
 
     /**
      * The document formatting provider interface defines the contract between extensions and
      * the formatting-feature.
      */
-    /*export interface OnTypeFormattingEditProvider {
-        autoFormatTriggerCharacters: string[];
-        /**
-         * Provide formatting edits after a character has been typed.
-         *
-         * The given position and character should hint to the provider
-         * what range the position to expand to, like find the matching `{`
-         * when `}` has been entered.
-         * /
-        provideOnTypeFormattingEdits(model: editor.ITextModel, position: Position, ch: string, options: FormattingOptions, token: CancellationToken): ProviderResult<TextEdit[]>;
-    }*/
 
     /**
      * A link inside the editor.
      */
-    /*export interface ILink {
-        range: IRange;
-        url?: Uri | string;
-        tooltip?: string;
-    }*/
 
-    /*export interface ILinksList {
-        links: ILink[];
-        dispose?(): void;
-    }*/
 
     /**
      * A provider of links.
      */
-    /*export interface LinkProvider {
-        provideLinks(model: editor.ITextModel, token: CancellationToken): ProviderResult<ILinksList>;
-        resolveLink?: (link: ILink, token: CancellationToken) => ProviderResult<ILink>;
-    }*/
 
     /**
      * A color in RGBA format.
      */
-    /*export interface IColor {
-        /**
-         * The red component in the range [0-1].
-         * /
-        readonly red: number;
-        /**
-         * The green component in the range [0-1].
-         * /
-        readonly green: number;
-        /**
-         * The blue component in the range [0-1].
-         * /
-        readonly blue: number;
-        /**
-         * The alpha component in the range [0-1].
-         * /
-        readonly alpha: number;
-    }*/
 
     /**
      * String representations for a color
      */
-    /*export interface IColorPresentation {
-        /**
-         * The label of this color presentation. It will be shown on the color
-         * picker header. By default this is also the text that is inserted when selecting
-         * this color presentation.
-         * /
-        label: string;
-        /**
-         * An {@link TextEdit edit} which is applied to a document when selecting
-         * this presentation for the color.
-         * /
-        textEdit?: TextEdit;
-        /**
-         * An optional array of additional {@link TextEdit text edits} that are applied when
-         * selecting this color presentation.
-         * /
-        additionalTextEdits?: TextEdit[];
-    }*/
 
     /**
      * A color range is a range in a text model which represents a color.
      */
-    /*export interface IColorInformation {
-        /**
-         * The range within the model.
-         * /
-        range: IRange;
-        /**
-         * The color represented in this range.
-         * /
-        color: IColor;
-    }*/
 
     /**
      * A provider of colors for editor models.
      */
-    /*export interface DocumentColorProvider {
-        /**
-         * Provides the color ranges for a specific model.
-         * /
-        provideDocumentColors(model: editor.ITextModel, token: CancellationToken): ProviderResult<IColorInformation[]>;
-        /**
-         * Provide the string representations for a color.
-         * /
-        provideColorPresentations(model: editor.ITextModel, colorInfo: IColorInformation, token: CancellationToken): ProviderResult<IColorPresentation[]>;
-    }*/
 
-    /*export interface SelectionRange {
-        range: IRange;
-    }*/
-
-    /*export interface SelectionRangeProvider {
-        /**
-         * Provide ranges that should be selected from the given position.
-         * /
-        provideSelectionRanges(model: editor.ITextModel, positions: Position[], token: CancellationToken): ProviderResult<SelectionRange[][]>;
-    }*/
-
-    /*export interface FoldingContext {
-    }*/
 
     /**
      * A provider of folding ranges for editor models.
      */
-    /*export interface FoldingRangeProvider {
-        /**
-         * An optional event to signal that the folding ranges from this provider have changed.
-         * /
-        onDidChange?: IEvent$1<this>;
-        /**
-         * Provides the folding ranges for a specific model.
-         * /
-        provideFoldingRanges(model: editor.ITextModel, context: FoldingContext, token: CancellationToken): ProviderResult<FoldingRange[]>;
-    }*/
 
-    /*export interface FoldingRange {
-        /**
-         * The one-based start line of the range to fold. The folded area starts after the line's last character.
-         * /
-        start: number;
-        /**
-         * The one-based end line of the range to fold. The folded area ends with the line's last character.
-         * /
-        end: number;
-        /**
-         * Describes the {@link FoldingRangeKind Kind} of the folding range such as {@link FoldingRangeKind.Comment Comment} or
-         * {@link FoldingRangeKind.Region Region}. The kind is used to categorize folding ranges and used by commands
-         * like 'Fold all comments'. See
-         * {@link FoldingRangeKind} for an enumeration of standardized kinds.
-         * /
-        kind?: FoldingRangeKind;
-    }*/
-
-    /*export class FoldingRangeKind {
-        value: string;
-        /**
-         * Kind for folding range representing a comment. The value of the kind is 'comment'.
-         * /
-        static readonly Comment: FoldingRangeKind;
-        /**
-         * Kind for folding range representing a import. The value of the kind is 'imports'.
-         * /
-        static readonly Imports: FoldingRangeKind;
-        /**
-         * Kind for folding range representing regions (for example marked by `#region`, `#endregion`).
-         * The value of the kind is 'region'.
-         * /
-        static readonly Region: FoldingRangeKind;
-        /**
-         * Returns a {@link FoldingRangeKind} for the given value.
-         *
-         * @param value of the kind.
-         * /
-        static fromValue(value: string) : FoldingRangeKind;
-        /**
-         * Creates a new {@link FoldingRangeKind}.
-         *
-         * @param value of the kind.
-         * /
-        constructor(value: string);
-    }*/
 
     public class WorkspaceEditMetadata
     {
@@ -9155,23 +6767,8 @@ namespace BlazorMonaco.Languages
         [JsonPropertyName("resource")]
         public string ResourceUri { get; set; }
         public WorkspaceEditMetadata Metadata { get; set; }
-        //undo(): Promise<void> | void;
-        //redo(): Promise<void> | void;
     }
 
-    /*export interface Rejection {
-        rejectReason?: string;
-    }*/
-
-    /*export interface RenameLocation {
-        range: IRange;
-        text: string;
-    }*/
-
-    /*export interface RenameProvider {
-        provideRenameEdits(model: editor.ITextModel, position: Position, newName: string, token: CancellationToken): ProviderResult<WorkspaceEdit & Rejection>;
-        resolveRenameLocation?(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<RenameLocation & Rejection>;
-    }*/
 
     public enum NewSymbolNameTag
     {
@@ -9184,15 +6781,6 @@ namespace BlazorMonaco.Languages
         Automatic = 1
     }
 
-    /*export interface NewSymbolName {
-        readonly newSymbolName: string;
-        readonly tags?: readonly NewSymbolNameTag[];
-    }*/
-
-    /*export interface NewSymbolNamesProvider {
-        supportsAutomaticNewSymbolNamesTriggerKind?: Promise<boolean | undefined>;
-        provideNewSymbolNames(model: editor.ITextModel, range: IRange, triggerKind: NewSymbolNameTriggerKind, token: CancellationToken): ProviderResult<NewSymbolName[]>;
-    }*/
 
     public class Command
     {
@@ -9202,46 +6790,6 @@ namespace BlazorMonaco.Languages
         public List<object> Arguments { get; set; }
     }
 
-    /*export interface CommentThreadRevealOptions {
-        preserveFocus: boolean;
-        focusReply: boolean;
-    }*/
-
-    /*export interface CommentAuthorInformation
-    {
-        name: string;
-        iconPath?: UriComponents;
-    }*/
-
-    /*export interface PendingCommentThread {
-        range: IRange | undefined;
-        uri: Uri;
-        uniqueOwner: string;
-        isReply: boolean;
-        comment: PendingComment;
-    }*/
-
-    /*export interface PendingComment {
-        body: string;
-        cursor: IPosition;
-    }*/
-
-    /*export interface CodeLens {
-        range: IRange;
-        id?: string;
-        command?: Command;
-    }*/
-
-    /*export interface CodeLensList {
-        readonly lenses: readonly CodeLens[];
-        dispose?(): void;
-    }*/
-
-    /*export interface CodeLensProvider {
-        onDidChange?: IEvent$1<this>;
-        provideCodeLenses(model: editor.ITextModel, token: CancellationToken): ProviderResult<CodeLensList>;
-        resolveCodeLens?(model: editor.ITextModel, codeLens: CodeLens, token: CancellationToken): ProviderResult<CodeLens>;
-    }*/
 
     public enum InlayHintKind
     {
@@ -9249,901 +6797,52 @@ namespace BlazorMonaco.Languages
         Parameter = 2
     }
 
-    /*export interface InlayHintLabelPart {
-        label: string;
-        tooltip?: string | IMarkdownString;
-        command?: Command;
-        location?: Location;
-    }*/
 
-    /*export interface InlayHint {
-        label: string | InlayHintLabelPart[];
-        tooltip?: string | IMarkdownString;
-        textEdits?: TextEdit[];
-        position: IPosition;
-        kind?: InlayHintKind;
-        paddingLeft?: boolean;
-        paddingRight?: boolean;
-    }*/
-
-    /*export interface InlayHintList {
-        hints: InlayHint[];
-        dispose(): void;
-    }*/
-
-    /*export interface InlayHintsProvider {
-        displayName?: string;
-        onDidChangeInlayHints?: IEvent$1<void>;
-        provideInlayHints(model: editor.ITextModel, range: Range, token: CancellationToken): ProviderResult<InlayHintList>;
-        resolveInlayHint?(hint: InlayHint, token: CancellationToken): ProviderResult<InlayHint>;
-    }*/
-
-    /*export interface SemanticTokensLegend {
-        readonly tokenTypes: string[];
-        readonly tokenModifiers: string[];
-    }*/
-
-    /*export interface SemanticTokens {
-        readonly resultId?: string;
-        readonly data: Uint32Array;
-    }*/
-
-    /*export interface SemanticTokensEdit {
-        readonly start: number;
-        readonly deleteCount: number;
-        readonly data?: Uint32Array;
-    }*/
-
-    /*export interface SemanticTokensEdits {
-        readonly resultId?: string;
-        readonly edits: SemanticTokensEdit[];
-    }*/
-
-    /*export interface DocumentSemanticTokensProvider {
-        readonly onDidChange?: IEvent$1<void>;
-        getLegend(): SemanticTokensLegend;
-        provideDocumentSemanticTokens(model: editor.ITextModel, lastResultId: string | null, token: CancellationToken): ProviderResult<SemanticTokens | SemanticTokensEdits>;
-        releaseDocumentSemanticTokens(resultId: string | undefined): void;
-    }*/
-
-    /*export interface DocumentRangeSemanticTokensProvider {
-        readonly onDidChange?: IEvent$1<void>;
-        getLegend(): SemanticTokensLegend;
-        provideDocumentRangeSemanticTokens(model: editor.ITextModel, range: Range, token: CancellationToken): ProviderResult<SemanticTokens>;
-    }*/
-
-    /*export interface ILanguageExtensionPoint {
-        id: string;
-        extensions?: string[];
-        filenames?: string[];
-        filenamePatterns?: string[];
-        firstLine?: string;
-        aliases?: string[];
-        mimetypes?: string[];
-        configuration?: Uri;
-    }*/
     /**
      * A Monarch language definition
      */
-    /*export interface IMonarchLanguage {
-        /**
-         * map from string to ILanguageRule[]
-         * /
-        tokenizer: {
-            [name: string]: IMonarchLanguageRule[];
-        };
-        /**
-         * is the language case insensitive?
-         * /
-        ignoreCase?: boolean;
-        /**
-         * is the language unicode-aware? (i.e., /\u{1D306}/)
-         * /
-        unicode?: boolean;
-        /**
-         * if no match in the tokenizer assign this token class (default 'source')
-         * /
-        defaultToken?: string;
-        /**
-         * for example [['{','}','delimiter.curly']]
-         * /
-        brackets?: IMonarchLanguageBracket[];
-        /**
-         * start symbol in the tokenizer (by default the first entry is used)
-         * /
-        start?: string;
-        /**
-         * attach this to every token class (by default '.' + name)
-         * /
-        tokenPostfix?: string;
-        /**
-         * include line feeds (in the form of a \n character) at the end of lines
-         * Defaults to false
-         * /
-        includeLF?: boolean;
-        /**
-         * Other keys that can be referred to by the tokenizer.
-         * /
-        [key: string]: any;
-    }*/
 
     /**
      * A rule is either a regular expression and an action
      * 		shorthands: [reg,act] == { regex: reg, action: act}
      *		and       : [reg,act,nxt] == { regex: reg, action: act{ next: nxt }}
      */
-    //export type IShortMonarchLanguageRule1 = [string | RegExp, IMonarchLanguageAction];
 
-    //export type IShortMonarchLanguageRule2 = [string | RegExp, IMonarchLanguageAction, string];
-
-    /*export interface IExpandedMonarchLanguageRule {
-        /**
-         * match tokens
-         * /
-        regex?: string | RegExp;
-        /**
-         * action to take on match
-         * /
-        action?: IMonarchLanguageAction;
-        /**
-         * or an include rule. include all rules from the included state
-         * /
-        include?: string;
-    }*/
-
-    //export type IMonarchLanguageRule = IShortMonarchLanguageRule1 | IShortMonarchLanguageRule2 | IExpandedMonarchLanguageRule;
 
     /**
      * An action is either an array of actions...
      * ... or a case statement with guards...
      * ... or a basic action with a token value.
      */
-    //export type IShortMonarchLanguageAction = string;
 
-    /*export interface IExpandedMonarchLanguageAction {
-        /**
-         * array of actions for each parenthesized match group
-         * /
-        group?: IMonarchLanguageAction[];
-        /**
-         * map from string to ILanguageAction
-         * /
-        cases?: Object;
-        /**
-         * token class (ie. css class) (or "@brackets" or "@rematch")
-         * /
-        token?: string;
-        /**
-         * the next state to push, or "@push", "@pop", "@popall"
-         * /
-        next?: string;
-        /**
-         * switch to this state
-         * /
-        switchTo?: string;
-        /**
-         * go back n characters in the stream
-         * /
-        goBack?: number;
-        /**
-         * @open or @close
-         * /
-        bracket?: string;
-        /**
-         * switch to embedded language (using the mimetype) or get out using "@pop"
-         * /
-        nextEmbedded?: string;
-        /**
-         * log a message to the browser console window
-         * /
-        log?: string;
-    }*/
-
-    //export type IMonarchLanguageAction = IShortMonarchLanguageAction | IExpandedMonarchLanguageAction | (IShortMonarchLanguageAction | IExpandedMonarchLanguageAction)[];
 
     /**
      * This interface can be shortened as an array, ie. ['{','}','delimiter.curly']
      */
-    /*export interface IMonarchLanguageBracket {
-        /**
-         * open bracket
-         * /
-        open: string;
-        /**
-         * closing bracket
-         * /
-        close: string;
-        /**
-         * token class
-         * /
-        token: string;
-    }*/
 
-}
-
-namespace BlazorMonaco.Worker
-{
-    /*export interface IMirrorTextModel {
-        readonly version: number;
-    }*/
-
-    /*export interface IMirrorModel extends IMirrorTextModel {
-        readonly uri: Uri;
-        readonly version: number;
-        getValue(): string;
-    }*/
-
-    /*export interface IWorkerContext<H = {}> {
-        /**
-         * A proxy to the main thread host object.
-         * /
-        host: H;
-        /**
-         * Get all available mirror models in this worker.
-         * /
-        getMirrorModels(): IMirrorModel[];
-    }*/
 }
 
 namespace BlazorMonaco
 {
-    /*interface CSSFormatConfiguration {
-        /** separate selectors with newline (e.g. "a,\nbr" or "a, br"): Default: true * /
-        newlineBetweenSelectors?: boolean;
-        /** add a new line after every css rule: Default: true * /
-        newlineBetweenRules?: boolean;
-        /** ensure space around selector separators:  '>', '+', '~' (e.g. "a>b" -> "a > b"): Default: false * /
-        spaceAroundSelectorSeparator?: boolean;
-        /** put braces on the same line as rules (`collapse`), or put braces on own line, Allman / ANSI style (`expand`). Default `collapse` * /
-        braceStyle?: 'collapse' | 'expand';
-        /** whether existing line breaks before elements should be preserved. Default: true * /
-        preserveNewLines?: boolean;
-        /** maximum number of line breaks to be preserved in one chunk. Default: unlimited * /
-        maxPreserveNewLines?: number;
-    }*/
-    /*interface Options$1 {
-        readonly validate?: boolean;
-        readonly lint?: {
-            readonly compatibleVendorPrefixes?: 'ignore' | 'warning' | 'error';
-            readonly vendorPrefix?: 'ignore' | 'warning' | 'error';
-            readonly duplicateProperties?: 'ignore' | 'warning' | 'error';
-            readonly emptyRules?: 'ignore' | 'warning' | 'error';
-            readonly importStatement?: 'ignore' | 'warning' | 'error';
-            readonly boxModel?: 'ignore' | 'warning' | 'error';
-            readonly universalSelector?: 'ignore' | 'warning' | 'error';
-            readonly zeroUnits?: 'ignore' | 'warning' | 'error';
-            readonly fontFaceProperties?: 'ignore' | 'warning' | 'error';
-            readonly hexColorLength?: 'ignore' | 'warning' | 'error';
-            readonly argumentsInColorFunction?: 'ignore' | 'warning' | 'error';
-            readonly unknownProperties?: 'ignore' | 'warning' | 'error';
-            readonly ieHack?: 'ignore' | 'warning' | 'error';
-            readonly unknownVendorSpecificProperties?: 'ignore' | 'warning' | 'error';
-            readonly propertyIgnoredDueToDisplay?: 'ignore' | 'warning' | 'error';
-            readonly important?: 'ignore' | 'warning' | 'error';
-            readonly float?: 'ignore' | 'warning' | 'error';
-            readonly idSelector?: 'ignore' | 'warning' | 'error';
-        };
-        /**
-         * Configures the CSS data types known by the langauge service.
-         * /
-        readonly data?: CSSDataConfiguration;
-        /**
-         * Settings for the CSS formatter.
-         * /
-        readonly format?: CSSFormatConfiguration;
-    }*/
-    /*interface ModeConfiguration$3 {
-        /**
-         * Defines whether the built-in completionItemProvider is enabled.
-         * /
-        readonly completionItems?: boolean;
-        /**
-         * Defines whether the built-in hoverProvider is enabled.
-         * /
-        readonly hovers?: boolean;
-        /**
-         * Defines whether the built-in documentSymbolProvider is enabled.
-         * /
-        readonly documentSymbols?: boolean;
-        /**
-         * Defines whether the built-in definitions provider is enabled.
-         * /
-        readonly definitions?: boolean;
-        /**
-         * Defines whether the built-in references provider is enabled.
-         * /
-        readonly references?: boolean;
-        /**
-         * Defines whether the built-in references provider is enabled.
-         * /
-        readonly documentHighlights?: boolean;
-        /**
-         * Defines whether the built-in rename provider is enabled.
-         * /
-        readonly rename?: boolean;
-        /**
-         * Defines whether the built-in color provider is enabled.
-         * /
-        readonly colors?: boolean;
-        /**
-         * Defines whether the built-in foldingRange provider is enabled.
-         * /
-        readonly foldingRanges?: boolean;
-        /**
-         * Defines whether the built-in diagnostic provider is enabled.
-         * /
-        readonly diagnostics?: boolean;
-        /**
-         * Defines whether the built-in selection range provider is enabled.
-         * /
-        readonly selectionRanges?: boolean;
-        /**
-         * Defines whether the built-in document formatting edit provider is enabled.
-         * /
-        readonly documentFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in document formatting range edit provider is enabled.
-         * /
-        readonly documentRangeFormattingEdits?: boolean;
-    }*/
-    /*interface LanguageServiceDefaults$3 {
-        readonly languageId: string;
-        readonly onDidChange: IEvent$1<LanguageServiceDefaults$3>;
-        readonly modeConfiguration: ModeConfiguration$3;
-        readonly options: Options$1;
-        setOptions(options: Options$1): void;
-        setModeConfiguration(modeConfiguration: ModeConfiguration$3): void;
-        /** @deprecated Use options instead * /
-        readonly diagnosticsOptions: DiagnosticsOptions$2;
-        /** @deprecated Use setOptions instead * /
-        setDiagnosticsOptions(options: DiagnosticsOptions$2): void;
-    }*/
     /** @deprecated Use Options instead */
-    //type DiagnosticsOptions$2 = Options$1;
-    //declare const cssDefaults: LanguageServiceDefaults$3;
-    //declare const scssDefaults: LanguageServiceDefaults$3;
-    //declare const lessDefaults: LanguageServiceDefaults$3;
-    /*interface CSSDataConfiguration {
-        /**
-         * Defines whether the standard CSS properties, at-directives, pseudoClasses and pseudoElements are shown.
-         * /
-        useDefaultDataProvider?: boolean;
-        /**
-         * Provides a set of custom data providers.
-         * /
-        dataProviders?: {
-            [providerId: string]: CSSDataV1;
-        };
-    }*/
     /**
      * Custom CSS properties, at-directives, pseudoClasses and pseudoElements
      * https://github.com/microsoft/vscode-css-languageservice/blob/main/docs/customData.md
      */
-    /*interface CSSDataV1 {
-        version: 1 | 1.1;
-        properties?: IPropertyData[];
-        atDirectives?: IAtDirectiveData[];
-        pseudoClasses?: IPseudoClassData[];
-        pseudoElements?: IPseudoElementData[];
-    }*/
-    //type EntryStatus = 'standard' | 'experimental' | 'nonstandard' | 'obsolete';
-    /*interface IReference$1 {
-        name: string;
-        url: string;
-    }*/
-    /*interface IPropertyData {
-        name: string;
-        description?: string | MarkupContent$1;
-        browsers?: string[];
-        restrictions?: string[];
-        status?: EntryStatus;
-        syntax?: string;
-        values?: IValueData$1[];
-        references?: IReference$1[];
-        relevance?: number;
-    }*/
-    /*interface IAtDirectiveData {
-        name: string;
-        description?: string | MarkupContent$1;
-        browsers?: string[];
-        status?: EntryStatus;
-        references?: IReference$1[];
-    }*/
-    /*interface IPseudoClassData {
-        name: string;
-        description?: string | MarkupContent$1;
-        browsers?: string[];
-        status?: EntryStatus;
-        references?: IReference$1[];
-    }*/
-    /*interface IPseudoElementData {
-        name: string;
-        description?: string | MarkupContent$1;
-        browsers?: string[];
-        status?: EntryStatus;
-        references?: IReference$1[];
-    }*/
-    /*interface IValueData {
-        name: string;
-        description?: string | MarkupContent$1;
-        browsers?: string[];
-        status?: EntryStatus;
-        references?: IReference$1[];
-    }*/
-    /*interface MarkupContent {
-        kind: MarkupKind$1;
-        value: string;
-    }*/
-    //declare type MarkupKind$1 = 'plaintext' | 'markdown';
 
-    //type monaco_contribution$3_CSSDataConfiguration = CSSDataConfiguration;
-    //type monaco_contribution$3_CSSDataV1 = CSSDataV1;
-    //type monaco_contribution$3_CSSFormatConfiguration = CSSFormatConfiguration;
-    //type monaco_contribution$3_EntryStatus = EntryStatus;
-    //type monaco_contribution$3_IAtDirectiveData = IAtDirectiveData;
-    //type monaco_contribution$3_IPropertyData = IPropertyData;
-    //type monaco_contribution$3_IPseudoClassData = IPseudoClassData;
-    //type monaco_contribution$3_IPseudoElementData = IPseudoElementData;
-    //declare const monaco_contribution$3_cssDefaults: typeof cssDefaults;
-    //declare const monaco_contribution$3_lessDefaults: typeof lessDefaults;
-    //declare const monaco_contribution$3_scssDefaults: typeof scssDefaults;
-    /*declare namespace monaco_contribution$3 {
-        export { monaco_contribution$3_cssDefaults as cssDefaults, monaco_contribution$3_lessDefaults as lessDefaults, monaco_contribution$3_scssDefaults as scssDefaults };
-        export type { monaco_contribution$3_CSSDataConfiguration as CSSDataConfiguration, monaco_contribution$3_CSSDataV1 as CSSDataV1, monaco_contribution$3_CSSFormatConfiguration as CSSFormatConfiguration, DiagnosticsOptions$2 as DiagnosticsOptions, monaco_contribution$3_EntryStatus as EntryStatus, monaco_contribution$3_IAtDirectiveData as IAtDirectiveData, monaco_contribution$3_IPropertyData as IPropertyData, monaco_contribution$3_IPseudoClassData as IPseudoClassData, monaco_contribution$3_IPseudoElementData as IPseudoElementData, IReference$1 as IReference, IValueData$1 as IValueData, LanguageServiceDefaults$3 as LanguageServiceDefaults, MarkupContent$1 as MarkupContent, MarkupKind$1 as MarkupKind, ModeConfiguration$3 as ModeConfiguration, Options$1 as Options };
-    }*/
 
-    /*interface HTMLFormatConfiguration {
-        readonly tabSize: number;
-        readonly insertSpaces: boolean;
-        readonly wrapLineLength: number;
-        readonly unformatted: string;
-        readonly contentUnformatted: string;
-        readonly indentInnerHtml: boolean;
-        readonly preserveNewLines: boolean;
-        readonly maxPreserveNewLines: number | undefined;
-        readonly indentHandlebars: boolean;
-        readonly endWithNewline: boolean;
-        readonly extraLiners: string;
-        readonly wrapAttributes: 'auto' | 'force' | 'force-aligned' | 'force-expand-multiline';
-    }*/
-    /*interface CompletionConfiguration {
-        readonly [providerId: string]: boolean;
-    }*/
-    /*interface Options {
-        /**
-         * Settings for the HTML formatter.
-         * /
-        readonly format?: HTMLFormatConfiguration;
-        /**
-         * Code completion settings.
-         * /
-        readonly suggest?: CompletionConfiguration;
-        /**
-         * Configures the HTML data types known by the HTML langauge service.
-         * /
-        readonly data?: HTMLDataConfiguration;
-    }*/
-    /*interface ModeConfiguration$2 {
-        /**
-         * Defines whether the built-in completionItemProvider is enabled.
-         * /
-        readonly completionItems?: boolean;
-        /**
-         * Defines whether the built-in hoverProvider is enabled.
-         * /
-        readonly hovers?: boolean;
-        /**
-         * Defines whether the built-in documentSymbolProvider is enabled.
-         * /
-        readonly documentSymbols?: boolean;
-        /**
-         * Defines whether the built-in definitions provider is enabled.
-         * /
-        readonly links?: boolean;
-        /**
-         * Defines whether the built-in references provider is enabled.
-         * /
-        readonly documentHighlights?: boolean;
-        /**
-         * Defines whether the built-in rename provider is enabled.
-         * /
-        readonly rename?: boolean;
-        /**
-         * Defines whether the built-in color provider is enabled.
-         * /
-        readonly colors?: boolean;
-        /**
-         * Defines whether the built-in foldingRange provider is enabled.
-         * /
-        readonly foldingRanges?: boolean;
-        /**
-         * Defines whether the built-in diagnostic provider is enabled.
-         * /
-        readonly diagnostics?: boolean;
-        /**
-         * Defines whether the built-in selection range provider is enabled.
-         * /
-        readonly selectionRanges?: boolean;
-        /**
-         * Defines whether the built-in documentFormattingEdit provider is enabled.
-         * /
-        readonly documentFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in documentRangeFormattingEdit provider is enabled.
-         * /
-        readonly documentRangeFormattingEdits?: boolean;
-    }*/
-    /*interface LanguageServiceDefaults$2 {
-        readonly languageId: string;
-        readonly modeConfiguration: ModeConfiguration$2;
-        readonly onDidChange: IEvent$1<LanguageServiceDefaults$2>;
-        readonly options: Options;
-        setOptions(options: Options): void;
-        setModeConfiguration(modeConfiguration: ModeConfiguration$2): void;
-    }*/
-    //declare const htmlLanguageService: LanguageServiceRegistration;
-    //declare const htmlDefaults: LanguageServiceDefaults$2;
-    //declare const handlebarLanguageService: LanguageServiceRegistration;
-    //declare const handlebarDefaults: LanguageServiceDefaults$2;
-    //declare const razorLanguageService: LanguageServiceRegistration;
-    //declare const razorDefaults: LanguageServiceDefaults$2;
-    /*interface LanguageServiceRegistration extends IDisposable$2 {
-        readonly defaults: LanguageServiceDefaults$2;
-    }*/
     /**
      * Registers a new HTML language service for the languageId.
      * Note: 'html', 'handlebar' and 'razor' are registered by default.
      *
-     * Use this method to register additional language ids with a HTML service.
+     * Use this method to registter additional language ids with a HTML service.
      * The language server has to be registered before an editor model is opened.
      */
-    //declare function registerHTMLLanguageService(languageId: string, options?: Options, modeConfiguration?: ModeConfiguration$2): LanguageServiceRegistration;
-    /*interface HTMLDataConfiguration {
-        /**
-         * Defines whether the standard HTML tags and attributes are shown
-         * /
-        readonly useDefaultDataProvider?: boolean;
-        /**
-         * Provides a set of custom data providers.
-         * /
-        readonly dataProviders?: {
-            [providerId: string]: HTMLDataV1;
-        };
-    }*/
     /**
      * Custom HTML tags attributes and attribute values
      * https://github.com/microsoft/vscode-html-languageservice/blob/main/docs/customData.md
      */
-    /*interface HTMLDataV1 {
-        readonly version: 1 | 1.1;
-        readonly tags?: ITagData[];
-        readonly globalAttributes?: IAttributeData[];
-        readonly valueSets?: IValueSet[];
-    }*/
-    /*interface IReference {
-        readonly name: string;
-        readonly url: string;
-    }*/
-    /*interface ITagData {
-        readonly name: string;
-        readonly description?: string | MarkupContent;
-        readonly attributes: IAttributeData[];
-        readonly references?: IReference[];
-    }*/
-    /*interface IAttributeData {
-        readonly name: string;
-        readonly description?: string | MarkupContent;
-        readonly valueSet?: string;
-        readonly values?: IValueData[];
-        readonly references?: IReference[];
-    }*/
-    /*interface IValueData {
-        readonly name: string;
-        readonly description?: string | MarkupContent;
-        readonly references?: IReference[];
-    }*/
-    /*interface IValueSet {
-        readonly name: string;
-        readonly values: IValueData[];
-    }*/
-    /*interface MarkupContent {
-        readonly kind: MarkupKind;
-        readonly value: string;
-    }*/
-    //declare type MarkupKind = 'plaintext' | 'markdown';
 
-    //type monaco_contribution$2_CompletionConfiguration = CompletionConfiguration;
-    //type monaco_contribution$2_HTMLDataConfiguration = HTMLDataConfiguration;
-    //type monaco_contribution$2_HTMLDataV1 = HTMLDataV1;
-    //type monaco_contribution$2_HTMLFormatConfiguration = HTMLFormatConfiguration;
-    //type monaco_contribution$2_IAttributeData = IAttributeData;
-    //type monaco_contribution$2_IReference = IReference;
-    //type monaco_contribution$2_ITagData = ITagData;
-    //type monaco_contribution$2_IValueData = IValueData;
-    //type monaco_contribution$2_IValueSet = IValueSet;
-    //type monaco_contribution$2_LanguageServiceRegistration = LanguageServiceRegistration;
-    //type monaco_contribution$2_MarkupContent = MarkupContent;
-    //type monaco_contribution$2_MarkupKind = MarkupKind;
-    //type monaco_contribution$2_Options = Options;
-    //declare const monaco_contribution$2_handlebarDefaults: typeof handlebarDefaults;
-    //declare const monaco_contribution$2_handlebarLanguageService: typeof handlebarLanguageService;
-    //declare const monaco_contribution$2_htmlDefaults: typeof htmlDefaults;
-    //declare const monaco_contribution$2_htmlLanguageService: typeof htmlLanguageService;
-    //declare const monaco_contribution$2_razorDefaults: typeof razorDefaults;
-    //declare const monaco_contribution$2_razorLanguageService: typeof razorLanguageService;
-    //declare const monaco_contribution$2_registerHTMLLanguageService: typeof registerHTMLLanguageService;
-    /*declare namespace monaco_contribution$2 {
-        export { monaco_contribution$2_handlebarDefaults as handlebarDefaults, monaco_contribution$2_handlebarLanguageService as handlebarLanguageService, monaco_contribution$2_htmlDefaults as htmlDefaults, monaco_contribution$2_htmlLanguageService as htmlLanguageService, monaco_contribution$2_razorDefaults as razorDefaults, monaco_contribution$2_razorLanguageService as razorLanguageService, monaco_contribution$2_registerHTMLLanguageService as registerHTMLLanguageService };
-        export type { monaco_contribution$2_CompletionConfiguration as CompletionConfiguration, monaco_contribution$2_HTMLDataConfiguration as HTMLDataConfiguration, monaco_contribution$2_HTMLDataV1 as HTMLDataV1, monaco_contribution$2_HTMLFormatConfiguration as HTMLFormatConfiguration, monaco_contribution$2_IAttributeData as IAttributeData, monaco_contribution$2_IReference as IReference, monaco_contribution$2_ITagData as ITagData, monaco_contribution$2_IValueData as IValueData, monaco_contribution$2_IValueSet as IValueSet, LanguageServiceDefaults$2 as LanguageServiceDefaults, monaco_contribution$2_LanguageServiceRegistration as LanguageServiceRegistration, monaco_contribution$2_MarkupContent as MarkupContent, monaco_contribution$2_MarkupKind as MarkupKind, ModeConfiguration$2 as ModeConfiguration, monaco_contribution$2_Options as Options };
-    }*/
-
-    /*interface BaseASTNode {
-        readonly type: 'object' | 'array' | 'property' | 'string' | 'number' | 'boolean' | 'null';
-        readonly parent?: ASTNode;
-        readonly offset: number;
-        readonly length: number;
-        readonly children?: ASTNode[];
-        readonly value?: string | boolean | number | null;
-    }*/
-
-    /*interface ObjectASTNode extends BaseASTNode {
-        readonly type: 'object';
-        readonly properties: PropertyASTNode[];
-        readonly children: ASTNode[];
-    }*/
-
-    /*interface PropertyASTNode extends BaseASTNode {
-        readonly type: 'property';
-        readonly keyNode: StringASTNode;
-        readonly valueNode?: ASTNode;
-        readonly colonOffset?: number;
-        readonly children: ASTNode[];
-    }*/
-
-    /*interface ArrayASTNode extends BaseASTNode {
-        readonly type: 'array';
-        readonly items: ASTNode[];
-        readonly children: ASTNode[];
-    }*/
-
-    /*interface StringASTNode extends BaseASTNode {
-        readonly type: 'string';
-        readonly value: string;
-    }*/
-
-    /*interface NumberASTNode extends BaseASTNode {
-        readonly type: 'number';
-        readonly value: number;
-        readonly isInteger: boolean;
-    }*/
-
-    /*interface BooleanASTNode extends BaseASTNode {
-        readonly type: 'boolean';
-        readonly value: boolean;
-    }*/
-
-    /*interface NullASTNode extends BaseASTNode {
-        readonly type: 'null';
-        readonly value: null;
-    }*/
-
-    //type ASTNode = ObjectASTNode | PropertyASTNode | ArrayASTNode | StringASTNode | NumberASTNode | BooleanASTNode | NullASTNode;
-
-    /*type JSONDocument = {
-        root: ASTNode | undefined;
-        getNodeFromOffset(offset: number, includeRightBound?: boolean): ASTNode | undefined;
-    };*/
-
-    //type JSONSchemaRef = JSONSchema | boolean;
-
-    /*interface JSONSchemaMap {
-        [name: string]: JSONSchemaRef;
-    }*/
-
-    /*interface JSONSchema {
-        id?: string;
-        $id?: string;
-        $schema?: string;
-        type?: string | string[];
-        title?: string;
-        default?: any;
-        definitions?: {
-            [name: string]: JSONSchema;
-        };
-        description?: string;
-        properties?: JSONSchemaMap;
-        patternProperties?: JSONSchemaMap;
-        additionalProperties?: boolean | JSONSchemaRef;
-        minProperties?: number;
-        maxProperties?: number;
-        dependencies?: JSONSchemaMap | {
-            [prop: string]: string[];
-        };
-        items?: JSONSchemaRef | JSONSchemaRef[];
-        minItems?: number;
-        maxItems?: number;
-        uniqueItems?: boolean;
-        additionalItems?: boolean | JSONSchemaRef;
-        pattern?: string;
-        minLength?: number;
-        maxLength?: number;
-        minimum?: number;
-        maximum?: number;
-        exclusiveMinimum?: boolean | number;
-        exclusiveMaximum?: boolean | number;
-        multipleOf?: number;
-        required?: string[];
-        $ref?: string;
-        anyOf?: JSONSchemaRef[];
-        allOf?: JSONSchemaRef[];
-        oneOf?: JSONSchemaRef[];
-        not?: JSONSchemaRef;
-        enum?: any[];
-        format?: string;
-        const?: any;
-        contains?: JSONSchemaRef;
-        propertyNames?: JSONSchemaRef;
-        examples?: any[];
-        $comment?: string;
-        if?: JSONSchemaRef;
-        then?: JSONSchemaRef;
-        else?: JSONSchemaRef;
-        defaultSnippets?: {
-            label?: string;
-            description?: string;
-            markdownDescription?: string;
-            body?: any;
-            bodyText?: string;
-        }[];
-        errorMessage?: string;
-        patternErrorMessage?: string;
-        deprecationMessage?: string;
-        enumDescriptions?: string[];
-        markdownEnumDescriptions?: string[];
-        markdownDescription?: string;
-        doNotSuggest?: boolean;
-        suggestSortText?: string;
-        allowComments?: boolean;
-        allowTrailingCommas?: boolean;
-    }*/
-
-    /*interface MatchingSchema {
-        node: ASTNode;
-        schema: JSONSchema;
-    }*/
-
-    /*interface DiagnosticsOptions$1 {
-        /**
-         * If set, the validator will be enabled and perform syntax and schema based validation,
-         * unless `DiagnosticsOptions.schemaValidation` is set to `ignore`.
-         * /
-        readonly validate?: boolean;
-        /**
-         * If set, comments are tolerated. If set to false, syntax errors will be emitted for comments.
-         * `DiagnosticsOptions.allowComments` will override this setting.
-         * /
-        readonly allowComments?: boolean;
-        /**
-         * A list of known schemas and/or associations of schemas to file names.
-         * /
-        readonly schemas?: {
-            /**
-             * The URI of the schema, which is also the identifier of the schema.
-             * /
-            readonly uri: string;
-            /**
-             * A list of glob patterns that describe for which file URIs the JSON schema will be used.
-             * '*' and '**' wildcards are supported. Exclusion patterns start with '!'.
-             * For example '*.schema.json', 'package.json', '!foo*.schema.json', 'foo/**\/BADRESP.json'.
-             * A match succeeds when there is at least one pattern matching and last matching pattern does not start with '!'.
-             * /
-            readonly fileMatch?: string[];
-            /**
-             * The schema for the given URI.
-             * /
-            readonly schema?: any;
-        }[];
-        /**
-         *  If set, the schema service would load schema content on-demand with 'fetch' if available
-         * /
-        readonly enableSchemaRequest?: boolean;
-        /**
-         * The severity of problems from schema validation. If set to 'ignore', schema validation will be skipped. If not set, 'warning' is used.
-         * /
-        readonly schemaValidation?: SeverityLevel;
-        /**
-         * The severity of problems that occurred when resolving and loading schemas. If set to 'ignore', schema resolving problems are not reported. If not set, 'warning' is used.
-         * /
-        readonly schemaRequest?: SeverityLevel;
-        /**
-         * The severity of reported trailing commas. If not set, trailing commas will be reported as errors.
-         * /
-        readonly trailingCommas?: SeverityLevel;
-        /**
-         * The severity of reported comments. If not set, 'DiagnosticsOptions.allowComments' defines whether comments are ignored or reported as errors.
-         * /
-        readonly comments?: SeverityLevel;
-    }*/
-    //type SeverityLevel = 'error' | 'warning' | 'ignore';
-    /*interface ModeConfiguration$1 {
-        /**
-         * Defines whether the built-in documentFormattingEdit provider is enabled.
-         * /
-        readonly documentFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in documentRangeFormattingEdit provider is enabled.
-         * /
-        readonly documentRangeFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in completionItemProvider is enabled.
-         * /
-        readonly completionItems?: boolean;
-        /**
-         * Defines whether the built-in hoverProvider is enabled.
-         * /
-        readonly hovers?: boolean;
-        /**
-         * Defines whether the built-in documentSymbolProvider is enabled.
-         * /
-        readonly documentSymbols?: boolean;
-        /**
-         * Defines whether the built-in tokens provider is enabled.
-         * /
-        readonly tokens?: boolean;
-        /**
-         * Defines whether the built-in color provider is enabled.
-         * /
-        readonly colors?: boolean;
-        /**
-         * Defines whether the built-in foldingRange provider is enabled.
-         * /
-        readonly foldingRanges?: boolean;
-        /**
-         * Defines whether the built-in diagnostic provider is enabled.
-         * /
-        readonly diagnostics?: boolean;
-        /**
-         * Defines whether the built-in selection range provider is enabled.
-         * /
-        readonly selectionRanges?: boolean;
-    }*/
-    /*interface LanguageServiceDefaults$1 {
-        readonly languageId: string;
-        readonly onDidChange: IEvent$1<LanguageServiceDefaults$1>;
-        readonly diagnosticsOptions: DiagnosticsOptions$1;
-        readonly modeConfiguration: ModeConfiguration$1;
-        setDiagnosticsOptions(options: DiagnosticsOptions$1): void;
-        setModeConfiguration(modeConfiguration: ModeConfiguration$1): void;
-    }*/
-    //declare const jsonDefaults: LanguageServiceDefaults$1;
-    /*interface IJSONWorker {
-        parseJSONDocument(uri: string): Promise<JSONDocument | null>;
-        getMatchingSchemas(uri: string): Promise<MatchingSchema[]>;
-    }*/
-    //declare const getWorker: () => Promise<(...uris: Uri[]) => Promise<IJSONWorker>>;
-
-    //type monaco_contribution$1_ASTNode = ASTNode;
-    //type monaco_contribution$1_ArrayASTNode = ArrayASTNode;
-    //type monaco_contribution$1_BaseASTNode = BaseASTNode;
-    //type monaco_contribution$1_BooleanASTNode = BooleanASTNode;
-    //type monaco_contribution$1_IJSONWorker = IJSONWorker;
-    //type monaco_contribution$1_JSONDocument = JSONDocument;
-    //type monaco_contribution$1_JSONSchema = JSONSchema;
-    //type monaco_contribution$1_JSONSchemaMap = JSONSchemaMap;
-    //type monaco_contribution$1_JSONSchemaRef = JSONSchemaRef;
-    //type monaco_contribution$1_MatchingSchema = MatchingSchema;
-    //type monaco_contribution$1_NullASTNode = NullASTNode;
-    //type monaco_contribution$1_NumberASTNode = NumberASTNode;
-    //type monaco_contribution$1_ObjectASTNode = ObjectASTNode;
-    //type monaco_contribution$1_PropertyASTNode = PropertyASTNode;
-    //type monaco_contribution$1_SeverityLevel = SeverityLevel;
-    //type monaco_contribution$1_StringASTNode = StringASTNode;
-    //declare const monaco_contribution$1_getWorker: typeof getWorker;
-    //declare const monaco_contribution$1_jsonDefaults: typeof jsonDefaults;
-    /*declare namespace monaco_contribution$1 {
-        export { monaco_contribution$1_getWorker as getWorker, monaco_contribution$1_jsonDefaults as jsonDefaults };
-        export type { monaco_contribution$1_ASTNode as ASTNode, monaco_contribution$1_ArrayASTNode as ArrayASTNode, monaco_contribution$1_BaseASTNode as BaseASTNode, monaco_contribution$1_BooleanASTNode as BooleanASTNode, DiagnosticsOptions$1 as DiagnosticsOptions, monaco_contribution$1_IJSONWorker as IJSONWorker, monaco_contribution$1_JSONDocument as JSONDocument, monaco_contribution$1_JSONSchema as JSONSchema, monaco_contribution$1_JSONSchemaMap as JSONSchemaMap, monaco_contribution$1_JSONSchemaRef as JSONSchemaRef, LanguageServiceDefaults$1 as LanguageServiceDefaults, monaco_contribution$1_MatchingSchema as MatchingSchema, ModeConfiguration$1 as ModeConfiguration, monaco_contribution$1_NullASTNode as NullASTNode, monaco_contribution$1_NumberASTNode as NumberASTNode, monaco_contribution$1_ObjectASTNode as ObjectASTNode, monaco_contribution$1_PropertyASTNode as PropertyASTNode, monaco_contribution$1_SeverityLevel as SeverityLevel, monaco_contribution$1_StringASTNode as StringASTNode };
-    }*/
 
     public enum ModuleKind
     {
@@ -10192,807 +6891,4 @@ namespace BlazorMonaco
         Classic = 1,
         NodeJs = 2
     }
-
-    /*interface MapLike<T> {
-        [index: string]: T;
-    }*/
-    //type CompilerOptionsValue = string | number | boolean | (string | number)[] | string[] | MapLike<string[]> | null | undefined;
-    /*interface CompilerOptions {
-        allowJs?: boolean;
-        allowSyntheticDefaultImports?: boolean;
-        allowUmdGlobalAccess?: boolean;
-        allowUnreachableCode?: boolean;
-        allowUnusedLabels?: boolean;
-        alwaysStrict?: boolean;
-        baseUrl?: string;
-        charset?: string;
-        checkJs?: boolean;
-        declaration?: boolean;
-        declarationMap?: boolean;
-        emitDeclarationOnly?: boolean;
-        declarationDir?: string;
-        disableSizeLimit?: boolean;
-        disableSourceOfProjectReferenceRedirect?: boolean;
-        downlevelIteration?: boolean;
-        emitBOM?: boolean;
-        emitDecoratorMetadata?: boolean;
-        experimentalDecorators?: boolean;
-        forceConsistentCasingInFileNames?: boolean;
-        importHelpers?: boolean;
-        inlineSourceMap?: boolean;
-        inlineSources?: boolean;
-        isolatedModules?: boolean;
-        jsx?: JsxEmit;
-        keyofStringsOnly?: boolean;
-        lib?: string[];
-        locale?: string;
-        mapRoot?: string;
-        maxNodeModuleJsDepth?: number;
-        module?: ModuleKind;
-        moduleResolution?: ModuleResolutionKind;
-        newLine?: NewLineKind;
-        noEmit?: boolean;
-        noEmitHelpers?: boolean;
-        noEmitOnError?: boolean;
-        noErrorTruncation?: boolean;
-        noFallthroughCasesInSwitch?: boolean;
-        noImplicitAny?: boolean;
-        noImplicitReturns?: boolean;
-        noImplicitThis?: boolean;
-        noStrictGenericChecks?: boolean;
-        noUnusedLocals?: boolean;
-        noUnusedParameters?: boolean;
-        noImplicitUseStrict?: boolean;
-        noLib?: boolean;
-        noResolve?: boolean;
-        out?: string;
-        outDir?: string;
-        outFile?: string;
-        paths?: MapLike<string[]>;
-        preserveConstEnums?: boolean;
-        preserveSymlinks?: boolean;
-        project?: string;
-        reactNamespace?: string;
-        jsxFactory?: string;
-        composite?: boolean;
-        removeComments?: boolean;
-        rootDir?: string;
-        rootDirs?: string[];
-        skipLibCheck?: boolean;
-        skipDefaultLibCheck?: boolean;
-        sourceMap?: boolean;
-        sourceRoot?: string;
-        strict?: boolean;
-        strictFunctionTypes?: boolean;
-        strictBindCallApply?: boolean;
-        strictNullChecks?: boolean;
-        strictPropertyInitialization?: boolean;
-        stripInternal?: boolean;
-        suppressExcessPropertyErrors?: boolean;
-        suppressImplicitAnyIndexErrors?: boolean;
-        target?: ScriptTarget;
-        traceResolution?: boolean;
-        resolveJsonModule?: boolean;
-        types?: string[];
-        /** Paths used to compute primary types search locations * /
-        typeRoots?: string[];
-        esModuleInterop?: boolean;
-        useDefineForClassFields?: boolean;
-        [option: string]: CompilerOptionsValue | undefined;
-    }*/
-    /*interface DiagnosticsOptions {
-        noSemanticValidation?: boolean;
-        noSyntaxValidation?: boolean;
-        noSuggestionDiagnostics?: boolean;
-        /**
-         * Limit diagnostic computation to only visible files.
-         * Defaults to false.
-         * /
-        onlyVisible?: boolean;
-        diagnosticCodesToIgnore?: number[];
-    }*/
-    /*interface WorkerOptions {
-        /** A full HTTP path to a JavaScript file which adds a function `customTSWorkerFactory` to the self inside a web-worker * /
-        customWorkerPath?: string;
-    }*/
-    /*interface InlayHintsOptions {
-        readonly includeInlayParameterNameHints?: 'none' | 'literals' | 'all';
-        readonly includeInlayParameterNameHintsWhenArgumentMatchesName?: boolean;
-        readonly includeInlayFunctionParameterTypeHints?: boolean;
-        readonly includeInlayVariableTypeHints?: boolean;
-        readonly includeInlayPropertyDeclarationTypeHints?: boolean;
-        readonly includeInlayFunctionLikeReturnTypeHints?: boolean;
-        readonly includeInlayEnumMemberValueHints?: boolean;
-    }*/
-    /*interface IExtraLib {
-        content: string;
-        version: number;
-    }*/
-    /*interface IExtraLibs {
-        [path: string]: IExtraLib;
-    }*/
-    /**
-     * A linked list of formatted diagnostic messages to be used as part of a multiline message.
-     * It is built from the bottom up, leaving the head to be the "main" diagnostic.
-     */
-    /*interface DiagnosticMessageChain {
-        messageText: string;
-        /** Diagnostic category: warning = 0, error = 1, suggestion = 2, message = 3 * /
-        category: 0 | 1 | 2 | 3;
-        code: number;
-        next?: DiagnosticMessageChain[];
-    }*/
-    /*interface Diagnostic extends DiagnosticRelatedInformation {
-        /** May store more in future. For now, this will simply be `true` to indicate when a diagnostic is an unused-identifier diagnostic. * /
-        reportsUnnecessary?: {};
-        reportsDeprecated?: {};
-        source?: string;
-        relatedInformation?: DiagnosticRelatedInformation[];
-    }*/
-    /*interface DiagnosticRelatedInformation {
-        /** Diagnostic category: warning = 0, error = 1, suggestion = 2, message = 3 * /
-        category: 0 | 1 | 2 | 3;
-        code: number;
-        /** TypeScriptWorker removes all but the `fileName` property to avoid serializing circular JSON structures. * /
-        file: {
-            fileName: string;
-        } | undefined;
-        start: number | undefined;
-        length: number | undefined;
-        messageText: string | DiagnosticMessageChain;
-    }*/
-    /*interface EmitOutput {
-        outputFiles: OutputFile[];
-        emitSkipped: boolean;
-        diagnostics?: Diagnostic[];
-    }*/
-    /*interface OutputFile {
-        name: string;
-        writeByteOrderMark: boolean;
-        text: string;
-    }*/
-    /*interface ModeConfiguration
-    {
-        /**
-         * Defines whether the built-in completionItemProvider is enabled.
-         * /
-        readonly completionItems?: boolean;
-        /**
-         * Defines whether the built-in hoverProvider is enabled.
-         * /
-        readonly hovers?: boolean;
-        /**
-         * Defines whether the built-in documentSymbolProvider is enabled.
-         * /
-        readonly documentSymbols?: boolean;
-        /**
-         * Defines whether the built-in definitions provider is enabled.
-         * /
-        readonly definitions?: boolean;
-        /**
-         * Defines whether the built-in references provider is enabled.
-         * /
-        readonly references?: boolean;
-        /**
-         * Defines whether the built-in references provider is enabled.
-         * /
-        readonly documentHighlights?: boolean;
-        /**
-         * Defines whether the built-in rename provider is enabled.
-         * /
-        readonly rename?: boolean;
-        /**
-         * Defines whether the built-in diagnostic provider is enabled.
-         * /
-        readonly diagnostics?: boolean;
-        /**
-         * Defines whether the built-in document formatting range edit provider is enabled.
-         * /
-        readonly documentRangeFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in signature help provider is enabled.
-         * /
-        readonly signatureHelp?: boolean;
-        /**
-         * Defines whether the built-in onType formatting edit provider is enabled.
-         * /
-        readonly onTypeFormattingEdits?: boolean;
-        /**
-         * Defines whether the built-in code actions provider is enabled.
-         * /
-        readonly codeActions?: boolean;
-        /**
-         * Defines whether the built-in inlay hints provider is enabled.
-         * /
-        readonly inlayHints?: boolean;
-    }*/
-    /*interface LanguageServiceDefaults {
-        /**
-         * Event fired when compiler options or diagnostics options are changed.
-         * /
-        readonly onDidChange: IEvent$1<void>;
-        /**
-         * Event fired when extra libraries registered with the language service change.
-         * /
-        readonly onDidExtraLibsChange: IEvent$1<void>;
-        readonly workerOptions: WorkerOptions;
-        readonly inlayHintsOptions: InlayHintsOptions;
-        readonly modeConfiguration: ModeConfiguration;
-        setModeConfiguration(modeConfiguration: ModeConfiguration): void;
-        /**
-         * Get the current extra libs registered with the language service.
-         * /
-        getExtraLibs(): IExtraLibs;
-        /**
-         * Add an additional source file to the language service. Use this
-         * for typescript (definition) files that won't be loaded as editor
-         * documents, like `jquery.d.ts`.
-         *
-         * @param content The file content
-         * @param filePath An optional file path
-         * @returns A disposable which will remove the file from the
-         * language service upon disposal.
-         * /
-        addExtraLib(content: string, filePath?: string): IDisposable$2;
-        /**
-         * Remove all existing extra libs and set the additional source
-         * files to the language service. Use this for typescript definition
-         * files that won't be loaded as editor documents, like `jquery.d.ts`.
-         * @param libs An array of entries to register.
-         * /
-        setExtraLibs(libs: {
-            content: string;
-            filePath?: string;
-        }[]): void;
-        /**
-         * Get current TypeScript compiler options for the language service.
-         * /
-        getCompilerOptions(): CompilerOptions;
-        /**
-         * Set TypeScript compiler options.
-         * /
-        setCompilerOptions(options: CompilerOptions): void;
-        /**
-         * Get the current diagnostics options for the language service.
-         * /
-        getDiagnosticsOptions(): DiagnosticsOptions;
-        /**
-         * Configure whether syntactic and/or semantic validation should
-         * be performed
-         * /
-        setDiagnosticsOptions(options: DiagnosticsOptions): void;
-        /**
-         * Configure webworker options
-         * /
-        setWorkerOptions(options: WorkerOptions): void;
-        /**
-         * No-op.
-         * /
-        setMaximumWorkerIdleTime(value: number): void;
-        /**
-         * Configure if all existing models should be eagerly sync'd
-         * to the worker on start or restart.
-         * /
-        setEagerModelSync(value: boolean): void;
-        /**
-         * Get the current setting for whether all existing models should be eagerly sync'd
-         * to the worker on start or restart.
-         * /
-        getEagerModelSync(): boolean;
-        /**
-         * Configure inlay hints options.
-         * /
-        setInlayHintsOptions(options: InlayHintsOptions): void;
-    }*/
-    /*interface TypeScriptWorker {
-        /**
-         * Get diagnostic messages for any syntax issues in the given file.
-         * /
-        getSyntacticDiagnostics(fileName: string): Promise<Diagnostic[]>;
-        /**
-         * Get diagnostic messages for any semantic issues in the given file.
-         * /
-        getSemanticDiagnostics(fileName: string): Promise<Diagnostic[]>;
-        /**
-         * Get diagnostic messages for any suggestions related to the given file.
-         * /
-        getSuggestionDiagnostics(fileName: string): Promise<Diagnostic[]>;
-        /**
-         * Get the content of a given file.
-         * /
-        getScriptText(fileName: string): Promise<string | undefined>;
-        /**
-         * Get diagnostic messages related to the current compiler options.
-         * @param fileName Not used
-         * /
-        getCompilerOptionsDiagnostics(fileName: string): Promise<Diagnostic[]>;
-        /**
-         * Get code completions for the given file and position.
-         * @returns `Promise<typescript.CompletionInfo | undefined>`
-         * /
-        getCompletionsAtPosition(fileName: string, position: number): Promise<any | undefined>;
-        /**
-         * Get code completion details for the given file, position, and entry.
-         * @returns `Promise<typescript.CompletionEntryDetails | undefined>`
-         * /
-        getCompletionEntryDetails(fileName: string, position: number, entry: string): Promise<any | undefined>;
-        /**
-         * Get signature help items for the item at the given file and position.
-         * @returns `Promise<typescript.SignatureHelpItems | undefined>`
-         * /
-        getSignatureHelpItems(fileName: string, position: number, options: any): Promise<any | undefined>;
-        /**
-         * Get quick info for the item at the given position in the file.
-         * @returns `Promise<typescript.QuickInfo | undefined>`
-         * /
-        getQuickInfoAtPosition(fileName: string, position: number): Promise<any | undefined>;
-        getDocumentHighlights(fileName: string, position: number, filesToSearch: string[]): Promise<ReadonlyArray<any> | undefined>;
-        /**
-         * Get the definition of the item at the given position in the file.
-         * @returns `Promise<ReadonlyArray<typescript.DefinitionInfo> | undefined>`
-         * /
-        getDefinitionAtPosition(fileName: string, position: number): Promise<ReadonlyArray<any> | undefined>;
-        /**
-         * Get references to the item at the given position in the file.
-         * @returns `Promise<typescript.ReferenceEntry[] | undefined>`
-         * /
-        getReferencesAtPosition(fileName: string, position: number): Promise<any[] | undefined>;
-        /**
-         * Get outline entries for the item at the given position in the file.
-         * @returns `Promise<typescript.NavigationTree | undefined>`
-         * /
-        getNavigationTree(fileName: string) : Promise<any | undefined>;
-        /**
-         * Get changes which should be applied to format the given file.
-         * @param options `typescript.FormatCodeOptions`
-         * @returns `Promise<typescript.TextChange[]>`
-         * /
-        getFormattingEditsForDocument(fileName: string, options: any): Promise<any[]>;
-        /**
-         * Get changes which should be applied to format the given range in the file.
-         * @param options `typescript.FormatCodeOptions`
-         * @returns `Promise<typescript.TextChange[]>`
-         * /
-        getFormattingEditsForRange(fileName: string, start: number, end: number, options: any): Promise<any[]>;
-        /**
-         * Get formatting changes which should be applied after the given keystroke.
-         * @param options `typescript.FormatCodeOptions`
-         * @returns `Promise<typescript.TextChange[]>`
-         * /
-        getFormattingEditsAfterKeystroke(fileName: string, postion: number, ch: string, options: any): Promise<any[]>;
-        /**
-         * Get other occurrences which should be updated when renaming the item at the given file and position.
-         * @returns `Promise<readonly typescript.RenameLocation[] | undefined>`
-         * /
-        findRenameLocations(fileName: string, positon: number, findInStrings: boolean, findInComments: boolean, providePrefixAndSuffixTextForRename: boolean): Promise<readonly any[] | undefined>;
-        /**
-         * Get edits which should be applied to rename the item at the given file and position (or a failure reason).
-         * @param options `typescript.RenameInfoOptions`
-         * @returns `Promise<typescript.RenameInfo>`
-         * /
-        getRenameInfo(fileName: string, positon: number, options: any): Promise<any>;
-        /**
-         * Get transpiled output for the given file.
-         * @returns `typescript.EmitOutput`
-         * /
-        getEmitOutput(fileName: string, emitOnlyDtsFiles?: boolean, forceDtsEmit?: boolean): Promise<EmitOutput>;
-        /**
-         * Get possible code fixes at the given position in the file.
-         * @param formatOptions `typescript.FormatCodeOptions`
-         * @returns `Promise<ReadonlyArray<typescript.CodeFixAction>>`
-         * /
-        getCodeFixesAtPosition(fileName: string, start: number, end: number, errorCodes: number[], formatOptions: any): Promise<ReadonlyArray<any>>;
-        /**
-         * Get inlay hints in the range of the file.
-         * @param fileName
-         * @returns `Promise<typescript.InlayHint[]>`
-         * /
-        provideInlayHints(fileName: string, start: number, end: number): Promise<ReadonlyArray<any>>;
-    }*/
-    //declare const typescriptVersion: string;
-    //declare const typescriptDefaults: LanguageServiceDefaults;
-    //declare const javascriptDefaults: LanguageServiceDefaults;
-    //declare const getTypeScriptWorker: () => Promise<(...uris: Uri[]) => Promise<TypeScriptWorker>>;
-    //declare const getJavaScriptWorker: () => Promise<(...uris: Uri[]) => Promise<TypeScriptWorker>>;
-
-    //type monaco_contribution_CompilerOptions = CompilerOptions;
-    //type monaco_contribution_Diagnostic = Diagnostic;
-    //type monaco_contribution_DiagnosticRelatedInformation = DiagnosticRelatedInformation;
-    //type monaco_contribution_DiagnosticsOptions = DiagnosticsOptions;
-    //type monaco_contribution_EmitOutput = EmitOutput;
-    //type monaco_contribution_IExtraLibs = IExtraLibs;
-    //type monaco_contribution_JsxEmit = JsxEmit;
-    //declare const monaco_contribution_JsxEmit: typeof JsxEmit;
-    //type monaco_contribution_LanguageServiceDefaults = LanguageServiceDefaults;
-    //type monaco_contribution_ModeConfiguration = ModeConfiguration;
-    //type monaco_contribution_ModuleKind = ModuleKind;
-    //declare const monaco_contribution_ModuleKind: typeof ModuleKind;
-    //type monaco_contribution_ModuleResolutionKind = ModuleResolutionKind;
-    //declare const monaco_contribution_ModuleResolutionKind: typeof ModuleResolutionKind;
-    //type monaco_contribution_NewLineKind = NewLineKind;
-    //declare const monaco_contribution_NewLineKind: typeof NewLineKind;
-    //type monaco_contribution_ScriptTarget = ScriptTarget;
-    //declare const monaco_contribution_ScriptTarget: typeof ScriptTarget;
-    //type monaco_contribution_TypeScriptWorker = TypeScriptWorker;
-    //type monaco_contribution_WorkerOptions = WorkerOptions;
-    //declare const monaco_contribution_getJavaScriptWorker: typeof getJavaScriptWorker;
-    //declare const monaco_contribution_getTypeScriptWorker: typeof getTypeScriptWorker;
-    //declare const monaco_contribution_javascriptDefaults: typeof javascriptDefaults;
-    //declare const monaco_contribution_typescriptDefaults: typeof typescriptDefaults;
-    //declare const monaco_contribution_typescriptVersion: typeof typescriptVersion;
-    /*declare namespace monaco_contribution {
-        export { monaco_contribution_JsxEmit as JsxEmit, monaco_contribution_ModuleKind as ModuleKind, monaco_contribution_ModuleResolutionKind as ModuleResolutionKind, monaco_contribution_NewLineKind as NewLineKind, monaco_contribution_ScriptTarget as ScriptTarget, monaco_contribution_getJavaScriptWorker as getJavaScriptWorker, monaco_contribution_getTypeScriptWorker as getTypeScriptWorker, monaco_contribution_javascriptDefaults as javascriptDefaults, monaco_contribution_typescriptDefaults as typescriptDefaults, monaco_contribution_typescriptVersion as typescriptVersion };
-        export type { monaco_contribution_CompilerOptions as CompilerOptions, monaco_contribution_Diagnostic as Diagnostic, monaco_contribution_DiagnosticRelatedInformation as DiagnosticRelatedInformation, monaco_contribution_DiagnosticsOptions as DiagnosticsOptions, monaco_contribution_EmitOutput as EmitOutput, monaco_contribution_IExtraLibs as IExtraLibs, monaco_contribution_LanguageServiceDefaults as LanguageServiceDefaults, monaco_contribution_ModeConfiguration as ModeConfiguration, monaco_contribution_TypeScriptWorker as TypeScriptWorker, monaco_contribution_WorkerOptions as WorkerOptions };
-    }*/
-
-    //#region node_modules/@hediet/json-rpc/dist/JsonRpcTypes.d.ts
-    /*type JSONObject = {
-        [key: string]: JSONValue | undefined;
-    };*/
-    //interface JSONArray extends Array<JSONValue> {}
-    //type JSONValue = string | number | boolean | null | JSONObject | JSONArray;
-    //type Message = IRequestMessage | IResponseMessage;
-    /**
-    * Represents a request or a notification.
-    */
-    /*interface IRequestMessage {
-        jsonrpc: "2.0";
-        /**  must not match `rpc\..*` * /
-        method: string;
-        params?: JSONArray | JSONObject;
-        /** Is not set if and only if the request is a notification. * /
-        id?: RequestId;
-        /** Requests don't have a result. * /
-        result?: never;
-    }*/
-    //type RequestId = number | string;
-    /**
-    * Either result or error is set.
-    */
-    /*interface IResponseMessage {
-        jsonrpc: "2.0";
-        /**
-        * This member is REQUIRED on success.
-        * This member MUST NOT exist if there was an error invoking the method.
-        * The value of this member is determined by the method invoked on the Server.
-        * /
-        result?: JSONValue;
-        /**
-        * This member is REQUIRED on error.
-        * This member MUST NOT exist if there was no error triggered during invocation.
-        * /
-        error?: ErrorObject;
-        /**
-        * If there was an error in detecting the id in the Request object
-        * (e.g. Parse error/Invalid Request), it MUST be Null.
-        * /
-        id: RequestId | null;
-        method?: never;
-    }*/
-    /*interface ErrorObject {
-        /** A Number that indicates the error type that occurred. * /
-        code: ErrorCode;
-        /** The message SHOULD be limited to a concise single sentence. * /
-        message: string;
-        /**
-        * A Primitive or Structured value that contains additional information about the error.
-        * This may be omitted.
-        * The value of this member is defined by the Server (e.g. detailed error information, nested errors etc.).
-        * /
-        data?: JSONValue;
-    }*/
-    /*declare namespace ErrorObject {
-        function create(obj: ErrorObject): ErrorObject;
-    }*/
-    //interface ErrorCode extends Number {}
-    /*declare namespace ErrorCode {
-        /**
-        * Invalid JSON was received by the server.
-        * An error occurred on the server while parsing the JSON text.
-        * /
-        const parseError: ErrorCode;
-        /**
-        * The JSON sent is not a valid Request object.
-        * /
-        const invalidRequest: ErrorCode;
-        /**
-        * The method does not exist/is not available.
-        * /
-        const methodNotFound: ErrorCode;
-        /**
-        * Invalid method parameter(s).
-        * /
-        const invalidParams: ErrorCode;
-        /**
-        * 	Internal JSON-RPC error.
-        * /
-        const internalError: ErrorCode;
-        /**
-        * implementation-defined server-errors.
-        * /
-        function isServerError(code: number): boolean;
-        /**
-        * implementation-defined server-errors.
-        * /
-        function serverError(code: number): ErrorCode;
-        /**
-        * Non-spec.
-        * /
-        const unexpectedServerError: ErrorCode;
-        function isApplicationError(code: number): boolean;
-        function applicationError(code: number): ErrorCode;
-        /**
-        * Non-spec.
-        * /
-        const genericApplicationError: ErrorCode;
-    }*/
-    //#endregion
-    //#region node_modules/@hediet/json-rpc/dist/common.d.ts
-    /*interface IDisposable$1 {
-        dispose(): void;
-    }*/
-    //type IEvent<T> = (listener: (e: T) => void) => IDisposable$1;
-    /*declare class EventEmitter<T> {
-        private listeners;
-        readonly event: IEvent<T>;
-        fire(args: T): void;
-    }*/
-    /*interface IValueWithChangeEvent<T> {
-        get value(): T;
-        get onChange(): IEvent<T>;
-    }*/
-    /*declare class ValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
-        private _value;
-        private eventEmitter;
-        constructor(initialValue: T);
-        get value(): T;
-        set value(newValue: T);
-        get onChange(): IEvent<T>;
-    }*/
-    //#endregion
-    //#region node_modules/@hediet/json-rpc/dist/MessageTransport.d.ts
-    /**
-    * Represents a mechanism to send and receive messages.
-    */
-    /*interface IMessageTransport {
-        get state(): IValueWithChangeEvent<ConnectionState>;
-        send(message: Message): Promise<void>;
-        /**
-        * Sets a listener for received messages.
-        * The listener might be called multiple times before this function returns.
-        * The method allows reentrancy.
-        * /
-        setListener(listener: MessageListener | undefined): void;
-        /**
-        * Returns a human readable representation of this stream.
-        * /
-        toString(): string;
-    }*/
-    /*type ConnectionState = {
-        state: "connecting";
-    } | {
-        state: "open";
-    } | {
-        state: "closed";
-        error: Error | undefined;
-    };*/
-    //type MessageListener = (message: Message) => void;
-    /**
-    * Base class for implementing a MessageStream.
-    * Provides an unreadMessage queue.
-    */
-    /*declare abstract class BaseMessageTransport implements IMessageTransport {
-        private static id;
-        private readonly _unprocessedMessages;
-        private _messageListener;
-        protected readonly id: number;
-        private readonly _state;
-        readonly state: ValueWithChangeEvent<ConnectionState>;
-        /**
-        * Sets a callback for incoming messages.
-        * /
-        setListener(listener: MessageListener | undefined): void;
-        /**
-        * Writes a message to the stream.
-        * /
-        send(message: Message): Promise<void>;
-        protected abstract _sendImpl(message: Message): Promise<void>;
-        /**
-        * Returns human readable information of this message stream.
-        * /
-        abstract toString(): string;
-        /**
-        * Call this in derived classes to signal a new message.
-        * /
-        protected _dispatchReceivedMessage(message: Message): void;
-        /**
-        * Call this in derived classes to signal that the connection closed.
-        * /
-        protected _onConnectionClosed(): void;
-        log(logger?: IMessageLogger): IMessageTransport;
-    }*/
-    /**
-    * Used by `StreamLogger` to log messages.
-    */
-    /*interface IMessageLogger {
-        log(stream: IMessageTransport, type: "incoming" | "outgoing", message: Message): void;
-    }*/
-    //#endregion
-    //#region node_modules/@hediet/json-rpc/dist/typedChannel/serializerMapping.d.ts
-    /*declare global {
-        interface JsonRpcSerializerMapper<T> {}
-    }*/
-    //#endregion
-    //#region src/utils.d.ts
-    /*interface IDisposable {
-        dispose(): void;
-    }*/
-    //#endregion
-    //#region src/adapters/LspClient.d.ts
-    /*declare class MonacoLspClient {
-        private _connection;
-        private readonly _capabilitiesRegistry;
-        private readonly _bridge;
-        private _initPromise;
-        constructor(transport: IMessageTransport);
-        private _init;
-        protected createFeatures(): IDisposable;
-    }*/
-    //#endregion
-    //#region node_modules/@hediet/json-rpc-websocket/dist/index.d.ts
-    /*type NormalizedWebSocketOptions = {
-        address: string;
-    };*/
-    /*type WebSocketOptions = NormalizedWebSocketOptions | {
-        host: string;
-        port: number;
-        forceTls?: boolean;
-    };*/
-    /**
-    * Represents a stream through a web socket.
-    * Use the static `connectTo` method to get a stream to a web socket server.
-    */
-    /*declare class WebSocketTransport extends BaseMessageTransport {
-        private readonly socket;
-        static connectTo(options: WebSocketOptions): Promise<WebSocketTransport>;
-        static fromWebSocket(socket: unknown): WebSocketTransport;
-        private readonly errorEmitter;
-        readonly onError: EventEmitter<{
-            error: unknown;
-        }>;
-        private constructor();
-        /**
-        * Closes the underlying socket.
-        * /
-        close(): void;
-        /**
-        * Same as `close`.
-        * /
-        dispose(): void;
-        _sendImpl(message: Message): Promise<void>;
-        toString(): string;
-    }*/
-    //#endregion
-    //#region node_modules/@hediet/json-rpc-browser/dist/worker.d.ts
-    /**
-    * Gets a stream that uses `worker.postMessage` to write
-    * and `worker.addEventListener` to read messages.
-    */
-    //declare function createTransportToWorker(worker: Worker): BaseMessageTransport;
-    //#endregion
-    //#region node_modules/@hediet/json-rpc-browser/dist/iframe.d.ts
-    /**
-    * Gets a stream that uses `worker.postMessage` to write
-    * and `worker.addEventListener` to read messages.
-    */
-    //declare function createTransportToIFrame(iframe: HTMLIFrameElement): BaseMessageTransport;
-
-    //type index_d_MonacoLspClient = MonacoLspClient;
-    //declare const index_d_MonacoLspClient: typeof MonacoLspClient;
-    //type index_d_WebSocketTransport = WebSocketTransport;
-    //declare const index_d_WebSocketTransport: typeof WebSocketTransport;
-    //declare const index_d_createTransportToIFrame: typeof createTransportToIFrame;
-    //declare const index_d_createTransportToWorker: typeof createTransportToWorker;
-    /*declare namespace index_d {
-        export {
-            index_d_MonacoLspClient as MonacoLspClient,
-            index_d_WebSocketTransport as WebSocketTransport,
-            index_d_createTransportToIFrame as createTransportToIFrame,
-            index_d_createTransportToWorker as createTransportToWorker,
-        };
-    }*/
-
-    //declare function createWebWorker<T extends object>(opts: IWebWorkerOptions): editor.MonacoWebWorker<T>;
-    /*interface IWebWorkerOptions {
-        /**
-        * The AMD moduleId to load.
-        * It should export a function `create` that should return the exported proxy.
-        * /
-        moduleId: string;
-        createWorker?: () => Worker;
-        /**
-        * The data to send over when calling create on the module.
-        * /
-        createData?: any;
-        /**
-        * A label to be used to identify the web worker for debugging purposes.
-        * /
-        label?: string;
-        /**
-        * An object that can be used by the web worker to make calls back to the main thread.
-        * /
-        host?: any;
-        /**
-        * Keep idle models.
-        * Defaults to false, which means that idle models will stop syncing after a while.
-        * /
-        keepIdleModels?: boolean;
-    }*/
-
-    //type editor_main_CancellationToken = CancellationToken;
-    //type editor_main_CancellationTokenSource = CancellationTokenSource;
-    //declare const editor_main_CancellationTokenSource: typeof CancellationTokenSource;
-    //type editor_main_Emitter<T> = Emitter<T>;
-    //declare const editor_main_Emitter: typeof Emitter;
-    //type editor_main_Environment = Environment;
-    //type editor_main_IKeyboardEvent = IKeyboardEvent;
-    //type editor_main_IMarkdownString = IMarkdownString;
-    //type editor_main_IMouseEvent = IMouseEvent;
-    //type editor_main_IPosition = IPosition;
-    //type editor_main_IRange = IRange;
-    //type editor_main_IScrollEvent = IScrollEvent;
-    //type editor_main_ISelection = ISelection;
-    //type editor_main_ITrustedTypePolicy = ITrustedTypePolicy;
-    //type editor_main_ITrustedTypePolicyOptions = ITrustedTypePolicyOptions;
-    //type editor_main_IWebWorkerOptions = IWebWorkerOptions;
-    //type editor_main_KeyCode = KeyCode;
-    //declare const editor_main_KeyCode: typeof KeyCode;
-    //type editor_main_KeyMod = KeyMod;
-    //declare const editor_main_KeyMod: typeof KeyMod;
-    //type editor_main_MarkdownStringTrustedOptions = MarkdownStringTrustedOptions;
-    //type editor_main_MarkerSeverity = MarkerSeverity;
-    //declare const editor_main_MarkerSeverity: typeof MarkerSeverity;
-    //type editor_main_MarkerTag = MarkerTag;
-    //declare const editor_main_MarkerTag: typeof MarkerTag;
-    //type editor_main_Position = Position;
-    //declare const editor_main_Position: typeof Position;
-    //type editor_main_Range = Range;
-    //declare const editor_main_Range: typeof Range;
-    //type editor_main_Selection = Selection;
-    //declare const editor_main_Selection: typeof Selection;
-    //type editor_main_SelectionDirection = SelectionDirection;
-    //declare const editor_main_SelectionDirection: typeof SelectionDirection;
-    //type editor_main_Thenable<T> = Thenable<T>;
-    //type editor_main_Token = Token;
-    //declare const editor_main_Token: typeof Token;
-    //type editor_main_Uri = Uri;
-    //declare const editor_main_Uri: typeof Uri;
-    //type editor_main_UriComponents = UriComponents;
-    //declare const editor_main_createWebWorker: typeof createWebWorker;
-    //import editor_main_editor = editor;
-    //import editor_main_languages = languages;
-    //import editor_main_worker = worker;
-    /*declare namespace editor_main {
-        export { editor_main_CancellationTokenSource as CancellationTokenSource, editor_main_Emitter as Emitter, editor_main_KeyCode as KeyCode, editor_main_KeyMod as KeyMod, editor_main_MarkerSeverity as MarkerSeverity, editor_main_MarkerTag as MarkerTag, editor_main_Position as Position, editor_main_Range as Range, editor_main_Selection as Selection, editor_main_SelectionDirection as SelectionDirection, editor_main_Token as Token, editor_main_Uri as Uri, editor_main_createWebWorker as createWebWorker, monaco_contribution$3 as css, editor_main_editor as editor, monaco_contribution$2 as html, monaco_contribution$1 as json, editor_main_languages as languages, index_d as lsp, monaco_contribution as typescript, editor_main_worker as worker };
-        export type { editor_main_CancellationToken as CancellationToken, editor_main_Environment as Environment, IDisposable$2 as IDisposable, IEvent$1 as IEvent, editor_main_IKeyboardEvent as IKeyboardEvent, editor_main_IMarkdownString as IMarkdownString, editor_main_IMouseEvent as IMouseEvent, editor_main_IPosition as IPosition, editor_main_IRange as IRange, editor_main_IScrollEvent as IScrollEvent, editor_main_ISelection as ISelection, editor_main_ITrustedTypePolicy as ITrustedTypePolicy, editor_main_ITrustedTypePolicyOptions as ITrustedTypePolicyOptions, editor_main_IWebWorkerOptions as IWebWorkerOptions, editor_main_MarkdownStringTrustedOptions as MarkdownStringTrustedOptions, editor_main_Thenable as Thenable, editor_main_UriComponents as UriComponents };
-    }*/
-
-    //export { editor_main as m };
-
-    /*declare namespace languages {
-        /** @deprecated Use the new top level "css" namespace instead. * /
-        export const css: { deprecated: true };
-
-        /** @deprecated Use the new top level "html" namespace instead. * /
-        export const html: { deprecated: true };
-
-        /** @deprecated Use the new top level "json" namespace instead. * /
-        export const json: { deprecated: true };
-
-        /** @deprecated Use the new top level "typescript" namespace instead. * /
-        export const typescript: { deprecated: true };
-    }*/
-
-
-    //declare global { export import monaco = editor_main; }
 }

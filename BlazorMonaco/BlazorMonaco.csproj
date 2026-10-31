@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <RazorLangVersion>3.0</RazorLangVersion>
-    <Authors>Serdar Ciplak</Authors>
+    <Authors>Microsoft, Serdar Ciplak, Polyatykina Tatyana</Authors>
     <RepositoryUrl>https://github.com/serdarciplak/BlazorMonaco</RepositoryUrl>
     <PackageTags>blazor;monaco;editor;vs;code;vscode;format;textarea;contenteditable</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
