@@ -1,14 +1,14 @@
 using BlazorMonaco;
 using BlazorMonaco.Editor;
 
-namespace SampleWebApp.Pages;
+namespace SampleWebApp.Client.Pages;
 
 public partial class DiffEditor
 {
     private string _valueToSetOriginal = "";
     private string _valueToSetModified = "";
 
-    private StandaloneDiffEditor? _diffEditor;
+    private MonacoDiffEditor? _diffEditor;
 
     private StandaloneDiffEditorConstructionOptions DiffEditorConstructionOptions(StandaloneDiffEditor editor)
     {

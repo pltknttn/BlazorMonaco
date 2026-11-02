@@ -2,17 +2,23 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using SampleWebApp;
+using SampleWebApp.Client.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+}
+else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
@@ -21,6 +27,8 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(SampleWebApp.Client._Imports).Assembly);
 
 app.Run();

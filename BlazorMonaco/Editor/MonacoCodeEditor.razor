@@ -1,4 +1,38 @@
 @namespace BlazorMonaco.Editor
 @inherits StandaloneCodeEditor
 
-<div id="@Id" class="monaco-editor-container @CssClass"></div>
+<div class="bm-code-editor @ThemeCssClass @CssClass" style="@ContainerStyle">
+    @if (ShowToolbar)
+    {
+        <EditorToolbar Theme="@Theme"
+                       FontSize="@ToolbarFontSize"
+                       MinFontSize="@MinFontSize"
+                       MaxFontSize="@MaxFontSize"
+                       WordWrap="@WordWrap"
+                       MinimapEnabled="@MinimapEnabled"
+                       ReadOnly="@IsReadOnly"
+                       ZoomLevel="@EffectiveZoomLevel"
+                       MinZoomLevel="@MinZoomLevel"
+                       MaxZoomLevel="@MaxZoomLevel"
+                       IsDiff="false"
+                       ThemeChanged="OnThemeChanged"
+                       FontSizeChanged="OnFontSizeChanged"
+                       WordWrapChanged="OnWordWrapChanged"
+                       MinimapChanged="OnMinimapChanged"
+                       ReadOnlyChanged="OnReadOnlyChanged"
+                       ZoomChanged="OnZoomChanged"
+                       FormatRequested="FormatDocument" />
+    }
+
+    <div id="@Id" class="monaco-editor-container bm-editor-surface"></div>
+
+    @if (ShowStatusBar)
+    {
+        <EditorStatusBar Status="@_status"
+                         Theme="@Theme"
+                         ZoomLevel="@EffectiveZoomLevel"
+                         ReadOnly="@IsReadOnly"
+                         IsDiff="false"
+                         IsInitialized="@_initialized" />
+    }
+</div>

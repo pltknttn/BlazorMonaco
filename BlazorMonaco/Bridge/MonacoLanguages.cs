@@ -9,8 +9,10 @@ namespace BlazorMonaco.Languages
      * Built-in language identifiers available in monaco-editor v0.57.0.
      * Use these constants instead of magic strings when registering providers or setting model language.
      */
-    public static class LanguageIds
+    public static class MonacoLanguages
     {
+        #region LanguageIds
+
         public const string Abap = "abap";
         public const string Actionscript3 = "actionscript3";
         public const string Ada = "ada";
@@ -91,13 +93,16 @@ namespace BlazorMonaco.Languages
         public const string Wgsl = "wgsl";
         public const string Xml = "xml";
         public const string Yaml = "yaml";
-    }
 
-    public static class MonacoLanguages
-    {
+        #endregion
+
         /**
          * Register a hover provider (used by e.g. editor hover).
          */
+
+        #region  Providers
+
+
         public static Task RegisterHoverProviderAsync(IJSRuntime jsRuntime, LanguageSelector language, HoverProvider.ProvideDelegate provideHover)
             => RegisterHoverProviderAsync(jsRuntime, language, new HoverProvider(provideHover));
 
@@ -320,5 +325,8 @@ namespace BlazorMonaco.Languages
          */
         public static Task RegisterOnTypeFormattingEditProvider(IJSRuntime jsRuntime, LanguageSelector language, OnTypeFormattingEditProvider onTypeFormattingEditProvider, string[] triggerCharacters)
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.languages.registerOnTypeFormattingEditProvider", language, DotNetObjectReference.Create(onTypeFormattingEditProvider), triggerCharacters);
+
+
+        #endregion
     }
 }

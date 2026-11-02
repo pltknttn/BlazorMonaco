@@ -338,3 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# Monaco Editor update script (scripts/update-monaco.sh)
+BlazorMonaco/.monaco-update.*
+BlazorMonaco/wwwroot/lib/.monaco-editor.bak.*

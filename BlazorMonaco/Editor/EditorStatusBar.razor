@@ -1,0 +1,38 @@
+@namespace BlazorMonaco.Editor
+
+<div class="bm-statusbar" role="group" aria-label="Editor status">
+    @if (!IsInitialized)
+    {
+        <div class="bm-statusbar-group">
+            <span class="bm-statusbar-item" title="Status">Ready</span>
+        </div>
+    }
+    else
+    {
+        <div class="bm-statusbar-group">
+            <span class="bm-statusbar-item" title="Language">@(string.IsNullOrEmpty(Status.Language) ? "plaintext" : Status.Language)</span>
+            <span class="bm-statusbar-item" title="Cursor position">Ln @Status.Line, Col @Status.Column</span>
+            @if (Status.SelectionLength > 0)
+            {
+                <span class="bm-statusbar-item" title="Selected characters">@Status.SelectionLength selected</span>
+            }
+            @if (Status.Selections > 1)
+            {
+                <span class="bm-statusbar-item" title="Cursors">@Status.Selections cursors</span>
+            }
+            <span class="bm-statusbar-item" title="Indentation">@IndentLabel</span>
+            <span class="bm-statusbar-item" title="End of line">@EolLabel</span>
+        </div>
+
+        <div class="bm-statusbar-group">
+            @if (IsDiff)
+            {
+                <span class="bm-statusbar-item" title="Diff layout">@(RenderSideBySide ? "Side by side" : "Inline")</span>
+            }
+            <span class="bm-statusbar-item" title="Line count">@Status.LineCount lines</span>
+            <span class="bm-statusbar-item" title="Theme">@Theme</span>
+            <span class="bm-statusbar-item" title="Zoom">@ZoomPercent%</span>
+            <span class="bm-statusbar-item" title="Edit mode">@(ReadOnly ? "Read-only" : "Editable")</span>
+        </div>
+    }
+</div>

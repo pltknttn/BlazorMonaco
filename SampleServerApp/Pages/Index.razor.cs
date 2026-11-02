@@ -5,7 +5,7 @@ using BlazorMonaco.Languages;
 using Microsoft.AspNetCore.Components;
 using Range = BlazorMonaco.Range;
 
-namespace SampleWebApp.Pages;
+namespace SampleServerApp.Pages;
 
 public partial class Index
 {

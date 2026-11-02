@@ -420,10 +420,31 @@ window.blazorMonaco.editor = {
         });
     },
 
-    createWebWorker: async function (options) {
+    createWebWorker: async function (options, hostRef) {
+        if (!options || !options.workerUrl)
+            throw new Error("BlazorMonaco: WebWorkerOptions.WorkerUrl is required.");
+
+        let host = null;
+        if (hostRef) {
+            // Expose the C# WorkerHost to the worker as `context.host`. Every property
+            // access returns a function that forwards the call to .NET.
+            host = new Proxy({}, {
+                get: function (_, property) {
+                    if (property === "then")
+                        return undefined;
+                    return function (...args) {
+                        return hostRef.invokeMethodAsync("InvokeAsync", String(property), args);
+                    };
+                }
+            });
+        }
+        else if (options.host) {
+            host = options.host;
+        }
+
         let workerOpts = {
             worker: new Worker(options.workerUrl),
-            host: options.host,
+            host: host,
             keepIdleModels: options.keepIdleModels
         };
         let worker = monaco.editor.createWebWorker(workerOpts);
@@ -1073,6 +1094,56 @@ window.blazorMonaco.editor = {
             case "OnMouseMove": editor.onMouseMove(listener); break;
             case "OnMouseUp": editor.onMouseUp(listener); break;
         }
+    },
+
+    setStatusEventListener: function (id, dotnetRef) {
+        let editorHolder = this.getEditorHolder(id);
+        if (editorHolder == null || editorHolder.editor == null)
+            return;
+
+        let editor = editorHolder.editor;
+        // Diff editors expose the relevant surface through getModifiedEditor().
+        let target = typeof editor.getModifiedEditor === "function" ? editor.getModifiedEditor() : editor;
+        if (target == null)
+            return;
+
+        let getStatus = function () {
+            let model = target.getModel();
+            let position = target.getPosition() || { lineNumber: 1, column: 1 };
+            let selections = target.getSelections() || [];
+            let selectionLength = 0;
+            if (model) {
+                for (let i = 0; i < selections.length; i++)
+                    selectionLength += model.getValueLengthInRange(selections[i]);
+            }
+            let options = model ? model.getOptions() : null;
+            return {
+                line: position.lineNumber,
+                column: position.column,
+                selectionLength: selectionLength,
+                selections: selections.length,
+                language: model ? model.getLanguageId() : "",
+                lineCount: model ? model.getLineCount() : 0,
+                eol: options && options.eol === "\r\n" ? "\r\n" : "\n",
+                tabSize: options ? options.tabSize : 4,
+                insertSpaces: options ? options.insertSpaces : true
+            };
+        };
+
+        let notify = function () {
+            dotnetRef.invokeMethodAsync("UpdateStatus", JSON.stringify(getStatus()));
+        };
+
+        target.onDidChangeCursorPosition(notify);
+        target.onDidChangeCursorSelection(notify);
+        target.onDidChangeModel(notify);
+        target.onDidChangeModelContent(notify);
+        target.onDidChangeModelLanguage(notify);
+        target.onDidChangeModelOptions(notify);
+
+        // Return the current snapshot as well. The Blazor component applies it immediately,
+        // which avoids showing the default ("0 lines", "plaintext") state until the first event.
+        return JSON.stringify(getStatus());
     },
 
     setInstanceModel: function (id, uriStr) {
@@ -2041,7 +2112,11 @@ window.blazorMonaco.languages = {
 window.blazorMonaco.worker = {
     dispose: function (id) {
         let worker = window.blazorMonaco.workers[id];
-        if (worker) worker.dispose();
+        if (!worker) return;
+        // Remove the entry first so a failed dispose cannot leave a stale worker
+        // in the registry (and repeated calls stay no-ops).
+        delete window.blazorMonaco.workers[id];
+        worker.dispose();
     },
     getProxy: async function (id) {
         let worker = window.blazorMonaco.workers[id];
@@ -2052,7 +2127,18 @@ window.blazorMonaco.worker = {
     withSyncedResources: async function (id, resources) {
         let worker = window.blazorMonaco.workers[id];
         if (!worker) return null;
-        return await worker.withSyncedResources((resources || []).map(u => monaco.Uri.parse(u)));
+        await worker.withSyncedResources((resources || []).map(u => monaco.Uri.parse(u)));
+        return null;
+    },
+
+    invoke: async function (id, method, args) {
+        let worker = window.blazorMonaco.workers[id];
+        if (!worker)
+            throw new Error("BlazorMonaco: worker not found (it may have been disposed): " + id);
+        let proxy = await worker.getProxy();
+        if (proxy == null || typeof proxy[method] !== "function")
+            throw new Error("BlazorMonaco: worker proxy method not found: " + method);
+        return await proxy[method].apply(proxy, args || []);
     }
 };
 

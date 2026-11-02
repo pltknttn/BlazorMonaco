@@ -1026,8 +1026,14 @@ namespace BlazorMonaco.Editor
         public static async Task<MonacoWebWorker<T>> CreateWebWorker<T>(IJSRuntime jsRuntime, WebWorkerOptions options) where T : class
         {
             var runtime = JsRuntimeExt.UpdateRuntime(jsRuntime);
-            var id = await runtime.SafeInvokeAsync<string>("blazorMonaco.editor.createWebWorker", options);
-            return new MonacoWebWorker<T> { Id = id, JsRuntime = runtime };
+            var hostReference = options?.Host?.Reference;
+            var id = await runtime.SafeInvokeAsync<string>("blazorMonaco.editor.createWebWorker", options, hostReference);
+            return new MonacoWebWorker<T>
+            {
+                Id = id,
+                JsRuntime = runtime,
+                Host = options?.Host
+            };
         }
 
     }
@@ -1073,9 +1079,12 @@ namespace BlazorMonaco.Editor
          */
         public string WorkerUrl { get; set; }
         /**
-         * An object that can be used by the web worker to make calls back to the main thread.
+         * A C# host object that can be used by the web worker to make calls back to the main thread.
+         * The object is exposed to the worker as `context.host`; calls are routed to
+         * <see cref="BlazorMonaco.Worker.WorkerHost.HandleAsync"/>.
          */
-        public object Host { get; set; }
+        [JsonIgnore]
+        public BlazorMonaco.Worker.WorkerHost Host { get; set; }
         /**
          * Keep idle models. Defaults to false, which means that idle models will stop syncing after a while.
          */
@@ -1091,6 +1100,11 @@ namespace BlazorMonaco.Editor
         internal IJSRuntime JsRuntime { get; set; }
         internal string Id { get; set; }
 
+        /**
+         * The C# host object that is available in the worker as `context.host`.
+         */
+        public BlazorMonaco.Worker.WorkerHost Host { get; internal set; }
+
         /** Terminate the web worker, thus invalidating the returned proxy. */
         public Task Dispose()
             => JsRuntime.SafeInvokeAsync("blazorMonaco.worker.dispose", Id);
@@ -1099,9 +1113,22 @@ namespace BlazorMonaco.Editor
         public Task<T> GetProxy()
             => JsRuntime.SafeInvokeAsync<T>("blazorMonaco.worker.getProxy", Id);
 
+        /**
+         * Invokes a method on the worker proxy without needing a typed proxy class.
+         * This is the C# equivalent of calling a method on the object returned by `getProxy()`.
+         */
+        public Task<TResult> InvokeAsync<TResult>(string method, params object[] arguments)
+            => JsRuntime.SafeInvokeAsync<TResult>("blazorMonaco.worker.invoke", Id, method, arguments ?? Array.Empty<object>());
+
+        /**
+         * Invokes a method on the worker proxy and ignores its result.
+         */
+        public Task InvokeVoidAsync(string method, params object[] arguments)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.worker.invoke", Id, method, arguments ?? Array.Empty<object>());
+
         /** Synchronize (send) the models at `resources` (uris) to the web worker. */
-        public Task<T> WithSyncedResources(List<string> resources)
-            => JsRuntime.SafeInvokeAsync<T>("blazorMonaco.worker.withSyncedResources", Id, resources);
+        public Task WithSyncedResources(List<string> resources)
+            => JsRuntime.SafeInvokeAsync("blazorMonaco.worker.withSyncedResources", Id, resources);
     }
 
     /**

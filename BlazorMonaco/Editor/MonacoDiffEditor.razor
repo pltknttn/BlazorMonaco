@@ -1,0 +1,45 @@
+@namespace BlazorMonaco.Editor
+@inherits StandaloneDiffEditor
+
+<div class="bm-diff-editor @ThemeCssClass @CssClass" style="@ContainerStyle">
+    @if (ShowToolbar)
+    {
+        <EditorToolbar Theme="@Theme"
+                       FontSize="@ToolbarFontSize"
+                       MinFontSize="@MinFontSize"
+                       MaxFontSize="@MaxFontSize"
+                       WordWrap="@WordWrap"
+                       MinimapEnabled="@MinimapEnabled"
+                       ReadOnly="@IsReadOnly"
+                       ZoomLevel="@EffectiveZoomLevel"
+                       MinZoomLevel="@MinZoomLevel"
+                       MaxZoomLevel="@MaxZoomLevel"
+                       IsDiff="true"
+                       RenderSideBySide="@RenderSideBySide"
+                       IgnoreTrimWhitespace="@IgnoreTrimWhitespace"
+                       ThemeChanged="OnThemeChanged"
+                       FontSizeChanged="OnFontSizeChanged"
+                       WordWrapChanged="OnWordWrapChanged"
+                       MinimapChanged="OnMinimapChanged"
+                       ReadOnlyChanged="OnReadOnlyChanged"
+                       ZoomChanged="OnZoomChanged"
+                       RenderSideBySideChanged="OnRenderSideBySideChanged"
+                       IgnoreTrimWhitespaceChanged="OnIgnoreTrimWhitespaceChanged"
+                       FormatRequested="FormatDocument"
+                       PreviousDiffRequested="PreviousDiff"
+                       NextDiffRequested="NextDiff" />
+    }
+
+    <div id="@Id" class="monaco-editor-container bm-editor-surface"></div>
+
+    @if (ShowStatusBar)
+    {
+        <EditorStatusBar Status="@_status"
+                         Theme="@Theme"
+                         ZoomLevel="@EffectiveZoomLevel"
+                         ReadOnly="@IsReadOnly"
+                         IsDiff="true"
+                         RenderSideBySide="@RenderSideBySide"
+                         IsInitialized="@_initialized" />
+    }
+</div>
