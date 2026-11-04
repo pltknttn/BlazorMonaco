@@ -11,7 +11,7 @@ namespace BlazorMonaco.Editor
     /// </summary>
     public partial class EditorToolbar
     {
-        private static readonly string[] Themes = { "vs", "vs-dark", "hc-black", "hc-light" };
+        private static readonly string[] s_themes = { "vs", "vs-dark", "hc-black", "hc-light" };
         private readonly string _themeSelectId = $"bm-theme-{Guid.NewGuid():N}";
         private int _fontSizeInput;
         private int _fontSizeInputVersion;

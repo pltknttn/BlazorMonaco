@@ -153,6 +153,10 @@ namespace BlazorMonaco.Editor
 
                 await ApplyAppearanceAsync(applyTheme: true);
                 await AttachStatusListenerAsync();
+
+                // The status bar is rendered before the editor is created. Refresh it once
+                // the editor is ready so it never stays in the "Ready" placeholder state.
+                await InvokeAsync(StateHasChanged);
                 return;
             }
 

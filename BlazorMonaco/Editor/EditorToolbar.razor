@@ -1,14 +1,14 @@
 @namespace BlazorMonaco.Editor
 
 <div class="bm-toolbar" role="toolbar" aria-label="Editor toolbar">
-    <div class="bm-toolbar-group bm-toolbar-theme" role="group" aria-label="Theme">
+    <div class="bm-toolbar-group bm-toolbar-group-theme" role="group" aria-label="Theme">
         <label class="bm-toolbar-label" for="@_themeSelectId">Theme</label>
-        <select id="@_themeSelectId" class="bm-toolbar-select" value="@Theme" @onchange="ThemeChangedInternal">
-            @foreach (var theme in Themes)
+        <select id="@_themeSelectId" class="bm-toolbar-select" aria-label="Theme" value="@Theme" @onchange="ThemeChangedInternal">
+            @foreach (var theme in s_themes)
             {
                 <option value="@theme" selected="@(theme == Theme)">@theme</option>
             }
-            @if (!string.IsNullOrWhiteSpace(Theme) && Array.IndexOf(Themes, Theme) < 0)
+            @if (!string.IsNullOrWhiteSpace(Theme) && Array.IndexOf(s_themes, Theme) < 0)
             {
                 <option value="@Theme" selected>@Theme</option>
             }
@@ -16,7 +16,7 @@
     </div>
 
     <div class="bm-toolbar-group" role="group" aria-label="Font size">
-        <button type="button" class="bm-toolbar-button" title="Decrease font size" aria-label="Decrease font size"
+        <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Decrease font size" aria-label="Decrease font size"
                 disabled="@(!CanDecreaseFontSize)" @onclick="DecreaseFontSize">A&minus;</button>
         <input @key="_fontSizeInputVersion"
                class="bm-toolbar-input"
@@ -29,57 +29,64 @@
                title="Font size in pixels"
                aria-label="Font size in pixels"
                @onchange="FontSizeInputChanged" />
-        <button type="button" class="bm-toolbar-button" title="Increase font size" aria-label="Increase font size"
+        <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Increase font size" aria-label="Increase font size"
                 disabled="@(!CanIncreaseFontSize)" @onclick="IncreaseFontSize">A+</button>
     </div>
 
     <div class="bm-toolbar-group" role="group" aria-label="Zoom">
-        <button type="button" class="bm-toolbar-button" title="Zoom out" aria-label="Zoom out"
+        <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Zoom out" aria-label="Zoom out"
                 disabled="@(!CanZoomOut)" @onclick="ZoomOut">&minus;</button>
-        <button type="button" class="bm-toolbar-button bm-toolbar-value" title="Reset zoom" aria-label="Reset zoom"
+        <button type="button" class="bm-toolbar-button bm-toolbar-button-value" title="Reset zoom to 100%" aria-label="Reset zoom"
                 @onclick="ZoomReset">@ZoomPercent%</button>
-        <button type="button" class="bm-toolbar-button" title="Zoom in" aria-label="Zoom in"
+        <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Zoom in" aria-label="Zoom in"
                 disabled="@(!CanZoomIn)" @onclick="ZoomIn">+</button>
     </div>
 
-    <button type="button" class="bm-toolbar-button @(WordWrap == "off" ? string.Empty : "is-active")"
-            title="Toggle word wrap" aria-label="Toggle word wrap" aria-pressed="@(WordWrap != "off" ? "true" : "false")"
-            @onclick="ToggleWordWrap">
-        Wrap: @WordWrapLabel
-    </button>
+    <div class="bm-toolbar-group" role="group" aria-label="Editor view">
+        <button type="button" class="bm-toolbar-button @(WordWrap == "off" ? string.Empty : "is-active")"
+                title="Toggle word wrap" aria-label="Toggle word wrap" aria-pressed="@(WordWrap != "off" ? "true" : "false")"
+                @onclick="ToggleWordWrap">
+            Wrap: @WordWrapLabel
+        </button>
 
-    <button type="button" class="bm-toolbar-button @(MinimapEnabled ? "is-active" : string.Empty)"
-            title="Toggle minimap" aria-label="Toggle minimap" aria-pressed="@(MinimapEnabled ? "true" : "false")"
-            @onclick="ToggleMinimap">
-        Map
-    </button>
+        <button type="button" class="bm-toolbar-button @(MinimapEnabled ? "is-active" : string.Empty)"
+                title="Toggle minimap" aria-label="Toggle minimap" aria-pressed="@(MinimapEnabled ? "true" : "false")"
+                @onclick="ToggleMinimap">
+            Minimap
+        </button>
 
-    <button type="button" class="bm-toolbar-button @(ReadOnly ? "is-active" : string.Empty)"
-            title="Toggle read-only mode" aria-label="Toggle read-only mode" aria-pressed="@(ReadOnly ? "true" : "false")"
-            @onclick="ToggleReadOnly">
-        @(ReadOnly ? "Read-only" : "Editable")
-    </button>
+        <button type="button" class="bm-toolbar-button @(ReadOnly ? "is-active" : string.Empty)"
+                title="Toggle read-only mode" aria-label="Toggle read-only mode" aria-pressed="@(ReadOnly ? "true" : "false")"
+                @onclick="ToggleReadOnly">
+            @(ReadOnly ? "Read-only" : "Editable")
+        </button>
+    </div>
 
     @if (IsDiff)
     {
-        <button type="button" class="bm-toolbar-button @(RenderSideBySide ? "is-active" : string.Empty)"
-                title="Toggle side-by-side / inline diff" aria-label="Toggle side-by-side / inline diff" aria-pressed="@(RenderSideBySide ? "true" : "false")"
-                @onclick="ToggleDiffLayout">
-            @(RenderSideBySide ? "Side by side" : "Inline")
-        </button>
-        <button type="button" class="bm-toolbar-button @(IgnoreTrimWhitespace ? "is-active" : string.Empty)"
-                title="Ignore trailing whitespace" aria-label="Ignore trailing whitespace" aria-pressed="@(IgnoreTrimWhitespace ? "true" : "false")"
-                @onclick="ToggleIgnoreWhitespace">
-            Ignore WS
-        </button>
+        <div class="bm-toolbar-group" role="group" aria-label="Diff options">
+            <button type="button" class="bm-toolbar-button @(RenderSideBySide ? "is-active" : string.Empty)"
+                    title="Toggle side-by-side / inline diff" aria-label="Toggle side-by-side / inline diff" aria-pressed="@(RenderSideBySide ? "true" : "false")"
+                    @onclick="ToggleDiffLayout">
+                @(RenderSideBySide ? "Side by side" : "Inline")
+            </button>
+            <button type="button" class="bm-toolbar-button @(IgnoreTrimWhitespace ? "is-active" : string.Empty)"
+                    title="Ignore trailing whitespace" aria-label="Ignore trailing whitespace" aria-pressed="@(IgnoreTrimWhitespace ? "true" : "false")"
+                    @onclick="ToggleIgnoreWhitespace">
+                Ignore WS
+            </button>
+        </div>
+
         <div class="bm-toolbar-group" role="group" aria-label="Diff navigation">
-            <button type="button" class="bm-toolbar-button" title="Previous change" aria-label="Previous change" @onclick="PreviousDiff">&#x25B2;</button>
-            <button type="button" class="bm-toolbar-button" title="Next change" aria-label="Next change" @onclick="NextDiff">&#x25BC;</button>
+            <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Previous change" aria-label="Previous change" @onclick="PreviousDiff">&#x25B2;</button>
+            <button type="button" class="bm-toolbar-button bm-toolbar-button-icon" title="Next change" aria-label="Next change" @onclick="NextDiff">&#x25BC;</button>
         </div>
     }
 
     <span class="bm-toolbar-spacer"></span>
 
-    <button type="button" class="bm-toolbar-button" title="Format document" aria-label="Format document"
-            disabled="@ReadOnly" @onclick="Format">Format</button>
+    <div class="bm-toolbar-group" role="group" aria-label="Document">
+        <button type="button" class="bm-toolbar-button" title="Format document" aria-label="Format document"
+                disabled="@ReadOnly" @onclick="Format">Format</button>
+    </div>
 </div>

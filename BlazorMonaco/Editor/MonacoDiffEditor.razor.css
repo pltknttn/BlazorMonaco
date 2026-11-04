@@ -20,6 +20,16 @@
     --bm-accent-fg: #ffffff;
     --bm-statusbar-bg: #007acc;
     --bm-statusbar-fg: #ffffff;
+    --bm-group-bg: rgba(0, 0, 0, 0.045);
+    --bm-group-hover-bg: rgba(0, 0, 0, 0.075);
+    --bm-group-border: transparent;
+    --bm-control-border: #c8c8c8;
+    --bm-control-hover-border: #9d9d9d;
+    --bm-control-active-bg: rgba(0, 0, 0, 0.14);
+    --bm-text-muted: #6b6b6b;
+    --bm-statusbar-divider: rgba(255, 255, 255, 0.25);
+    --bm-statusbar-item-hover: rgba(255, 255, 255, 0.16);
+    --bm-color-scheme: light;
 }
 
 .bm-diff-editor.bm-theme-dark {
@@ -33,6 +43,16 @@
     --bm-accent-fg: #ffffff;
     --bm-statusbar-bg: #007acc;
     --bm-statusbar-fg: #ffffff;
+    --bm-group-bg: rgba(255, 255, 255, 0.06);
+    --bm-group-hover-bg: rgba(255, 255, 255, 0.10);
+    --bm-group-border: transparent;
+    --bm-control-border: #565656;
+    --bm-control-hover-border: #7a7a7a;
+    --bm-control-active-bg: rgba(255, 255, 255, 0.16);
+    --bm-text-muted: #9d9d9d;
+    --bm-statusbar-divider: rgba(255, 255, 255, 0.25);
+    --bm-statusbar-item-hover: rgba(255, 255, 255, 0.16);
+    --bm-color-scheme: dark;
 }
 
 .bm-diff-editor.bm-theme-hc {
@@ -46,6 +66,16 @@
     --bm-accent-fg: #000000;
     --bm-statusbar-bg: #000000;
     --bm-statusbar-fg: #ffffff;
+    --bm-group-bg: #000000;
+    --bm-group-hover-bg: rgba(255, 255, 255, 0.12);
+    --bm-group-border: #6fc3df;
+    --bm-control-border: #6fc3df;
+    --bm-control-hover-border: #ffffff;
+    --bm-control-active-bg: rgba(255, 255, 255, 0.18);
+    --bm-text-muted: #ffffff;
+    --bm-statusbar-divider: #6fc3df;
+    --bm-statusbar-item-hover: rgba(255, 255, 255, 0.18);
+    --bm-color-scheme: dark;
 }
 
 .bm-diff-editor.bm-theme-hc-light {
@@ -59,6 +89,16 @@
     --bm-accent-fg: #ffffff;
     --bm-statusbar-bg: #0f4a85;
     --bm-statusbar-fg: #ffffff;
+    --bm-group-bg: #ffffff;
+    --bm-group-hover-bg: rgba(0, 0, 0, 0.06);
+    --bm-group-border: #0f4a85;
+    --bm-control-border: #0f4a85;
+    --bm-control-hover-border: #000000;
+    --bm-control-active-bg: rgba(0, 0, 0, 0.14);
+    --bm-text-muted: #000000;
+    --bm-statusbar-divider: rgba(255, 255, 255, 0.40);
+    --bm-statusbar-item-hover: rgba(255, 255, 255, 0.18);
+    --bm-color-scheme: light;
 }
 
 .bm-diff-editor .bm-editor-surface {
