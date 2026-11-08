@@ -1,52 +1,149 @@
-@page "/"
+﻿@page "/"
 @inject IJSRuntime jsRuntime
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
 
-<h3>Code Editor</h3>
+<PageTitle>SampleServerApp - Code Editor</PageTitle>
 
-<div>
-    <div style="margin:10px 0;">
-        Theme:
-        <select @onchange="ChangeTheme">
-            <option value="vs">Visual Studio</option>
-            <option value="vs-dark">Visual Studio Dark</option>
-            <option value="hc-black">High Contrast Black</option>
-        </select>
+<div class="demo-page">
+    <header class="demo-header">
+        <div>
+            <h1 class="demo-title">Code Editor</h1>
+            <p class="demo-subtitle">
+                A full-featured <code>MonacoCodeEditor</code>: toolbar + status bar, content &amp; model
+                management, navigation &amp; selection, decorations &amp; markers, language providers,
+                commands &amp; actions, and the global Monaco API.
+            </p>
+        </div>
+        <div class="demo-badges">
+            <span class="badge rounded-pill text-bg-primary">BlazorMonaco</span>
+            <span class="badge rounded-pill text-bg-secondary">Monaco Editor</span>
+        </div>
+    </header>
+
+    <div class="demo-layout">
+        <div class="demo-editor-column">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Editor <span>(toolbar &amp; status bar are built in)</span></h2>
+                <MonacoCodeEditor @ref="_editor" Id="demo-code-editor" Height="600px"
+                    Theme="@_theme" FontSize="16"
+                    ConstructionOptions="EditorConstructionOptions"
+                    OnDidInit="EditorOnDidInit"
+                    OnDidChangeCursorPosition="OnDidChangeCursorPosition"
+                    OnDidChangeModelContent="OnDidChangeModelContent"
+                    OnContextMenu="OnContextMenu" />
+                <p class="demo-hint">
+                    Try <span class="demo-kbd">Ctrl+Enter</span> to run a command, <span class="demo-kbd">Ctrl+B</span> for an action,
+                    <span class="demo-kbd">Shift+Alt+F</span> to format, hover a word or press <span class="demo-kbd">Ctrl+Space</span>
+                    to use the language features.
+                </p>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Content</h2>
+                <div class="demo-row">
+                    <input type="text" @bind="_valueToSet" placeholder="New editor value" class="form-control form-control-sm" />
+                    <button class="btn btn-primary btn-sm" @onclick="SetValue">Set Value</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="GetValue">Get Value</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ResetValue">Reset</button>
+                </div>
+                <p class="demo-hint">Sets and reads the model text. Watch the status bar and log.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Model Management</h2>
+                <div class="demo-row">
+                    <input type="text" @bind="_newModelValue" placeholder="Value for a second model" class="form-control form-control-sm" />
+                    <button class="btn btn-primary btn-sm" @onclick="CreateAndSwitchModel">Create &amp; Switch</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="ModelInfo">Model Info</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="SwitchBack">Switch Back</button>
+                </div>
+                <p class="demo-hint">Creates a global shared model and swaps it onto the editor, then back.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Navigation &amp; Selection</h2>
+                <div class="demo-row">
+                    <label class="demo-label" for="nav-line">Line</label>
+                    <input id="nav-line" type="number" min="1" @bind="_navLine" class="form-control form-control-sm" style="width:6rem" />
+                    <button class="btn btn-secondary btn-sm" @onclick="RevealLine">Reveal Line</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="SelectWord">Select Word</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="GetSelection">Get Selection</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="FocusEditor">Focus</button>
+                </div>
+                <p class="demo-hint">Scrolls to a line, selects a word under the caret, and reports the current selection.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Decorations &amp; Markers</h2>
+                <div class="demo-row">
+                    <button class="btn btn-primary btn-sm" @onclick="AddDecorations">Add Decorations</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="AddInlineDecoration">Add Inline</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="RemoveDecorations">Remove</button>
+                    <button class="btn btn-warning btn-sm" @onclick="AddMarker">Add Marker</button>
+                    <button class="btn btn-danger btn-sm" @onclick="ClearMarkers">Clear Markers</button>
+                </div>
+                <p class="demo-hint">Whole-line and inline highlights plus an error marker that a quick-fix can correct.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Language Providers</h2>
+                <div class="demo-grid-2">
+                    <button class="btn btn-primary btn-sm" @onclick="RegisterHoverProvider">Hover</button>
+                    <button class="btn btn-primary btn-sm" @onclick="RegisterCompletionProvider">Completion</button>
+                    <button class="btn btn-primary btn-sm" @onclick="RegisterCodeActionProvider">Quick Fix</button>
+                    <button class="btn btn-primary btn-sm" @onclick="RegisterFormattingProvider">Formatting</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="TokenizeSample">Tokenize</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="ColorizeSample">Colorize</button>
+                </div>
+                <p class="demo-hint">
+                    <span class="demo-kbd">Ctrl+Space</span> completion, hover a word, <span class="demo-kbd">Ctrl+.</span> / lightbulb quick fix,
+                    <span class="demo-kbd">Shift+Alt+F</span> format. Register once per language.
+                </p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Commands, Actions &amp; Global API</h2>
+                <div class="demo-grid-2">
+                    <button class="btn btn-primary btn-sm" @onclick="AddCommand">Add Command</button>
+                    <button class="btn btn-primary btn-sm" @onclick="AddAction">Add Action</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="DefineTheme">Define Theme</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="ApplyBuiltinTheme">Reset Theme</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="ListEditors">List Editors</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="ListModels">List Models</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="GetMarkers">Get Markers</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="RemeasureFonts">Remeasure Fonts</button>
+                </div>
+                <p class="demo-hint">
+                    <span class="demo-kbd">Ctrl+Enter</span> command, <span class="demo-kbd">Ctrl+B</span> action,
+                    custom theme <code>demo-synth</code> via <code>Global.DefineTheme</code>.
+                </p>
+            </div>
+        </div>
     </div>
-    <div style="margin:10px 0;">
-        New Value: <input type="text" @bind="_valueToSet" style="width: 400px;" />
-        <button @onclick="SetValue">Set Value</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="GetValue">Get Value</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="AddCommand">Add Command</button>
-        <span style="font-size:10px">Ctrl+Enter to trigger the command.</span>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="AddAction">Add Action</button>
-        <span style="font-size:10px">Ctrl+B to trigger the action.</span>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="RegisterHoverProvider">RegisterHoverProvider</button>
-        <span style="font-size:10px">Hover over a word</span>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="RegisterCodeActionProvider">RegisterCodeActionProvider</button>
-        <span style="font-size:10px">Hover over the "this" on line:4</span>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="RegisterDocumentFormattingEditProvider">RegisterDocumentFormattingEditProvider</button>
-        <span style="font-size:10px">Shift+Alt+F to trigger the action.</span>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="RegisterCompletionItemProvider">RegisterCompletionItemProvider</button>
-        <span style="font-size:10px">Ctrl+Space on the "this" on line:4</span>
-    </div>
-    <div style="margin:10px 0;">
-        See the console for the button results.
+
+    <div class="demo-card demo-log-card">
+        <div class="demo-log-head">
+            <h2>Live Log</h2>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ClearLog">Clear</button>
+            <span class="demo-hint" style="margin-left:auto">Events and API results appear here.</span>
+        </div>
+        <div class="demo-log" tabindex="0">
+            @if (_logLines.Count == 0)
+            {
+                <span class="demo-log-empty">Press an action button above to see a result.</span>
+            }
+            @foreach (var line in _logLines)
+            {
+                <div class="demo-log-line">
+                    <span class="demo-log-time">@line.Time</span>
+                    <span class="demo-log-kind">[@line.Kind]</span>
+                    <span>@line.Message</span>
+                </div>
+            }
+        </div>
     </div>
 </div>
-
-<StandaloneCodeEditor @ref="_editor" Id="sample-code-editor" ConstructionOptions="EditorConstructionOptions"
-    OnDidInit="EditorOnDidInit" OnContextMenu="OnContextMenu" />

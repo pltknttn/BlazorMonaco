@@ -35,13 +35,13 @@ namespace BlazorMonaco.Worker
     /// The context that Monaco passes to a web worker factory.
     /// Mirrors Monaco's <c>monaco.worker.IWorkerContext&lt;H&gt;</c>.
     /// </summary>
-    /// <typeparam name="H">The type of the host object available in the worker.</typeparam>
-    public interface IWorkerContext<H>
+    /// <typeparam name="THost">The type of the host object available in the worker.</typeparam>
+    public interface IWorkerContext<out THost>
     {
         /// <summary>
         /// A proxy to the host object on the main thread.
         /// </summary>
-        H Host { get; }
+        THost Host { get; }
 
         /// <summary>
         /// Gets all models that are mirrored into this worker.

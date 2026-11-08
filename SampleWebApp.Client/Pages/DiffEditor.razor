@@ -2,34 +2,115 @@
 @page "/diff-editor"
 @inject IJSRuntime jsRuntime
 
-<h3>Diff Editor</h3>
+<PageTitle>SampleWebApp - Diff Editor</PageTitle>
 
-<div>
-    <div style="margin:10px 0;">
-        New Value: <input type="text" @bind="_valueToSetOriginal" style="width: 400px;" />
-        <button @onclick="SetValueOriginal">Set Value Original</button>
+<div class="demo-page">
+    <header class="demo-header">
+        <div>
+            <h1 class="demo-title">Diff Editor</h1>
+            <p class="demo-subtitle">
+                A <code>MonacoDiffEditor</code>: shared models for original &amp; modified sides, side-by-side /
+                inline modes, ignore-whitespace, navigation between changes, decorations &amp; markers, actions,
+                and the underlying <code>OriginalEditor</code>/<code>ModifiedEditor</code> APIs.
+            </p>
+        </div>
+        <div class="demo-badges">
+            <span class="badge rounded-pill text-bg-primary">BlazorMonaco</span>
+            <span class="badge rounded-pill text-bg-secondary">Diff</span>
+        </div>
+    </header>
+
+    <div class="demo-layout">
+        <div class="demo-editor-column">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Diff Editor <span>(toolbar &amp; status bar built in)</span></h2>
+                <MonacoDiffEditor @ref="_diffEditor" Id="demo-diff-editor" Height="520px" FontSize="15"
+                    ConstructionOptions="DiffEditorConstructionOptions"
+                    OnDidInit="EditorOnDidInit"
+                    OnDidUpdateDiff="OnDidUpdateDiff"
+                    OnDidChangeModel="OnDidChangeModel"
+                    OnDidChangeCursorPositionModified="OnDidChangeCursorPositionModified"
+                    OnKeyUpModified="OnKeyUpModified" />
+                <p class="demo-hint">
+                    Edit either side; the diff recomputes live. <span class="demo-kbd">Ctrl+Enter</span> runs a command on the modified side,
+                    <span class="demo-kbd">Ctrl+B</span> triggers an action, <span class="demo-kbd">Shift+Alt+F</span> formats.
+                </p>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Content</h2>
+                <div class="demo-row">
+                    <input type="text" @bind="_valueToSetOriginal" placeholder="Original value" class="form-control form-control-sm" />
+                    <button class="btn btn-primary btn-sm" @onclick="SetValueOriginal">Set Original</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="GetValueOriginal">Get Original</button>
+                </div>
+                <div class="demo-row" style="margin-top:0.4rem">
+                    <input type="text" @bind="_valueToSetModified" placeholder="Modified value" class="form-control form-control-sm" />
+                    <button class="btn btn-primary btn-sm" @onclick="SetValueModified">Set Modified</button>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="GetValueModified">Get Modified</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" @onclick="RefreshFromModels">Refresh From Models</button>
+                <p class="demo-hint">Sets/reads either side and reports both model values.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Diff Navigation</h2>
+                <div class="demo-row">
+                    <button class="btn btn-primary btn-sm" @onclick="RevealFirstDiff">First Diff</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="NextDiff">Next Diff</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="PreviousDiff">Previous Diff</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="GetDiffModel">Get Model</button>
+                </div>
+                <p class="demo-hint">Jump through the changes with <code>GoToDiff</code> / <code>RevealFirstDiff</code>.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Decorations &amp; Markers</h2>
+                <div class="demo-row">
+                    <button class="btn btn-primary btn-sm" @onclick="AddDecorationModified">Add Decor</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="RemoveDecorationModified">Remove</button>
+                    <button class="btn btn-warning btn-sm" @onclick="AddMarkerModified">Add Marker</button>
+                    <button class="btn btn-danger btn-sm" @onclick="ClearMarker">Clear Marker</button>
+                </div>
+                <p class="demo-hint">Decorate and mark the modified side independently.</p>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Actions &amp; Events</h2>
+                <div class="demo-grid-2">
+                    <button class="btn btn-primary btn-sm" @onclick="AddCommand">Add Command</button>
+                    <button class="btn btn-primary btn-sm" @onclick="AddAction">Add Action</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="FormatModified">Format Modified</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="SetReadOnly">Toggle ReadOnly</button>
+                </div>
+                <p class="demo-hint">
+                    Commands/actions run on the modified side. Formatting via the toolbar uses the same action.
+                </p>
+            </div>
+        </div>
     </div>
-    <div style="margin:10px 0;">
-        New Value: <input type="text" @bind="_valueToSetModified" style="width: 400px;" />
-        <button @onclick="SetValueModified">Set Value Modified</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="GetValueOriginal">Get Value Original</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="GetValueModified">Get Value Modified</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="AddCommand">Add Command Original (Ctrl+Enter)</button>
-    </div>
-    <div style="margin:10px 0;">
-        <button @onclick="AddAction">Add Action Modified (Ctrl+B)</button>
-    </div>
-    <div style="margin:10px 0;">
-        See the console for results.
+
+    <div class="demo-card demo-log-card">
+        <div class="demo-log-head">
+            <h2>Live Log</h2>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ClearLog">Clear</button>
+            <span class="demo-hint" style="margin-left:auto">Events and API results appear here.</span>
+        </div>
+        <div class="demo-log" tabindex="0">
+            @if (_logLines.Count == 0)
+            {
+                <span class="demo-log-empty">Press an action button above to see a result.</span>
+            }
+            @foreach (var line in _logLines)
+            {
+                <div class="demo-log-line">
+                    <span class="demo-log-time">@line.Time</span>
+                    <span class="demo-log-kind">[@line.Kind]</span>
+                    <span>@line.Message</span>
+                </div>
+            }
+        </div>
     </div>
 </div>
-
-<MonacoDiffEditor @ref="_diffEditor" Id="sample-diff-editor" Height="500px"
-    ConstructionOptions="DiffEditorConstructionOptions"
-    OnDidInit="EditorOnDidInit" OnKeyUpOriginal="EditorOnKeyUpOriginal" OnKeyUpModified="EditorOnKeyUpModified" />
