@@ -1,0 +1,196 @@
+@page "/worker"
+@inject IJSRuntime jsRuntime
+
+<PageTitle>SampleWasmApp - Web Worker</PageTitle>
+
+<div class="demo-page">
+    <header class="demo-header">
+        <div>
+            <h1 class="demo-title">Monaco Web Worker</h1>
+            <p class="demo-subtitle">
+                A custom Monaco editor web worker driven from C#. It echoes text, uppercases input, sums
+                numbers, calls back into a <code>BlazorMonaco.Worker.WorkerHost</code> on the main thread, and
+                reports the models Monaco synchronizes with the worker.
+            </p>
+        </div>
+        <div class="demo-badges">
+            <span class="badge rounded-pill text-bg-primary">BlazorMonaco</span>
+            <span class="badge rounded-pill text-bg-secondary">Web Worker</span>
+        </div>
+    </header>
+
+    <div class="demo-layout">
+        <div class="demo-editor-column">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Editor <span>(the worker sees a synced mirror of this model)</span></h2>
+                <MonacoCodeEditor @ref="_editor" Id="worker-code-editor" Height="360px"
+                    ConstructionOptions="EditorConstructionOptions" OnDidInit="EditorOnDidInit" />
+                <p class="demo-hint">Type in the editor, then use <em>Model info</em> to see the worker's mirror.</p>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Control</h2>
+                <div class="demo-row">
+                    <input type="text" @bind="_text" style="min-width:12rem" class="form-control form-control-sm" />
+                    <button class="btn btn-primary btn-sm" @onclick="CreateWorker" disabled="@_isBusy">Create worker</button>
+                </div>
+                <div class="demo-row">
+                    <button class="btn btn-secondary btn-sm" @onclick="Echo" disabled="@(_worker is null || _isBusy)">Echo</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="Uppercase" disabled="@(_worker is null || _isBusy)">Uppercase</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="Sum" disabled="@(_worker is null || _isBusy)">Sum</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="HostInfo" disabled="@(_worker is null || _isBusy)">Ask host</button>
+                    <button class="btn btn-secondary btn-sm" @onclick="ModelInfo" disabled="@(_worker is null || _isBusy)">Model info</button>
+                </div>
+                <span class="demo-hint">Create first. The worker calls the C# host via <code>context.host</code>.</span>
+            </div>
+
+            <div class="demo-card">
+                <h2 class="demo-card-heading">Output</h2>
+                <pre class="demo-console" tabindex="0">@_output</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private MonacoCodeEditor? _editor;
+    private MonacoWebWorker<object>? _worker;
+    private EchoWorkerHost? _host;
+    private string _text = "Hello from Blazor";
+    private string _output = "Create the worker to get started.";
+    private bool _isBusy;
+
+    private static StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+        => new()
+        {
+            Language = "javascript",
+            AutomaticLayout = true,
+            Value = "// The worker receives a mirror of this model.\nconst message = 'Hello from the editor';\n"
+        };
+
+    private async Task EditorOnDidInit()
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task CreateWorker()
+    {
+        await RunAsync(async () =>
+        {
+            if (_worker != null)
+            {
+                await _worker.Dispose();
+                _worker = null;
+            }
+
+            _host?.Dispose();
+            _host = new EchoWorkerHost(WriteLine);
+
+            _worker = await BlazorMonaco.Editor.Global.CreateWebWorker<object>(jsRuntime, new WebWorkerOptions
+            {
+                WorkerUrl = "WebWorkers/monaco-echo.worker.js",
+                Host = _host,
+                KeepIdleModels = true
+            });
+
+            if (_editor != null)
+            {
+                var model = await _editor.GetModel();
+                if (model != null)
+                    await _worker.WithSyncedResources([model.Uri]);
+            }
+
+            _output = "Worker created.";
+        });
+    }
+
+    private async Task Echo()
+    {
+        if (_worker == null)
+            return;
+
+        await RunAsync(async () =>
+        {
+            var result = await _worker.InvokeAsync<string>("echo", _text);
+            WriteLine(result);
+        });
+    }
+
+    private async Task Uppercase()
+    {
+        if (_worker == null)
+            return;
+
+        await RunAsync(async () =>
+        {
+            var result = await _worker.InvokeAsync<string>("uppercase", _text);
+            WriteLine(result);
+        });
+    }
+
+    private async Task Sum()
+    {
+        if (_worker == null)
+            return;
+
+        await RunAsync(async () =>
+        {
+            var result = await _worker.InvokeAsync<int>("sum", new object[] { new[] { 1, 2, 3, 4, 5 } });
+            WriteLine($"sum(1..5) = {result}");
+        });
+    }
+
+    private async Task HostInfo()
+    {
+        if (_worker == null)
+            return;
+
+        await RunAsync(async () =>
+        {
+            var result = await _worker.InvokeAsync<string>("hostInfo");
+            WriteLine($"Host says: {result}");
+        });
+    }
+
+    private async Task ModelInfo()
+    {
+        if (_worker == null)
+            return;
+
+        await RunAsync(async () =>
+        {
+            var result = await _worker.InvokeAsync<List<WorkerModelInfo>>("modelInfo");
+            foreach (var model in result ?? [])
+                WriteLine($"model {model.Uri} v{model.Version}, {model.Length} chars");
+        });
+    }
+
+    private async Task RunAsync(Func<Task> action)
+    {
+        _isBusy = true;
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            WriteLine($"ERROR: {ex.Message}");
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private void WriteLine(string line)
+        => _output = $"{line}{System.Environment.NewLine}{_output}";
+
+    public sealed class WorkerModelInfo
+    {
+        public string Uri { get; set; } = string.Empty;
+        public int Version { get; set; }
+        public int Length { get; set; }
+    }
+}

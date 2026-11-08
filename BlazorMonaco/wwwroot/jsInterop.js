@@ -130,6 +130,37 @@ window.blazorMonaco.editor = {
         window.blazorMonaco.isWasm = isWasm;
     },
 
+    /**
+     * Configure `self.MonacoEnvironment.getWorkerUrl` so Monaco can locate language workers
+     * (json, css, html, typescript, ...). `baseUrl` should point to the folder that contains
+     * the `vs` folder, e.g. `_content/BlazorMonaco/lib/monaco-editor/min`.
+     */
+    setDefaultWorkerUrl: function (baseUrl) {
+        if (!baseUrl) baseUrl = '';
+        if (!baseUrl.endsWith('/')) baseUrl += '/';
+        window.MonacoEnvironment = window.MonacoEnvironment || {};
+        window.MonacoEnvironment.getWorkerUrl = function (moduleId, label) {
+            if (label === 'json' || label === 'jsonc') return baseUrl + 'vs/language/json/json.worker.js';
+            if (label === 'css' || label === 'scss' || label === 'less') return baseUrl + 'vs/language/css/css.worker.js';
+            if (label === 'html' || label === 'handlebars' || label === 'razor') return baseUrl + 'vs/language/html/html.worker.js';
+            if (label === 'typescript' || label === 'javascript') return baseUrl + 'vs/language/typescript/ts.worker.js';
+            return baseUrl + 'vs/editor/editor.worker.js';
+        };
+        return window.MonacoEnvironment;
+    },
+
+    /**
+     * Register the C# MonacoLocalization reference so Monaco can resolve localized strings
+     * from .NET via `blazorMonaco.editor.registerLocalization`.
+     */
+    registerLocalization: function (dotnetRef) {
+        window.MonacoEnvironment = window.MonacoEnvironment || {};
+        window.MonacoEnvironment.localizedStrings = function (key) {
+            return dotnetRef.invokeMethodAsync("GetLocalizedString", key);
+        };
+        return window.MonacoEnvironment;
+    },
+
     toContentWidget: function (widget) {
         return {
             getId: () => widget.id,

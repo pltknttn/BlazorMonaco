@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="@Assets["css/bootstrap/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["css/app.css"]" />
     <link rel="stylesheet" href="@Assets["SampleWebApp.styles.css"]" />
+    <!-- Keep the Monaco stylesheet in the Blazor-managed head so it survives enhanced navigation. -->
+    <link rel="stylesheet" href="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.css" />
     <ImportMap />
     <HeadOutlet />
 </head>
@@ -25,6 +27,19 @@
     </div>
     <script src="_content/BlazorMonaco/jsInterop.js"></script>
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
+    <script>
+        // Configure Monaco language workers before editor.main.js loads.
+        // Required for Blazor Server (no IJSRuntime in Program.cs).
+        window.MonacoEnvironment = window.MonacoEnvironment || {};
+        window.MonacoEnvironment.getWorkerUrl = function (moduleId, label) {
+            var baseUrl = '_content/BlazorMonaco/lib/monaco-editor/min/';
+            if (label === 'json' || label === 'jsonc') return baseUrl + 'vs/language/json/json.worker.js';
+            if (label === 'css' || label === 'scss' || label === 'less') return baseUrl + 'vs/language/css/css.worker.js';
+            if (label === 'html' || label === 'handlebars' || label === 'razor') return baseUrl + 'vs/language/html/html.worker.js';
+            if (label === 'typescript' || label === 'javascript') return baseUrl + 'vs/language/typescript/ts.worker.js';
+            return baseUrl + 'vs/editor/editor.worker.js';
+        };
+    </script>
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
     <script src="_framework/blazor.web.js"></script>
     <script src="test-helper.js"></script>

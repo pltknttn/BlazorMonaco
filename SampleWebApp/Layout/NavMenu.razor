@@ -1,6 +1,6 @@
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorMonaco v3.5.0</a>
+        <a class="navbar-brand" href="">BlazorMonaco v3.6.0</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,24 +10,24 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All" data-enhance-nav="false">
                 <span aria-hidden="true"></span> Code Editor
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="diff-editor" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="diff-editor" Match="NavLinkMatch.All" data-enhance-nav="false">
                 <span aria-hidden="true"></span> Diff Editor
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="worker" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="worker" Match="NavLinkMatch.All" data-enhance-nav="false">
                 <span aria-hidden="true"></span> Web Worker
             </NavLink>
         </div>
         @if (App.IsDebug)
         {
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="test" Match="NavLinkMatch.All">
+                <NavLink class="nav-link" href="test" Match="NavLinkMatch.All" data-enhance-nav="false">
                     <span aria-hidden="true"></span> Test Page
                 </NavLink>
             </div>
