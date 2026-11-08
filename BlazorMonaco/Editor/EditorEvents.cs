@@ -627,9 +627,25 @@ namespace BlazorMonaco.Editor
         /**
          * Register the C# MonacoLocalization reference so Monaco can resolve localized strings
          * from .NET. Call this once during app startup after populating MonacoLocalization strings.
+         * Every missing key triggers a JSInterop call back to .NET.
          */
         public static Task RegisterLocalization(IJSRuntime jsRuntime)
             => JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerLocalization", MonacoLocalization.GetReference());
+
+        /**
+         * Register all localized strings at once as a plain JavaScript object.
+         * This is the fast path: Monaco uses the object directly without any JSInterop
+         * round-trips per string. Call this once during app startup after populating
+         * MonacoLocalization strings.
+         *
+         * @param strings Optional pre-populated dictionary. If null, all strings currently
+         *        stored in MonacoLocalization are used.
+         */
+        public static Task RegisterLocalizationStrings(IJSRuntime jsRuntime, IReadOnlyDictionary<string, string> strings = null)
+        {
+            var data = strings ?? MonacoLocalization.GetAllStrings();
+            return JsRuntimeExt.UpdateRuntime(jsRuntime).SafeInvokeAsync("blazorMonaco.editor.registerLocalizationStrings", data);
+        }
 
     }
     public class BuiltinTheme

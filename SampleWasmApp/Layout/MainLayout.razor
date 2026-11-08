@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Globalization
+@using BlazorMonaco.Resources
+@inherits LayoutComponentBase
+@inject IJSRuntime jsRuntime
 
 <div class="sidebar">
     <NavMenu />
@@ -8,9 +11,53 @@
     <div class="top-row px-4">
         <a href="https://microsoft.github.io/monaco-editor/docs.html" target="_blank" rel="noreferrer">Monaco docs</a>
         <a href="https://github.com/serdarciplak/BlazorMonaco" target="_blank" rel="noreferrer">GitHub</a>
+        <select class="form-select form-select-sm ms-3" @onchange="OnLanguageChanged">
+            <option value="">English (default)</option>
+            <option value="ru-RU">Русский</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="zh-CN">中文 (简体)</option>
+            <option value="uz-UZ">Oʻzbekcha</option>
+            <option value="kk-KZ">Қазақша</option>
+            <option value="be-BY">Беларуская</option>
+            <option value="fr-FR">Français</option>
+            <option value="es-ES">Español</option>
+        </select>
     </div>
 
     <article class="content px-4">
         @Body
     </article>
 </main>
+
+@code {
+
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        var cultureName = e.Value?.ToString() ?? "";
+        if (string.IsNullOrEmpty(cultureName))
+        {
+            CultureInfo.CurrentUICulture = new CultureInfo("en");
+        }
+        else
+        {
+            CultureInfo.CurrentUICulture = new CultureInfo(cultureName);
+        }
+
+        await LoadAndRegisterLocalization();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadAndRegisterLocalization();
+        }
+    }
+
+    private async Task LoadAndRegisterLocalization()
+    {
+        var strings = MonacoResourceLoader.GetStrings(CultureInfo.CurrentUICulture);
+        MonacoLocalization.SetStrings(strings);
+        await BlazorMonaco.Editor.Global.RegisterLocalizationStrings(jsRuntime);
+    }
+}

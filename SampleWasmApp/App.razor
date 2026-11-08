@@ -1,4 +1,9 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@inject IJSRuntime jsRuntime
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Resources
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -12,6 +17,24 @@
 </Router>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Configure Monaco language workers before first editor is created.
+            await BlazorMonaco.Editor.Global.SetDefaultWorkerUrl(
+                jsRuntime,
+                "_content/BlazorMonaco/lib/monaco-editor/min"
+            );
+
+            // Load English strings from embedded Monaco.resx and register with Monaco.
+            var strings = BlazorMonaco.Resources.MonacoResourceLoader.GetStrings(
+                System.Globalization.CultureInfo.CurrentUICulture);
+            MonacoLocalization.SetStrings(strings);
+            await BlazorMonaco.Editor.Global.RegisterLocalizationStrings(jsRuntime);
+        }
+    }
+
 #if DEBUG
     internal static bool IsDebug => true;
 #else

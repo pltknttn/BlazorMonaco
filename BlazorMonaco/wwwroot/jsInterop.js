@@ -150,8 +150,23 @@ window.blazorMonaco.editor = {
     },
 
     /**
+     * Register all localized strings at once as a plain JavaScript object.
+     * This is the fast path: Monaco uses the object directly without any JSInterop
+     * round-trips per string. Call this once during app startup.
+     *
+     * @param strings A dictionary/object of { key: localizedValue } pairs.
+     */
+    registerLocalizationStrings: function (strings) {
+        window.MonacoEnvironment = window.MonacoEnvironment || {};
+        window.MonacoEnvironment.localizedStrings = strings || {};
+        return window.MonacoEnvironment;
+    },
+
+    /**
      * Register the C# MonacoLocalization reference so Monaco can resolve localized strings
      * from .NET via `blazorMonaco.editor.registerLocalization`.
+     * Use this as a fallback for strings that are added after startup or resolved
+     * dynamically. Every missing key triggers a JSInterop call back to .NET.
      */
     registerLocalization: function (dotnetRef) {
         window.MonacoEnvironment = window.MonacoEnvironment || {};
