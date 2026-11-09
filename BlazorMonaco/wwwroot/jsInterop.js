@@ -7,6 +7,35 @@ window.blazorMonaco.editor = {
 
     //#region Utilities
 
+    /**
+     * Monaco 0.55+ loads the editor and its language chunks as AMD modules, so
+     * `monaco` is not defined immediately after editor.main.js has been parsed.
+     * Blazor Server can start the interactive circuit before those modules have
+     * finished loading, which used to make `create` fail with "monaco is undefined".
+     * Resolve only after the editor module is actually ready.
+     */
+    waitForMonaco: function () {
+        if (typeof monaco !== 'undefined' && monaco.editor != null)
+            return Promise.resolve();
+
+        if (window.blazorMonaco.monacoReadyPromise != null)
+            return window.blazorMonaco.monacoReadyPromise;
+
+        if (typeof require !== 'function' || typeof define !== 'function') {
+            return Promise.reject(new Error("BlazorMonaco: Monaco Editor is not loaded. Please check that the script tags for loader.js and editor.main.js are present in your html file."));
+        }
+
+        window.blazorMonaco.monacoReadyPromise = new Promise((resolve, reject) => {
+            require(['vs/editor/editor.main'], () => resolve(), error => {
+                window.blazorMonaco.monacoReadyPromise = null;
+                reject(error instanceof Error
+                    ? error
+                    : new Error("BlazorMonaco: Failed to load Monaco Editor (vs/editor/editor.main)."));
+            });
+        });
+        return window.blazorMonaco.monacoReadyPromise;
+    },
+
     getEditorHolder: function (id, silent = false) {
         let editorHolder = window.blazorMonaco.editors.find(h => h.id === id);
 
@@ -238,11 +267,8 @@ window.blazorMonaco.editor = {
         return monaco.editor.colorizeModelLine(model, lineNumber, tabSize);
     },
 
-    create: function (id, options, override, dotnetRef) {
-        if (typeof monaco === 'undefined') {
-            console.error("BlazorMonaco: monaco is undefined. Please check that you have the script tag for editor.main.js in your html file");
-            return;
-        }
+    create: async function (id, options, override, dotnetRef) {
+        await this.waitForMonaco();
 
         if (options == null)
             options = {};
@@ -267,11 +293,8 @@ window.blazorMonaco.editor = {
         window.blazorMonaco.editors.push({ id: id, editor: editor, dotnetRef: dotnetRef });
     },
 
-    createDiffEditor: function (id, options, override, dotnetRef, dotnetRefOriginal, dotnetRefModified) {
-        if (typeof monaco === 'undefined') {
-            console.error("BlazorMonaco: monaco is undefined. Please check that you have the script tag for editor.main.js in your html file");
-            return;
-        }
+    createDiffEditor: async function (id, options, override, dotnetRef, dotnetRefOriginal, dotnetRefModified) {
+        await this.waitForMonaco();
 
         if (options == null)
             options = {};
@@ -302,7 +325,9 @@ window.blazorMonaco.editor = {
             editor.setModel(oldModel);
     },
 
-    createModel: function (value, language, uriStr) {
+    createModel: async function (value, language, uriStr) {
+        await this.waitForMonaco();
+
         //uri is the key; if no uri exists, create one
         if (uriStr == null || uriStr == "") {
             uriStr = "generatedUriKey_" + this.uuidv4();
@@ -438,12 +463,14 @@ window.blazorMonaco.editor = {
         monaco.editor.addKeybindingRules(rules);
     },
 
-    registerLifecycleListeners: function (lifecycleRef) {
+    registerLifecycleListeners: async function (lifecycleRef) {
         if (window.blazorMonaco.lifecycleListenersRegistered) return;
         window.blazorMonaco.lifecycleListenersRegistered = true;
         window.blazorMonaco.lifecycleRef = lifecycleRef;
-        if (typeof monaco === 'undefined') {
-            console.warn("BlazorMonaco: monaco is undefined; lifecycle listeners will not be registered.");
+        try {
+            await this.waitForMonaco();
+        } catch (error) {
+            console.warn("BlazorMonaco: monaco is not loaded; lifecycle listeners will not be registered.", error);
             return;
         }
         monaco.editor.onDidCreateEditor(editor => {

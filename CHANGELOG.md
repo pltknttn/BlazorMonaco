@@ -5,6 +5,8 @@
 - Added new editor options (`wordWrapIndicator`, `fullwidthCharacterWidth`, `doubleClickSelectsBlock`, `closeOnResult`, `showLongLineWarning`) and API members (`RevealAllCursors`, `GetWidthOfLine`, `RenderAsync`, `GetCustomLineHeightsDecorationsInRange`).
 - Updated NuGet dependencies to the latest patch versions.
 - Breaking change: `EditorHoverOptions.Enabled` is now a string (`'on' | 'off' | 'onKeyboardModifier'`) instead of a boolean, to match the Monaco Editor API.
+- Fixed null-handling issue in `MonacoResourceLoader` when no resource set is found for the requested culture.
+- Fixed a race condition where the editor could be created before Monaco's asynchronously loaded AMD modules were ready (most visible in Blazor Server apps as `monaco is undefined` followed by `Couldn't find the editor with id`).
 
 ## 3.5.0
 - Updated to Monaco Editor **v0.55.1**

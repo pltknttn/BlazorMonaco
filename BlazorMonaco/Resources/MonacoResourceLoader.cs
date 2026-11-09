@@ -11,7 +11,7 @@ namespace BlazorMonaco.Resources
      */
     public static class MonacoResourceLoader
     {
-        private static readonly ResourceManager _resourceManager =
+        private static readonly ResourceManager s_resourceManager =
             new ResourceManager("BlazorMonaco.Resources.Monaco", typeof(MonacoResourceLoader).Assembly);
 
         /**
@@ -23,16 +23,18 @@ namespace BlazorMonaco.Resources
             if (culture == null)
                 culture = CultureInfo.InvariantCulture;
 
-            var resourceSet = _resourceManager.GetResourceSet(culture, createIfNotExists: true, tryParents: true);
+            var resourceSet = s_resourceManager.GetResourceSet(culture, createIfNotExists: true, tryParents: true);
             var result = new Dictionary<string, string>();
 
-            if (resourceSet != null)
+            if (resourceSet == null)
             {
-                foreach (System.Collections.DictionaryEntry entry in resourceSet)
-                {
-                    if (entry.Key is string key && entry.Value is string value)
-                        result[key] = value;
-                }
+                return result;
+            }
+
+            foreach (System.Collections.DictionaryEntry entry in resourceSet)
+            {
+                if (entry.Key is string key && entry.Value is string value)
+                    result[key] = value;
             }
 
             return result;
